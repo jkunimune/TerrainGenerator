@@ -1,19 +1,11 @@
 public class Tile {
   public int altitude;
   public int biome;
-  public int lat;
-  public int lon;
   
   
   
   public Tile() {
     altitude = 0;
     biome = 0;
-  }
-  
-  
-  
-  public int distTo(Tile that) {
-    return 0;
   }
 }
