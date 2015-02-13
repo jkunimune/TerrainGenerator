@@ -5,14 +5,30 @@ public class Globe { // a class to create a spherical surface and generate terra
   
   
   public Globe(int r) {
-    map = new Tile[(int)(r*Math.PI)][]; // the map is a matrix of tiles with varying width
+    map = new Tile[(int)(r * Math.PI)][]; // the map is a matrix of tiles with varying width
     map[0] = new Tile[1]; // the top and bottom are of width 1 (the poles)
     map[map.length-1] = new Tile[1];
     
-    for (int lat = 1; lat < map.length/2; lat ++) { // the length of each row is determined with trig
-      map[lat] = new Tile[(int)(2*Math.PI*Math.sin(lat))/map[lat-1].length*map[lat-1].length];
-      map[map.length-lat] = map[lat]; // the top and bottom are symmetrical
+    for (int lat = 1; lat <= map.length/2; lat ++) {
+      int width = (int)(2*Math.PI * r * Math.sin(lat*Math.PI/map.length)); // the length of each row is determined with trig
+      width = width / map[lat-1].length * map[lat-1].length; // each row has length divisible with row above it (for convinience)
+      
+      map[lat] = new Tile[width];
+      map[map.length-lat-1] = new Tile[width]; // the top and bottom are symmetrical
     }
+    
+    for (int lat = 0; lat < map.length; lat ++) { // initializes all elements
+      for (int lon = 0; lon < map[lat].length; lon ++) {
+        map[lat][lon] = new Tile();
+      }
+    }
+  }
+  
+  
+  public void randomize() { // randomizes each tile for testing purposes
+    for (Tile[] row: map)
+      for (Tile t: row)
+        t.randomize();
   }
   
   
@@ -44,19 +60,14 @@ public class Globe { // a class to create a spherical surface and generate terra
 //  }
 //  
 //  
-//  public Tile getTile(int lat, int lon) {
-//  }
+  public Tile getTile(double lat, double lon) {
+    int x = (int)(lat*map.length/Math.PI);
+    int y = (int)(lon*map[x].length/(2*Math.PI));
+    return map[x][y];
+  }
 //  
 //  
 //  public Tile[][] getTileMatrix() {
-//  }
-//  
-//  
-//  public Color getColor(int lat, int lon) {
-//  }
-//  
-//  
-//  public Color[][] getColorMatrix() {
 //  }
 //  
 //  
