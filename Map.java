@@ -5,13 +5,15 @@ import javax.swing.*;
 
 
 public class Map extends JPanel { // a class to manage the graphic elements of terrain generation
-  private static final int width = 800;
-  private static final int height = 600;
+  private static int width;
+  private static int height;
   BufferedImage img;
   
   
   
-  public Map() {
+  public Map(int w, int h) {
+    width = w;
+    height = h;
     img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
     setPreferredSize(new Dimension(width, height));
     JFrame frame = new JFrame();
@@ -40,10 +42,10 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public void equirectangular(Globe world) {
+  public void equirectangular(Globe world, String colorScheme) {
     for (int x = 0; x < width; x ++)
       for (int y = 0; y < height; y ++)
-        drawPx(x, y, world.getTile(y*Math.PI/height, x*2*Math.PI/width).getColorByBiome());
+        drawPx(x, y, world.getTile(y*Math.PI/height, x*2*Math.PI/width).getColorBy(colorScheme));
   }
 //  
 //  

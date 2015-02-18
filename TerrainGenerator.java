@@ -2,10 +2,10 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
   public static void main( String args[] )
   {
     Globe world = new Globe(20);
-    Map theMap = new Map();
+    Map theMap = new Map(800, 600);
     
     world.randomize();
-    theMap.equirectangular(world);
+    theMap.equirectangular(world, "altitude");
     theMap.show();
   }
 }

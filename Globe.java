@@ -32,6 +32,13 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
+  public void setAllAlt(int alt) {
+    for (Tile[] row: map)
+      for (Tile t: row)
+        t.altitude = alt;
+  }
+  
+  
 //  public void spawnContinents() {
 //  }
 //  
