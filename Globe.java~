@@ -32,6 +32,13 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
+  public void setAllAlt(int alt) {
+    for (Tile[] row: map)
+      for (Tile t: row)
+        t.altitude = alt;
+  }
+  
+  
 //  public void spawnContinents() {
 //  }
 //  
@@ -61,6 +68,11 @@ public class Globe { // a class to create a spherical surface and generate terra
 //  
 //  
   public Tile getTile(double lat, double lon) {
+    if (lat < 0 || lat > Math.PI || lon < 0 || lon > 2*Math.PI) {
+      System.out.println("Error accessing "+lat+","+lon);
+      return new Tile();
+    }
+    
     int x = (int)(lat*map.length/Math.PI);
     int y = (int)(lon*map[x].length/(2*Math.PI));
     return map[x][y];

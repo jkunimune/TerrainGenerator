@@ -46,23 +46,24 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
     for (int x = 0; x < width; x ++)
       for (int y = 0; y < height; y ++)
         drawPx(x, y, world.getTile(y*Math.PI/height, x*2*Math.PI/width).getColorBy(colorScheme));
+    show();
   }
-//  
-//  
-//  public ??? mercator(Globe world) {
-//  }
-//  
-//  
-//  public ??? fromSpace(Globe world) {
-//  }
-//  
-//  
-//  public ??? fromSpace3D(Globe world) {
-//  }
-//  
-//  
-//  public ??? lambert(Globe world) {
-//  }
+  
+  
+  public void mercator(Globe world, String colorScheme) {
+    for (int x = 0; x < width; x ++)
+      for (int y = 0; y < height; y ++)
+        drawPx(x, y, world.getTile(Math.PI/2 + Math.atan(((double)y-height/2) / (width/2/Math.PI)), x * 2*Math.PI / width).getColorBy(colorScheme));
+    show();
+  }
+  
+  
+  public void lambert(Globe world, String colorScheme) {
+    for (int x = 0; x < width; x ++)
+      for (int y = 0; y < height; y ++)
+        drawPx(x, y, world.getTile(Math.PI/2 + Math.asin((y-height/2.0) / (height/2.0)), x * 2*Math.PI / width).getColorBy(colorScheme));
+    show();
+  }
 //  
 //  
 //  public ??? sinusoidal(Globe world) {
@@ -74,5 +75,17 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
 //  
 //  
 //  public ??? equidistantConic(Globe world) {
+//  }
+//  
+//  
+//  public ??? polar(Globe world) {
+//  }
+//
+//
+//  public ??? fromSpace(Globe world) {
+//  }
+//  
+//  
+//  public ??? fromSpace3D(Globe world) {
 //  }
 }
