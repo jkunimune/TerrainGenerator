@@ -49,8 +49,34 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
-//  public void spawnContinents() {
-//  }
+  public void spawnContinents() { // sets everything to a continent or an ocean
+    //while (any(0)) {
+      for (Tile[] row: map) {
+        for (Tile tile: row) {
+          if (tile.biome == 0) {
+            int seaProb = -140;
+            int landProb = -150;
+            ArrayList<Tile> adjacent = adjacentTo(tile);
+            for (Tile ref: adjacent) { // reads all adjacent tiles to look for land or sea
+              if (ref.biome == 1)
+                seaProb += 120;
+              if (ref.biome == 4)
+                landProb += 120;
+            }
+            
+            if (randChance(seaProb))
+              tile.basaltize();
+            else if (randChance(landProb))
+              tile.granitize();
+          }
+        }
+      }
+      
+      for (Tile[] row: map) // copies the temporary variables to biome
+        for (Tile tile: row)
+          tile.biome = tile.temp1;
+    }
+  //}
 //  
 //  
 //  public void plateTechtonics() {
@@ -103,13 +129,14 @@ public class Globe { // a class to create a spherical surface and generate terra
     if (tile.lat == map.length-1)
       return new ArrayList<Tile>(Arrays.asList(map[map.length-2]));
     
+    //System.out.println("Running adjacentTo for the tile with index "+tile.lat+", "+tile.lon);
     ArrayList<Tile> output = new ArrayList<Tile>(); // initializes the output
-    output.add(map[tile.lat][tile.lon+1]); // adds the tiles laterally adjacent
-    output.add(map[tile.lat][tile.lon-1]);
+    output.add(map [tile.lat] [(tile.lon+1)%map[tile.lat].length]); // adds the tiles laterally adjacent
+    output.add(map [tile.lat] [(tile.lon-1+map[tile.lat].length)%map[tile.lat].length]); // does a bunch of complex addition and moduli to keep it in bounds
     if (tile.lat < map.length/2) { // behaves differently from here for the northern and southern hemispheres
-      output.add(map[tile.lat-1][tile.lon*map[tile.lat-1].length/map[tile.lat].length]); // adds the one north of it
-      for (int i = 0; i < map[tile.lat+1].length/map[tile.lat].length; i ++) // adds all the ones south of it
-        output.add(map[tile.lat+1][tile.lon*map[tile.lat+1].length/map[tile.lat].length+i]);
+      output.add(map [tile.lat-1] [tile.lon*map[tile.lat-1].length/map[tile.lat].length]); // adds the one north of it
+      for (int i = 0; i < map [tile.lat+1].length/map[tile.lat].length; i ++) // adds all the ones south of it
+        output.add(map [tile.lat+1] [tile.lon*map[tile.lat+1].length/map[tile.lat].length+i]);
     }
     else {
       output.add(map[tile.lat+1][tile.lon*map[tile.lat+1].length/map[tile.lat].length]); // adds the one north of it
