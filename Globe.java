@@ -54,20 +54,15 @@ public class Globe { // a class to create a spherical surface and generate terra
       for (Tile[] row: map) {
         for (Tile tile: row) {
           if (tile.biome == 0) {
-            int seaProb = -140;
-            int landProb = -150;
             ArrayList<Tile> adjacent = adjacentTo(tile);
-            for (Tile ref: adjacent) { // reads all adjacent tiles to look for land or sea
-              if (ref.biome == 1)
-                seaProb += 120;
-              if (ref.biome == 4)
-                landProb += 120;
-            }
+            for (Tile ref: adjacent) // reads all adjacent tiles to look for land or sea
+              if (randChance(-5))
+                tile.spreadFrom(ref);
             
-            if (randChance(seaProb))
-              tile.basaltize();
-            else if (randChance(landProb))
-              tile.granitize();
+            if (tile.biome == 0 && randChance(-147)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
+              tile.startPlate(false); // seeds new plates occasionally
+            else if (tile.biome == 0 && randChance(-141))
+              tile.startPlate(true);
           }
         }
       }
@@ -100,6 +95,10 @@ public class Globe { // a class to create a spherical surface and generate terra
 //  
 //  
 //  public void rainFall() {
+//  }
+//  
+//  
+//  public void generate() {
 //  }
 //  
 //  
@@ -157,7 +156,7 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
-  public boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
+  private boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
     return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
   }
 }

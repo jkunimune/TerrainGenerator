@@ -1,15 +1,20 @@
 public class TerrainGenerator{ // a class to generate and display terrain onto a spherical surface
   public static void main(String args[])
   {
-    Globe world = new Globe(100);
-    Map theMap = new Map(800, 600);
-    
-    theMap.lambert(world, "biome");
-    
-    while (world.any(0)) {
-      delay(10);
-      world.spawnContinents();
-      theMap.lambert(world, "biome");
+    while (true) {
+      Globe world = new Globe(100);
+      Map lamb = new Map(1200, 600);
+      
+      lamb.lambert(world, "biome");
+      
+      while (world.any(0)) {
+        delay(10);
+        world.spawnContinents();
+        lamb.lambert(world, "biome");
+      }
+      
+      System.out.println("end");
+      delay(10000);
     }
   }
   
