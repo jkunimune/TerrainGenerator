@@ -3,18 +3,18 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
   {
     while (true) {
       Globe world = new Globe(100);
-      Map lamb = new Map(800, 600);
+      Map lamb = new Map(1200, 600);
       
-      lamb.lambert(world, "biome");
+      lamb.lambert(world, "altitude");
       
-      while (world.any(0)) {
+      while (world.any(-257)) {
         delay(10);
         world.spawnContinents();
-        lamb.lambert(world, "biome");
+        lamb.lambert(world, "altitude");
       }
       
       System.out.println("end");
-      delay(10000);
+      delay(20000);
     }
   }
   

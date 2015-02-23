@@ -53,23 +53,24 @@ public class Globe { // a class to create a spherical surface and generate terra
     //while (any(0)) {
       for (Tile[] row: map) {
         for (Tile tile: row) {
-          if (tile.biome == 0) {
+          if (tile.altitude == -257) {
             ArrayList<Tile> adjacent = adjacentTo(tile);
             for (Tile ref: adjacent) // reads all adjacent tiles to look for land or sea
-              if (randChance(-5))
+              if (ref.altitude >= -256 && randChance(-8))
                 tile.spreadFrom(ref);
             
-            if (tile.biome == 0 && randChance(-147)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
+            if (tile.altitude == -257 && randChance(-146)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
               tile.startPlate(false); // seeds new plates occasionally
-            else if (tile.biome == 0 && randChance(-141))
+            else if (tile.altitude == -257 && randChance(-139))
               tile.startPlate(true);
           }
         }
       }
       
-      for (Tile[] row: map) // copies the temporary variables to biome
+      for (Tile[] row: map) // copies the temporary variables to altitude
         for (Tile tile: row)
-          tile.biome = tile.temp1;
+          if (tile.temp1 < -56 || tile.temp1 >= 56) // only copies those that have been set to something
+            tile.altitude = tile.temp1;
     }
   //}
 //  
@@ -147,10 +148,10 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
-  public boolean any(int testBiome) { // checks if any of a given biome exists on the map
+  public boolean any(int testAlt) { // checks if any of a given altitude exists on the map
     for (Tile[] row: map)
       for (Tile t: row)
-        if (t.biome == testBiome)
+        if (t.altitude == testAlt)
           return true;
     return false;
   }

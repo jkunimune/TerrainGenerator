@@ -8,10 +8,12 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   private static int width;
   private static int height;
   BufferedImage img;
+  Globe glb;
   
   
   
-  public Map(int w, int h) {
+  public Map(Globe newWorld, int w, int h) {
+    glb = newWorld;
     width = w;
     height = h;
     img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
@@ -42,10 +44,10 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public void equirectangular(Globe world, String colorScheme) {
+  public void equirectangular(String colorScheme) {
     for (int x = 0; x < width; x ++)
       for (int y = 0; y < height; y ++)
-        drawPx(x, y, world.getTile(y*Math.PI/height, x*2*Math.PI/width).getColorBy(colorScheme));
+        drawPx(x, y, glb.getTile(y*Math.PI/height, x*2*Math.PI/width).getColorBy(colorScheme));
     show();
   }
   
@@ -53,7 +55,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   public void mercator(Globe world, String colorScheme) {
     for (int x = 0; x < width; x ++)
       for (int y = 0; y < height; y ++)
-        drawPx(x, y, world.getTile(Math.PI/2 + Math.atan(((double)y-height/2) / (width/2/Math.PI)), x * 2*Math.PI / width).getColorBy(colorScheme));
+        drawPx(x, y, glb.getTile(Math.PI/2 + Math.atan(((double)y-height/2) / (width/2/Math.PI)), x * 2*Math.PI / width).getColorBy(colorScheme));
     show();
   }
   
@@ -61,7 +63,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   public void lambert(Globe world, String colorScheme) {
     for (int x = 0; x < width; x ++)
       for (int y = 0; y < height; y ++)
-        drawPx(x, y, world.getTile(Math.PI/2 + Math.asin((y-height/2.0) / (height/2.0)), x * 2*Math.PI / width).getColorBy(colorScheme));
+        drawPx(x, y, glb.getTile(Math.PI/2 + Math.asin((y-height/2.0) / (height/2.0)), x * 2*Math.PI / width).getColorBy(colorScheme));
     show();
   }
 //  
