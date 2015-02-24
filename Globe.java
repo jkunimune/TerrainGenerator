@@ -73,23 +73,55 @@ public class Globe { // a class to create a spherical surface and generate terra
     }
   
   
-//  public void plateTechtonics() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
-//    for (Tile[] thsRow: map)
-//    for (Tile[] thsTile: row)
-//    for (Tilep[] row: map)
-//      for (Tile[] 
-//  }
+  /*public void plateTechtonics() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
+    for (Tile[] thisRow: map) {
+      for (Tile thisTil: thisRow) {
+        for (Tile[] thatRow: map) {
+          for (Tile thatTil: thatRow) {
+            if (!thatTil.equals(thisTil)) { // assuming they are not the same tile
+              int deltaOmega; // is the magnitude of the difference in their angular velocities
+              int arcLength; // is the magnitude of the distance between them
+              int theta; // is the cosine of the angle between deltaOmega and arcLength
+              int rise = (int)(10*deltaOmega/Math.pow(arcLength,2)*Math.cos(theta)); // is how much they push each other up
+              
+              if (thisTil.altitude < 0) { // if this is ocean
+                if (rise < 0) { // if they are going towards each other
+                  if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
+                    thisTil.temp1 += rise/1; // it forms a sea trench
+                  }
+                  else { // if this is above that one
+                    thisTil.temp1 -= rise/1; // it forms an island chain
+                  }
+                }
+                else { // if they are going away from each other
+                  thisTil.temp1 -= rise/4; // it forms an ocean rift
+                }
+              }
+              else { // if this is land
+                if (rise < 0) { // if they are going towards each other
+                  thisTil.temp1 -= rise/2; // it forms a mountain range
+                }
+                else { // if they are going away from each other
+                  thisTil.temp1 -= rise/2; // it forms a valley
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }*/
 //  
 //  
 //  public void randomize() {
 //  }
 //  
 //  
-//  public void orographicEffect() {
+//  public void smooth() {
 //  }
 //  
 //  
-//  public void smooth() {
+//  public void orographicEffect() {
 //  }
 //  
 //  
