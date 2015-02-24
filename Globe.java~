@@ -49,8 +49,7 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
-  public void spawnContinents() { // sets everything to a continent or an ocean
-    //while (any(0)) {
+  public void spawnContinents() { // sets some tiles to a continent or an ocean
       for (Tile[] row: map) {
         for (Tile tile: row) {
           if (tile.altitude == -257) {
@@ -61,7 +60,7 @@ public class Globe { // a class to create a spherical surface and generate terra
             
             if (tile.altitude == -257 && randChance(-146)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
               tile.startPlate(false); // seeds new plates occasionally
-            else if (tile.altitude == -257 && randChance(-140))
+            else if (tile.altitude == -257 && randChance(-139))
               tile.startPlate(true);
           }
         }
@@ -72,11 +71,14 @@ public class Globe { // a class to create a spherical surface and generate terra
           if (tile.temp1 < -56 || tile.temp1 >= 56) // only copies those that have been set to something
             tile.altitude = tile.temp1;
     }
-  //}
-//  
-//  
-//  public void plateTechtonics() {
-//  }
+  
+  
+  public void plateTechtonics() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
+    for (Tile[] thsRow: map)
+    for (Tile[] thsTile: row)
+    for (Tilep[] row: map)
+      for (Tile[] 
+  }
 //  
 //  
 //  public void randomize() {
@@ -148,10 +150,10 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
-  public boolean any(int testBiome) { // checks if any of a given biome exists on the map
+  public boolean any(int testAlt) { // checks if any of a given altitude exists on the map
     for (Tile[] row: map)
       for (Tile t: row)
-        if (t.altitude == testBiome)
+        if (t.altitude == testAlt)
           return true;
     return false;
   }

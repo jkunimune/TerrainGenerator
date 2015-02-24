@@ -52,7 +52,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public void mercator(Globe world, String colorScheme) {
+  public void mercator(String colorScheme) {
     for (int x = 0; x < width; x ++)
       for (int y = 0; y < height; y ++)
         drawPx(x, y, glb.getTile(Math.PI/2 + Math.atan(((double)y-height/2) / (width/2/Math.PI)), x * 2*Math.PI / width).getColorBy(colorScheme));
@@ -60,7 +60,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public void lambert(Globe world, String colorScheme) {
+  public void lambert(String colorScheme) {
     for (int x = 0; x < width; x ++)
       for (int y = 0; y < height; y ++)
         drawPx(x, y, glb.getTile(Math.PI/2 + Math.asin((y-height/2.0) / (height/2.0)), x * 2*Math.PI / width).getColorBy(colorScheme));

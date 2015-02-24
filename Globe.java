@@ -49,14 +49,13 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
-  public void spawnContinents() { // sets everything to a continent or an ocean
-    //while (any(0)) {
+  public void spawnContinents() { // sets some tiles to a continent or an ocean
       for (Tile[] row: map) {
         for (Tile tile: row) {
           if (tile.altitude == -257) {
             ArrayList<Tile> adjacent = adjacentTo(tile);
             for (Tile ref: adjacent) // reads all adjacent tiles to look for land or sea
-              if (ref.altitude >= -256 && randChance(-8))
+              if (ref.altitude >= -256 && randChance(-40 + (int)(Math.pow(ref.altitude,2)/128))) // deeper/higher continents spread faster
                 tile.spreadFrom(ref);
             
             if (tile.altitude == -257 && randChance(-146)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
@@ -72,10 +71,13 @@ public class Globe { // a class to create a spherical surface and generate terra
           if (tile.temp1 < -56 || tile.temp1 >= 56) // only copies those that have been set to something
             tile.altitude = tile.temp1;
     }
-  //}
-//  
-//  
-//  public void plateTechtonics() {
+  
+  
+//  public void plateTechtonics() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
+//    for (Tile[] thsRow: map)
+//    for (Tile[] thsTile: row)
+//    for (Tilep[] row: map)
+//      for (Tile[] 
 //  }
 //  
 //  
