@@ -7,11 +7,16 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
       
       lamb.lambert("altitude");
       
+      world.spawnContinent();
+      
       while (world.any(-257)) {
         delay(10);
         world.spawnContinents();
         lamb.lambert("altitude");
       }
+      
+      /*world.test();
+      lamb.lambert("altitude");*/
       
       System.out.println("end");
       delay(20000);

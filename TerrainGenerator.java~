@@ -5,12 +5,12 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
       Globe world = new Globe(100);
       Map lamb = new Map(world, 1200, 600);
       
-      lamb.equirectangular("altitude");
+      lamb.lambert("altitude");
       
       while (world.any(-257)) {
         delay(10);
         world.spawnContinents();
-        lamb.equirectangular("altitude");
+        lamb.lambert("altitude");
       }
       
       System.out.println("end");

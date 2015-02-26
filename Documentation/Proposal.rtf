@@ -1,0 +1,30 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf210
+{\fonttbl\f0\fnil\fcharset77 KannadaMN;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f0\b\fs48 \cf0 Civi HD\
+
+\b0\fs24 \
+
+\b Overview:
+\b0 \
+	For my computer science independent project, I will program Civi HD, the sequel to the proclaimed screen-saver Civi.  Civi was a program I made for the Meggy Jr. during the second semester last year.  It involved a random number of empires that would spread, fight, colonize, industrialize, decay, revolutionize, and more over time, just like real civilizations.  I dubbed it \'d2Civi\'d3 as short for \'d2civilization\'d3 (Civ was already taken).  While it was interesting to watch, the two things that I wished I could have fixed were the 8x8 nature of the screen and the fact that the civilizations were playing out on a blank terrain-less square.  Well, now I can!\
+	With the power of Java and object-oriented programming, I will create Civi HD, an entertainment app that will generate a spherical surface onto which will spawn various Civis, which will spread, fight, decay, and all that jazz automatically.  My project will occur in three parts.\
+	Part I: The Terrain.  I have already started this portion.  A realistic spherical terrain will generate using plate tectonic, orographic effect, and erosion algorithms.\
+	Part II: The Civis.  This will be modeled largely off of my Meggy Jr. version of Civi (and also probably influenced by Sid Meier\'d5s Civ V).  It will involve the spawning and behavior of empires on the generated surface, as certain natural disasters incurred by the world itself.\
+	Part III: The God.  This part is basically what I plan to strive for but do not necessarily expect to accomplish.  If I have extra time after parts I and II, I will create an interactive interface that will allow the user to throw meteors, start earthquakes, and spark revolutions.  The user basically becomes a malicious god.\
+\
+
+\b Details:\
+
+\b0 	The program will start by generating a map.  This will be created by plates of land and sea that spread across the map until it is full.  Then, the program will apply plate tectonics such that plates can collide to form mountain ranges, island chains, ocean rifts, and sea trenches.  The map will be randomized and smoothed out a bit to give it a more realistic look, and then each point will be assigned a temperature and rainfall level based on its latitude and geographic location (orographic effect).  Each point will get a biome based on its climate and altitude, and then it will rain.  Water will naturally flow toward the ocean, eroding land as it goes.\
+\
+
+\b Program layout:
+\b0 \
+	The Civi HD program will be accessed through the main method of the static CiviHDDriver class.  In this method, three objects will be invoked: Map, the Globe, and the Civis. \
+	Map is an interface, which will control the visual output of the program.  Map will have a constructor that takes a Globe and opens a new window for Civi HD, a BufferedImage, an instance of the Globe class, and an abstract method display(String colorScheme).  Implementations of the Map interface will each have a unique display(String colorScheme) method that projects the surface of the Globe onto the BufferedImage according to a given algorithm, such as the Mercator projection algorithm, and write it to the computer screen.  This will allow easy interchangeability for the manner in which Civi is displayed, without affecting the program itself.\
+	Globe is a class that will hold and manage data for the map on which Civi takes place.  The main feature of the Globe class will be an irregular matrix of Tiles, which will be created during the constructor based on a given radius.  Each Tile will represent a section of the world\'d5s surface, and contain instance variables for altitude, biome, owner, development, etc.  The irregular matrix in Globe will be an array of arrays of varying lengths, according to trigonometric functions.  Thus, the surface will represent a sphere rather than a cylinder.  Globe will have getter methods to reference tiles at different points.  It will also have a public method, generate(), to randomly generate terrain (part I of my project).\
+	The final, and perhaps most important part of my program, is the ArrayList<Civi>.  Civi is a class that will represent a country or empire that roams the surface of the Globe.  It will have instance variables for military strength, scientific advancement, happiness, and other statistics of the like, and a constructor to randomize these stats.  It will also have an ArrayList<Tile> to help keep track of which Tiles it owns.  The Civi class will have a public method update() to automatically cause the Civi to wage war, scientifically advance, spread, decay, fight civil wars, colonize, industrialize, and things like that.}
