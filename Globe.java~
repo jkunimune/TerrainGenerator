@@ -9,6 +9,7 @@ public class Globe { // a class to create a spherical surface and generate terra
   
   
   public Globe(int r) {
+    radius = r;
     map = new Tile[(int)(r * Math.PI)][]; // the map is a matrix of tiles with varying width
     map[0] = new Tile[1]; // the top and bottom are of width 1 (the poles)
     map[map.length-1] = new Tile[1];
@@ -30,8 +31,13 @@ public class Globe { // a class to create a spherical surface and generate terra
   
   
   public void test() { // only used for testing purposes
-    for (Tile t: adjacentTo(getTile(Math.PI/2, 3)))
-      t.biome = 0;
+    for (int lat = 0; lat < map.length; lat ++)
+      for (int lon = 0; lon < map[lat].length/2; lon ++)
+        map[lat][lon].altitude = -64;
+    
+    for (int lat = 0; lat < map.length; lat ++)
+      for (int lon = map[lat].length/2; lon < map[lat].length; lon ++)
+        map[lat][lon].altitude = 63;
   }
   
   
@@ -49,28 +55,33 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
+  public void spawnContinent() { // initializes a single techtonic plate
+    this.getTile(Math.random()*Math.PI, Math.random()*2*Math.PI).startPlate(Math.random()<.5);
+  }
+  
+  
   public void spawnContinents() { // sets some tiles to a continent or an ocean
-      for (Tile[] row: map) {
-        for (Tile tile: row) {
-          if (tile.altitude == -257) {
-            ArrayList<Tile> adjacent = adjacentTo(tile);
-            for (Tile ref: adjacent) // reads all adjacent tiles to look for land or sea
-              if (ref.altitude >= -256 && randChance(-40 + (int)(Math.pow(ref.altitude,2)/128))) // deeper/higher continents spread faster
-                tile.spreadFrom(ref);
-            
-            if (tile.altitude == -257 && randChance(-146)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
-              tile.startPlate(false); // seeds new plates occasionally
-            else if (tile.altitude == -257 && randChance(-139))
-              tile.startPlate(true);
-          }
+    for (Tile[] row: map) {
+      for (Tile tile: row) {
+        if (tile.altitude == -257) {
+          ArrayList<Tile> adjacent = adjacentTo(tile);
+          for (Tile ref: adjacent) // reads all adjacent tiles to look for land or sea
+            if (ref.altitude >= -256 && randChance(-40 + (int)(Math.pow(ref.altitude,2)/128))) // deeper/higher continents spread faster
+            tile.spreadFrom(ref);
+          
+          if (tile.altitude == -257 && randChance(-148)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
+            tile.startPlate(false); // seeds new plates occasionally
+          else if (tile.altitude == -257 && randChance(-141))
+            tile.startPlate(true);
         }
       }
-      
-      for (Tile[] row: map) // copies the temporary variables to altitude
-        for (Tile tile: row)
-          if (tile.temp1 < -56 || tile.temp1 >= 56) // only copies those that have been set to something
-            tile.altitude = tile.temp1;
     }
+    
+    for (Tile[] row: map) // copies the temporary variables to altitude
+    for (Tile tile: row)
+      if (tile.temp1 < -56 || tile.temp1 >= 56) // only copies those that have been set to something
+      tile.altitude = tile.temp1;
+  }
   
   
   /*public void plateTechtonics() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
@@ -79,9 +90,22 @@ public class Globe { // a class to create a spherical surface and generate terra
         for (Tile[] thatRow: map) {
           for (Tile thatTil: thatRow) {
             if (!thatTil.equals(thisTil)) { // assuming they are not the same tile
-              int deltaOmega; // is the magnitude of the difference in their angular velocities
-              int arcLength; // is the magnitude of the distance between them
-              int theta; // is the cosine of the angle between deltaOmega and arcLength
+              int deltaOmega = Math.sqrt(Math.pow(Math.sin(thisTil.temp2/100.0)*Math.cos(thisTil.temp3/100.0)-
+                                                  Math.sin(thatTil.temp2/100.0)*Math.cos(thatTil.temp3/100.0),2) +
+                                         Math.pow(Math.cos(thisTil.temp2/100.0)-
+                                                  Math.cos(thatTil.temp2/100.0),2) + // really complicated math (don't bother trying to figure it out)
+                                         Math.pow(Math.sin(thisTil.temp2/100.0)*Math.sin(thisTil.temp3/100.0)-
+                                                  Math.sin(thatTil.temp2/100.0)*Math.sin(thatTil.temp3/100.0),2)); // is the magnitude of the difference in their angular velocities
+              
+              int arcLength = radius * Math.acos(1 - (Math.pow(Math.sin(thisTil.lat*Math.PI/globe.length)*Math.cos(thisTil.lon*Math.PI/globe.length)-
+                                                               Math.sin(thatTil.lat*Math.PI/globe.length)*Math.cos(thatTil.lon*Math.PI/globe.length),2) +
+                                                      Math.pow(Math.cos(thisTil.lat*Math.PI/globe.length)-
+                                                               Math.cos(thatTil.lat*Math.PI/globe.length),2) + // really complicated math (don't bother trying to figure it out)
+                                                      Math.pow(Math.sin(thisTil.lat*Math.PI/globe.length)*Math.sin(thisTil.lon*Math.PI/globe.length)-
+                                                               Math.sin(thatTil.lat*Math.PI/globe.length)*Math.sin(thatTil.lon*Math.PI/globe.length),2))/2); // is the magnitude of the distance between them
+              
+              int rise ; // is the dot product of deltaOmega and arcLength
+              
               int rise = (int)(10*deltaOmega/Math.pow(arcLength,2)*Math.cos(theta)); // is how much they push each other up
               
               if (thisTil.altitude < 0) { // if this is ocean
