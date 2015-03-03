@@ -1,18 +1,25 @@
 public class Vector {
-  private int r; // magnitude
+  private double r; // magnitude
   private double a; // altitude
   private double b; // bearing
   
   
   
-  public Vector(double newX, double newY, double newZ) { // constructs a new vector given horizontal, vertical, and depthual lengths
-    r = (int)Math.sqrt(newX*newX + newY*newY + newZ*newZ);
+  public Vector(double newX, double newY, double newZ, boolean cartesian) { // constructs a new vector given horizontal, vertical, and depthual lengths
+    r = Math.sqrt(newX*newX + newY*newY + newZ*newZ);
     a = Math.acos(newY/r);
-    b = Math.atan(newZ/newX);
+    if (newX != 0) { // accounts for various cases for beta
+      if (newX > 0)  b = Math.atan(newZ/newX);
+      else        b = Math.atan(newZ/newX)+Math.PI;
+    }
+    else {
+      if (newZ > 0)  b = Math.PI/2;
+      else        b = 3*Math.PI/2;
+    }
   }
   
   
-  public Vector(int newR, double newAlpha, double newBeta) { // constructs a new vector given magnitude, altitude, and bearing
+  public Vector(double newR, double newAlpha, double newBeta) { // constructs a new vector given magnitude, altitude, and bearing
     r = newR;
     a = newAlpha;
     b = newBeta;
@@ -20,7 +27,23 @@ public class Vector {
   
   
   
+  public void setR(double newR) {
+    r = newR;
+  }
+  
+  
+  public void setA(double newAlpha) {
+    a = newAlpha;
+  }
+  
+  
+  public void setB(double newBeta) {
+    b = newBeta;
+  }
+  
+  
   public double getX() { // magnitude of the x component
+    //System.out.println("Calculating X: r is "+r+", alpha is "+a+", and beta is "+b);
     return r*Math.sin(a)*Math.cos(b);
   }
   
@@ -35,7 +58,7 @@ public class Vector {
   }
   
   
-  public int getR() { // magnitude
+  public double getR() { // magnitude
     return r;
   }
   
@@ -56,32 +79,38 @@ public class Vector {
   
   
   public Vector plus(Vector that) { // computes sum with that
-    return new Vector(this.getX()+that.getX(), this.getY()+that.getY(), this.getZ()+that.getZ());
+    return new Vector(this.getX()+that.getX(), this.getY()+that.getY(), this.getZ()+that.getZ(), true);
   }
   
   
   public Vector minus(Vector that) { // computes difference with that
-    return new Vector(this.getX()-that.getX(), this.getY()-that.getY(), this.getZ()-that.getZ());
+    return new Vector(this.getX()-that.getX(), this.getY()-that.getY(), this.getZ()-that.getZ(), true);
   }
   
   
   public Vector times(double c) { // computes product with c
-    return new Vector((int)(r*c), a, b);
+    return new Vector(c*r, a, b);
   }
   
   
   public double dot(Vector that) { // computes dot product with that
-    return this.getX()*that.getX() + this.getY()*that.getY() + this.getZ()+that.getZ();
+    return this.getX()*that.getX() + this.getY()*that.getY() + this.getZ()*that.getZ();
   }
   
   
   public Vector cross(Vector that) { // computes cross product with that
-    return new Vector(this.getY()*that.getZ() - this.getZ()*that.getY(), this.getZ()*that.getX() - this.getX()*that.getZ(), this.getX()*that.getY() - this.getY()*that.getZ());
+    return new Vector(this.getY()*that.getZ() - this.getZ()*that.getY(),
+                      this.getZ()*that.getX() - this.getX()*that.getZ(),
+                      this.getX()*that.getY() - this.getY()*that.getZ(), true);
   }
   
   
-  public double to(Vector that) { // computes angle to that
-    return 0.0;
+  public double angleTo(Vector that) { // computes angle to that
+    return Math.acos(1 - (
+                          Math.pow(Math.sin(this.getA())*Math.cos(this.getB()) - Math.sin(that.getA())*Math.cos(that.getB()) ,2) + 
+                          Math.pow(Math.cos(this.getA()) - Math.cos(that.getA()) ,2) + 
+                          Math.pow(Math.sin(this.getA())*Math.sin(this.getB()) - Math.sin(that.getA())*Math.sin(that.getB()) ,2)
+                         )/2);
   }
   
   
@@ -117,5 +146,15 @@ public class Vector {
     r = txt.getR();
     a = txt.getA();
     b = txt.getB();
+  }
+  
+  
+  public String toString() {
+    return "<"+getX()+", "+getY()+", "+getZ()+">";
+  }
+  
+  
+  public String toStringPolar() {
+    return "("+getR()+", "+getA()+", "+getB()+")";
   }
 }

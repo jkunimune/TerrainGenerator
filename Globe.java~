@@ -32,12 +32,20 @@ public class Globe { // a class to create a spherical surface and generate terra
   
   public void test() { // only used for testing purposes
     for (int lat = 0; lat < map.length; lat ++)
-      for (int lon = 0; lon < map[lat].length/2; lon ++)
-        map[lat][lon].altitude = -64;
+      for (int lon = 0; lon < map[lat].length/2; lon ++) {
+        map[lat][lon].altitude = 63;
+        map[lat][lon].temp1 = 63;
+        map[lat][lon].temp2 = 314;
+        map[lat][lon].temp3 = 0;
+      }
     
     for (int lat = 0; lat < map.length; lat ++)
-      for (int lon = map[lat].length/2; lon < map[lat].length; lon ++)
-        map[lat][lon].altitude = 63;
+      for (int lon = map[lat].length/2; lon < map[lat].length; lon ++) {
+        map[lat][lon].altitude = -64;
+        map[lat][lon].temp1 = -64;
+        map[lat][lon].temp2 = 0;
+        map[lat][lon].temp3 = 0;
+      }
   }
   
   
@@ -84,57 +92,64 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
-  /*public void plateTechtonics() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
+  public void plateTechtonics() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
     for (Tile[] thisRow: map) {
       for (Tile thisTil: thisRow) {
+        double totalChange = 0; // keeps track of how much to change the altitude
         for (Tile[] thatRow: map) {
           for (Tile thatTil: thatRow) {
             if (!thatTil.equals(thisTil)) { // assuming they are not the same tile
-              int deltaOmega = Math.sqrt(Math.pow(Math.sin(thisTil.temp2/100.0)*Math.cos(thisTil.temp3/100.0)-
-                                                  Math.sin(thatTil.temp2/100.0)*Math.cos(thatTil.temp3/100.0),2) +
-                                         Math.pow(Math.cos(thisTil.temp2/100.0)-
-                                                  Math.cos(thatTil.temp2/100.0),2) + // really complicated math (don't bother trying to figure it out)
-                                         Math.pow(Math.sin(thisTil.temp2/100.0)*Math.sin(thisTil.temp3/100.0)-
-                                                  Math.sin(thatTil.temp2/100.0)*Math.sin(thatTil.temp3/100.0),2)); // is the magnitude of the difference in their angular velocities
+              if (thisTil.temp2 == thatTil.temp2 && thisTil.temp3 == thatTil.temp3) // ignore them if they are on the same plate
+                break;
               
-              int arcLength = radius * Math.acos(1 - (Math.pow(Math.sin(thisTil.lat*Math.PI/globe.length)*Math.cos(thisTil.lon*Math.PI/globe.length)-
-                                                               Math.sin(thatTil.lat*Math.PI/globe.length)*Math.cos(thatTil.lon*Math.PI/globe.length),2) +
-                                                      Math.pow(Math.cos(thisTil.lat*Math.PI/globe.length)-
-                                                               Math.cos(thatTil.lat*Math.PI/globe.length),2) + // really complicated math (don't bother trying to figure it out)
-                                                      Math.pow(Math.sin(thisTil.lat*Math.PI/globe.length)*Math.sin(thisTil.lon*Math.PI/globe.length)-
-                                                               Math.sin(thatTil.lat*Math.PI/globe.length)*Math.sin(thatTil.lon*Math.PI/globe.length),2))/2); // is the magnitude of the distance between them
+              Vector r1 = new Vector(1, thisTil.lat*Math.PI/map.length, thisTil.lon*2*Math.PI/map[thisTil.lat].length);
+              Vector r2 = new Vector(1, thatTil.lat*Math.PI/map.length, thatTil.lon*2*Math.PI/map[thatTil.lat].length);
+              Vector delTheta = r1.cross(r2);
+              delTheta.setR(r1.angleTo(r2)*radius); // the distance between them
               
-              int rise ; // is the dot product of deltaOmega and arcLength
+              if (delTheta.getR() > 10) // if they are farther than 10 tiles apart, ignore them
+                break;
               
-              int rise = (int)(10*deltaOmega/Math.pow(arcLength,2)*Math.cos(theta)); // is how much they push each other up
+              Vector omega1 = new Vector(1, thisTil.temp2/100.0, thisTil.temp3/100.0);
+              Vector omega2 = new Vector(1, thatTil.temp2/100.0, thatTil.temp3/100.0);
+              Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
+              
+              double rise = 4.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),2);
               
               if (thisTil.altitude < 0) { // if this is ocean
                 if (rise < 0) { // if they are going towards each other
                   if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
-                    thisTil.temp1 += rise/1; // it forms a sea trench
+                    totalChange += rise/1; // it forms a sea trench
                   }
                   else { // if this is above that one
-                    thisTil.temp1 -= rise/1; // it forms an island chain
+                    totalChange -= rise/1; // it forms an island chain
                   }
                 }
                 else { // if they are going away from each other
-                  thisTil.temp1 -= rise/4; // it forms an ocean rift
+                  totalChange -= rise/2; // it forms an ocean rift
                 }
               }
               else { // if this is land
                 if (rise < 0) { // if they are going towards each other
-                  thisTil.temp1 -= rise/2; // it forms a mountain range
+                  totalChange -= rise/1; // it forms a mountain range
                 }
                 else { // if they are going away from each other
-                  thisTil.temp1 -= rise/2; // it forms a valley
+                  totalChange -= rise/1; // it forms a valley
                 }
               }
             }
           }
         }
+        thisTil.temp1 += totalChange;
+        //System.out.println("Done with "+thisTil.lat+", "+thisTil.lon);
       }
+      System.out.println("Done with row");
     }
-  }*/
+    
+    for (Tile[] thisRow: map)
+      for (Tile thisTil: thisRow)
+        thisTil.altitude = thisTil.temp1;
+  }
 //  
 //  
 //  public void randomize() {

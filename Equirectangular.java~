@@ -1,0 +1,19 @@
+public class Equirectangular extends Map {
+  private static int width;
+  private static int height;
+  
+  
+  
+  public Equirectangular(Globe g, int x, int y) {
+    super(g, x, y);
+  }
+  
+  
+  
+  public void display(String colorScheme) {
+    for (int x = 0; x < width; x ++)
+      for (int y = 0; y < height; y ++)
+        drawPx(x, y, glb.getTile(y*Math.PI/height, x*2*Math.PI/width).getColorBy(colorScheme));
+    show();
+  }
+}

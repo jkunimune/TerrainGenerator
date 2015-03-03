@@ -5,8 +5,9 @@ import javax.swing.*;
 
 
 public class Map extends JPanel { // a class to manage the graphic elements of terrain generation
-  private static int width;
-  private static int height;
+  final Color[] colors = {new Color(255,70,0), new Color(0,0,200), new Color(200,255,255), new Color(255,255,255), new Color(0,255,0),
+    new Color(255,200,25), new Color(0,150,25), new Color(200,100,50), new Color(200,100,255), new Color(0,25,255), new Color(0,0,0),
+    new Color(255, 255, 200)};
   BufferedImage img;
   Globe glb;
   
@@ -33,6 +34,39 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
     //repaint();
   }
   
+  
+  public void display(String colorScheme) {
+    System.out.println("WARNING: Non-functional Map object.\nPlease construct a subclass of Map.");
+  }
+  
+  
+  public Color getColorAt(Tile t, String colorScheme) {
+    if (type.equals("biome"))
+      return getColorByBiome(t);
+    else if (type.equals("altitude"))
+      return getColorByAlt(t);
+    else
+      return Color.black;
+  }
+  
+  
+  public Color getColorByBiome(Tile t) {
+    return colors[t.biome];
+  }
+  
+  
+  public Color getColorByAlt(Tile t) {
+    if (altitude < -256) // if altitude is below minimum, return the color of lava
+      return colors[0];
+    else if (altitude >= 256) // if altitude is above maximum, return the color of space
+      return colors[10];
+    else if (altitude < 0) // if altitude is below sea level, return a blue that gets darker as one goes deeper
+      return new Color(0, 0, 256+altitude);
+    else // if altitude is above sea level, return a green that gets brighter as one goes higher
+      return new Color(altitude, 255, altitude);
+  }
+  
+  
   @Override
   public void paintComponent(Graphics g) {
     g.drawImage(img, 0, 0, null);
@@ -52,7 +86,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public void mercator(Globe world, String colorScheme) {
+  public void mercator(String colorScheme) {
     for (int x = 0; x < width; x ++)
       for (int y = 0; y < height; y ++)
         drawPx(x, y, glb.getTile(Math.PI/2 + Math.atan(((double)y-height/2) / (width/2/Math.PI)), x * 2*Math.PI / width).getColorBy(colorScheme));
@@ -60,7 +94,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public void lambert(Globe world, String colorScheme) {
+  public void lambert(String colorScheme) {
     for (int x = 0; x < width; x ++)
       for (int y = 0; y < height; y ++)
         drawPx(x, y, glb.getTile(Math.PI/2 + Math.asin((y-height/2.0) / (height/2.0)), x * 2*Math.PI / width).getColorBy(colorScheme));

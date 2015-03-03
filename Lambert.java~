@@ -1,0 +1,19 @@
+public class Lambert extends Map {
+  private static int width;
+  private static int height;
+  
+  
+  
+  public Lamber(Globe g, int x, int y) {
+    super(g, x, y);
+  }
+  
+  
+  
+  public void display(String colorScheme) {
+    for (int x = 0; x < width; x ++)
+      for (int y = 0; y < height; y ++)
+        drawPx(x, y, glb.getTile(Math.PI/2 + Math.atan(((double)y-height/2) / (width/2/Math.PI)), x * 2*Math.PI / width).getColorBy(colorScheme));
+    show();
+  }
+}

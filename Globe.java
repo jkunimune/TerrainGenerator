@@ -30,6 +30,53 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
+  /* PRECONDITION: each Map's Globe is this */
+  public void generate(ArrayList<Map> maps) { // randomly generates a map and simultaneously displays it on several projections
+    for (Map m: maps)
+      m.display("altitude");
+      
+    this.spawnContinent();
+    
+    while (any(-257)) {
+      delay(10);
+      this.spawnContinents();
+      for (Map m: maps)
+        m.display("altitude");
+    }
+    
+    this.plateTechtonics();
+    for (Map m: maps)
+      m.display("altitude");
+  }
+  
+  
+  /* PRECONDITION: map's Globe is this */
+  public void generate(Map map) { // randomly generates a map and simultaneously displays it
+    map.display("altitude");
+      
+    this.spawnContinent();
+    
+    while (any(-257)) {
+      delay(10);
+      this.spawnContinents();
+      map.display("altitude");
+    }
+    
+    this.plateTechtonics();
+    map.display("altitude");
+  }
+  
+  
+  public void generate() { // randomly generates a map
+    this.spawnContinent();
+    
+    while (any(-257))
+      this.spawnContinents();
+    
+    this.plateTechtonics();
+  }
+  
+  
   public void test() { // only used for testing purposes
     for (int lat = 0; lat < map.length; lat ++)
       for (int lon = 0; lon < map[lat].length/2; lon ++) {
@@ -77,9 +124,9 @@ public class Globe { // a class to create a spherical surface and generate terra
             if (ref.altitude >= -256 && randChance(-40 + (int)(Math.pow(ref.altitude,2)/128))) // deeper/higher continents spread faster
             tile.spreadFrom(ref);
           
-          if (tile.altitude == -257 && randChance(-148)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
+          if (tile.altitude == -257 && randChance(-150)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
             tile.startPlate(false); // seeds new plates occasionally
-          else if (tile.altitude == -257 && randChance(-141))
+          else if (tile.altitude == -257 && randChance(-143))
             tile.startPlate(true);
         }
       }
@@ -141,9 +188,7 @@ public class Globe { // a class to create a spherical surface and generate terra
           }
         }
         thisTil.temp1 += totalChange;
-        //System.out.println("Done with "+thisTil.lat+", "+thisTil.lon);
       }
-      System.out.println("Done with row");
     }
     
     for (Tile[] thisRow: map)
@@ -177,10 +222,14 @@ public class Globe { // a class to create a spherical surface and generate terra
 //  
 //  
   public Tile getTile(double lat, double lon) { // returns a tile at a given coordinate
-    if (lat < 0 || lat > Math.PI || lon < 0 || lon > 2*Math.PI) {
+    if (lat < 0 || lat > Math.PI) {
       System.out.println("Error accessing "+lat+","+lon);
       return new Tile(-1, -1);
     }
+    
+    lon %= 2*Math.PI;
+    if (lon < 0)
+      lon += 2*Math.PI;
     
     int y = (int)(lat*map.length/Math.PI);
     int x = (int)(lon*map[y].length/(2*Math.PI));
@@ -232,5 +281,11 @@ public class Globe { // a class to create a spherical surface and generate terra
   
   private boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
     return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
+  }
+  
+  
+  public static void delay(int mSec) {
+    long start = System.currentTimeMillis();
+    while (System.currentTimeMillis() < start+mSec) {}
   }
 }

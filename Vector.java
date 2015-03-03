@@ -10,11 +10,11 @@ public class Vector {
     a = Math.acos(newY/r);
     if (newX != 0) { // accounts for various cases for beta
       if (newX > 0)  b = Math.atan(newZ/newX);
-      else        b = Math.atan(newZ/newX)+Math.PI;
+      else           b = Math.atan(newZ/newX)+Math.PI;
     }
     else {
       if (newZ > 0)  b = Math.PI/2;
-      else        b = 3*Math.PI/2;
+      else           b = 3*Math.PI/2;
     }
   }
   
