@@ -124,6 +124,8 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
       return getColorByRain(t);
     else if (type.equals("temperature"))
       return getColorByTemp(t);
+    else if (type.equals("climate"))
+      return getColorByClimate(t);
     else
       return Color.black;
   }
@@ -147,12 +149,35 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   
   public Color getColorByRain(Tile t) {
+    if (t.rainfall >= 256)
+      return new Color(0, 0, 255);
+    if (t.rainfall < 0)
+      return new Color(255, 255, 255);
     return new Color(255-t.rainfall, 255-t.rainfall, 255);
   }
   
   
   public Color getColorByTemp(Tile t) {
+    if (t.temperature >= 256)
+      return new Color(255, 0, 0);
+    if (t.temperature < 0)
+      return new Color(255, 255, 255);
     return new Color(255, 255-t.temperature, 255-t.temperature);
+  }
+  
+  
+  public Color getColorByClimate(Tile t) {
+    int tempCol = 255-t.temperature;
+    int rainCol = 255-t.rainfall;
+    if (t.temperature >= 256)
+      return new Color(255, 0, 0);
+    if (t.temperature < 0)
+      return new Color(255, 255, 255);
+    if (t.rainfall >= 256)
+      return new Color(0, 0, 255);
+    if (t.rainfall < 0)
+      return new Color(255, 255, 255);
+    return new Color(rainCol, (tempCol+rainCol)/2, tempCol);
   }
   
   

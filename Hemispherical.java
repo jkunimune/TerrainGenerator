@@ -15,16 +15,8 @@ public class Hemispherical extends Map { // a realistic globe projection that sh
     for (int x = 0; x < 2*radius; x ++) { // displays western hemisphere
       for (int y = 0; y < 2*radius; y ++) {
         if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius) {
-          double longitude;
-          if (x > radius) // if x is on left of circle
-            longitude = Math.atan((double)(y-radius)/(x-radius));
-          else if (x < radius) // if point is on right of circle
-            longitude = Math.atan((double)(y-radius)/(x-radius)) + Math.PI;
-          else { // if point is on vertical line of symetry
-            if (y > radius)  longitude = Math.PI/2;
-            else        longitude = 3*Math.PI/2;
-          }
-          double lattitude = Math.sqrt((x-radius)*(x-radius) + (y-radius)*(y-radius))*Math.PI/radius;
+          double longitude = Math.asin((x-radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + Math.PI/2;
+          double lattitude = Math.acos(1-(double)y/radius);
           
           drawPx(x, y, getColorBy(colorScheme, glb.getTile(lattitude, longitude)));
         }
@@ -34,16 +26,8 @@ public class Hemispherical extends Map { // a realistic globe projection that sh
     for (int x = 2*radius; x < 4*radius; x ++) { // displays eastern hemisphere
       for (int y = 0; y < 2*radius; y ++) {
         if ((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < radius*radius) {
-          double longitude;
-          if (x > radius) // if x is on left of circle
-            longitude = Math.atan((double)(y-radius)/(x-radius));
-          else if (x < radius) // if point is on right of circle
-            longitude = Math.atan((double)(y-radius)/(x-radius)) + Math.PI;
-          else { // if point is on vertical line of symetry
-            if (y > radius)  longitude = Math.PI/2;
-            else        longitude = 3*Math.PI/2;
-          }
-          double lattitude = Math.sqrt((x-radius)*(x-radius) + (y-radius)*(y-radius))*Math.PI/radius;
+          double longitude = Math.asin((x-3*radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + 3*Math.PI/2;
+          double lattitude = Math.acos(1-(double)y/radius);
           
           drawPx(x, y, getColorBy(colorScheme, glb.getTile(lattitude, longitude)));
         }
