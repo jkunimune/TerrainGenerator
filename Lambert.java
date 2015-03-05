@@ -2,8 +2,8 @@ import java.awt.*;
 
 
 
-public class Mercator extends Map { // a sphere projection designed to preserve shapes but distorts size near poles, which are not visible
-  public Mercator(Globe g, int x, int y) {
+public class Lambert extends Map { // an equal area globe projection that distorts shape severely near poles, which are lines
+  public Lambert(Globe g, int x, int y) {
     super(g, x, y);
   }
   
@@ -23,7 +23,7 @@ public class Mercator extends Map { // a sphere projection designed to preserve 
   
   
   public double getLat(int x, int y) {
-    return Math.PI/2 + Math.atan(((double)y-height*5/8) / (width/2/Math.PI));
+    return Math.PI/2 + Math.asin((y-height/2.0) / (height/2.0));
   }
   
   

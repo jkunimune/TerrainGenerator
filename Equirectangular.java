@@ -12,7 +12,7 @@ public class Equirectangular extends Map { // a simple globe projection that is 
   public void display(String colorScheme) {
     for (int x = 0; x < width; x ++) {
       for (int y = 0; y < height; y ++) {
-        if ((x/2*2 == width/10/2*2 || x/2*2 == width*9/10/2*2) && y/5%2 == 0)
+        if ((x/2*2 == width/10/2*2 || x/2*2 == width*9/10/2*2) && y/7%2 == 0)
           drawPx(x, y, Color.black);
         else
           drawPx(x, y, getColorBy(colorScheme, x, y));
