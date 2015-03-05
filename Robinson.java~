@@ -1,4 +1,4 @@
-public class Robinson extends Map {
+public class Robinson extends Map { // a compromise globe projection that was used by National Geographic for some time
   private static int width;
   private static int height;
   

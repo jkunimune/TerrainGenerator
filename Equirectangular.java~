@@ -1,4 +1,4 @@
-public class Equirectangular extends Map {
+public class Equirectangular extends Map { // a simple globe projection that is easy to calculate
   public Equirectangular(Globe g, int x, int y) {
     super(g, x, y);
   }

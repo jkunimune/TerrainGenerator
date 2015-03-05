@@ -90,7 +90,7 @@ public class Globe { // a class to create a spherical surface and generate terra
       map.display("altitude");
     }
     this.rough(2);
-      map.display("altitude");
+    map.display("altitude");
   }
   
   

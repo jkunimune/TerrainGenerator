@@ -13,7 +13,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     
     while (true) {
       Globe world = new Globe(100);
-      Map theMap = new Hemispherical(world, 1200, 600);
+      Map theMap = new Lambert(world, 1200, 600);
       
       world.generate(theMap);
       

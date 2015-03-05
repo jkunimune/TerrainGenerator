@@ -11,9 +11,6 @@ public class Robinson extends Map { // a compromise globe projection that was us
   
   
   public void display(String colorScheme) {
-    for (int x = 0; x < width; x ++)
-      for (int y = 0; y < height; y ++)
-        drawPx(x, y, getColorBy(colorScheme, glb.getTile(y*Math.PI/height, x*2*Math.PI/width)));
-    show();
+    System.out.println("WIP");
   }
 }

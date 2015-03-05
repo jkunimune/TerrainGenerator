@@ -1,9 +1,4 @@
-public class FromSpace extends Map {
-  private static int width;
-  private static int height;
-  
-  
-  
+public class FromSpace extends Map { // a globe projection designed to mimic a photograph from space
   public FromSpace(Globe g, int x, int y) {
     super(g, x, y);
   }
