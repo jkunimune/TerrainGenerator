@@ -25,8 +25,6 @@ public class Globe { // a class to create a spherical surface and generate terra
     for (int lat = 0; lat < map.length; lat ++) { // initializes all elements
       for (int lon = 0; lon < map[lat].length; lon ++) {
         map[lat][lon] = new Tile(lat, lon);
-        map[lat][lon].temperature = (int)(255*Math.sin(lat*Math.PI/map.length));
-        map[lat][lon].rainfall = (int)(255*Math.pow(Math.sin(lat*Math.PI/map.length),2));
       }
     }
   }
@@ -82,15 +80,20 @@ public class Globe { // a class to create a spherical surface and generate terra
     map.display("altitude");
     
     System.out.println("Roughing up and smoothing down terrain...");
-    for (int i = 128; i > 2; i /= 8) {
+    for (int i = 128; i > 2; i /= 4) {
       this.rough(i);
       map.display("altitude");
       for (int j = 0; j < 6; j ++)
-        this.smooth(.25);
+        this.smooth(.125);
       map.display("altitude");
     }
     this.rough(2);
     map.display("altitude");
+    
+    System.out.println("Generating climate...");
+    this.acclimate(.2);
+    this.orographicEffect();
+    map.display("rainfall");
   }
   
   
@@ -184,8 +187,8 @@ public class Globe { // a class to create a spherical surface and generate terra
               if (thisTil.temp2 == thatTil.temp2 && thisTil.temp3 == thatTil.temp3) // ignore them if they are on the same plate
                 break;
               
-              Vector r1 = new Vector(1, thisTil.lat*Math.PI/map.length, thisTil.lon*2*Math.PI/map[thisTil.lat].length);
-              Vector r2 = new Vector(1, thatTil.lat*Math.PI/map.length, thatTil.lon*2*Math.PI/map[thatTil.lat].length);
+              final Vector r1 = new Vector(1, thisTil.lat*Math.PI/map.length, thisTil.lon*2*Math.PI/map[thisTil.lat].length);
+              final Vector r2 = new Vector(1, thatTil.lat*Math.PI/map.length, thatTil.lon*2*Math.PI/map[thatTil.lat].length);
               Vector delTheta = r1.cross(r2);
               delTheta.setR(r1.angleTo(r2)*radius); // the distance between them
               
@@ -233,10 +236,12 @@ public class Globe { // a class to create a spherical surface and generate terra
   
   
   public void acclimate(double amount) { // randomizes the climate a bit
-    for (Tile[] row: map) {
-      for (Tile t: row) {
-        t.temperature += (int)(Math.random()*255*amount-t.temperature*amount);
-        t.rainfall += (int)(Math.random()*255*amount-t.rainfall*amount);
+    for (int lat = 0; lat < map.length; lat ++) {
+      for (int lon = 0; lon < map[lat].length; lon ++) {
+        map[lat][lon].temperature = (int)(255*Math.sin(lat*Math.PI/map.length));
+        map[lat][lon].rainfall = (int)(255*Math.pow(Math.sin(lat*Math.PI/map.length),2));
+        map[lat][lon].temperature += (int)(Math.random()*255*amount-map[lat][lon].temperature*amount);
+        map[lat][lon].rainfall += (int)(Math.random()*255*amount-map[lat][lon].rainfall*amount);
       }
     }
   }
@@ -265,39 +270,66 @@ public class Globe { // a class to create a spherical surface and generate terra
         
         til.temp1 = 0;
         for (Tile adj: adjacent)
-          til.temp1 += 3/2*adj.altitude/adjacent.size();
+          til.temp1 += 1.7*adj.altitude/adjacent.size();
         for (Tile nby: nearby)
-          til.temp1 -= 1/2*nby.altitude/nearby.size();
+          til.temp1 -= 0.3*nby.altitude/nearby.size();
         til.temp1 = (int)((1-amount)*til.temp1+amount*til.altitude);
         
-        til.temp2 = 0;
+        /*til.temp2 = 0;
         for (Tile adj: adjacent)
-          til.temp2 += 3/2*adj.temperature/adjacent.size();
+          til.temp2 += 1.7*adj.temperature/adjacent.size();
         for (Tile nby: nearby)
-          til.temp2 -= 1/2*nby.temperature/nearby.size();
+          til.temp2 -= 0.3*nby.temperature/nearby.size();
         til.temp2 = (int)((1-amount)*til.temp1+amount*til.temperature);
         
         til.temp3 = 0;
         for (Tile adj: adjacent)
-          til.temp3 += 3/2*adj.rainfall/adjacent.size();
+          til.temp3 += 1.7*adj.rainfall/adjacent.size();
         for (Tile nby: nearby)
-          til.temp3 -= 1/2*nby.rainfall/nearby.size();
-        til.temp3 = (int)((1-amount)*til.temp1+amount*til.rainfall);
+          til.temp3 -= 0.3*nby.rainfall/nearby.size();
+        til.temp3 = (int)((1-amount)*til.temp1+amount*til.rainfall);*/
       }
     }
     
     for (Tile[] row: map) {
       for (Tile til: row) {
         til.altitude = til.temp1;
-        til.temperature = til.temp2;
-        til.rainfall = til.temp3;
+        /*til.temperature = til.temp2;
+        til.rainfall = til.temp3;*/
       }
     }
   }
-//  
-//  
-//  public void orographicEffect() {
-//  }
+  
+  
+  public void orographicEffect() { // alters
+    for (Tile[] row: map) {
+      for (Tile til: row) {
+        if (til.altitude < 0)
+          til.rainfall = 255;
+        else {
+          til.rainfall += moisture(til, -1, 4);
+          til.rainfall += moisture(til, 1, 4);
+        }
+      }
+    }
+  }
+  
+  
+  public int moisture(Tile til, int dir, int dist) { // determines how much moisture blows in from a given direction
+    int here;
+    if (til.altitude < 0)  here = 8*dist;
+    else                   here = 0;
+    
+    if (dist <= 0)
+      return 0;
+    
+    final Tile next = map[til.lat][(til.lon+dir+map[til.lat].length)%map[til.lat].length];
+    
+    if (next.altitude >= 127) // if there a mountain range coming up
+      return here;
+    else
+      return here + moisture(next, dir, dist-1);
+  }
 //  
 //  
 //  public void biomeAssign() {

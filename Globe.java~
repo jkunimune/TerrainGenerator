@@ -25,15 +25,18 @@ public class Globe { // a class to create a spherical surface and generate terra
     for (int lat = 0; lat < map.length; lat ++) { // initializes all elements
       for (int lon = 0; lon < map[lat].length; lon ++) {
         map[lat][lon] = new Tile(lat, lon);
+        map[lat][lon].temperature = (int)(255*Math.sin(lat*Math.PI/map.length));
+        map[lat][lon].rainfall = (int)(255*Math.pow(Math.sin(lat*Math.PI/map.length),2));
       }
     }
   }
   
   
   /* PRECONDITION: each Map's Globe is this */
-  public void generate(ArrayList<Map> maps) { // randomly generates a map and simultaneously displays it on several projections
+  public void generate(Map[] maps) { // randomly generates a map and simultaneously displays it on several projections
     for (Map m: maps)
       m.display("altitude");
+    System.out.println("Generating landmasses...");
       
     this.spawnContinent();
     
@@ -44,7 +47,18 @@ public class Globe { // a class to create a spherical surface and generate terra
         m.display("altitude");
     }
     
-    this.plateTechtonics();
+    System.out.println("Shifting continents...");
+    //this.plateTechtonics();
+    for (Map m: maps)
+      m.display("altitude");
+    
+    System.out.println("Roughing up terrain...");
+    this.rough(64);
+    for (Map m: maps)
+      m.display("altitude");
+    
+    System.out.println("Smoothing down terrain...");
+    this.smooth(.5);
     for (Map m: maps)
       m.display("altitude");
   }
@@ -53,16 +67,29 @@ public class Globe { // a class to create a spherical surface and generate terra
   /* PRECONDITION: map's Globe is this */
   public void generate(Map map) { // randomly generates a map and simultaneously displays it
     map.display("altitude");
+    System.out.println("Generating landmasses...");
       
     this.spawnContinent();
     
     while (any(-257)) {
-      delay(10);
       this.spawnContinents();
       map.display("altitude");
+      delay(10);
     }
     
-    this.plateTechtonics();
+    System.out.println("Shifting continents...");
+    //this.plateTechtonics();
+    map.display("altitude");
+    
+    System.out.println("Roughing up and smoothing down terrain...");
+    for (int i = 128; i > 2; i /= 8) {
+      this.rough(i);
+      map.display("altitude");
+      for (int j = 0; j < 6; j ++)
+        this.smooth(.25);
+      map.display("altitude");
+    }
+    this.rough(2);
     map.display("altitude");
   }
   
@@ -70,10 +97,18 @@ public class Globe { // a class to create a spherical surface and generate terra
   public void generate() { // randomly generates a map
     this.spawnContinent();
     
+    System.out.println("Generating landmasses...");
     while (any(-257))
       this.spawnContinents();
     
-    this.plateTechtonics();
+    System.out.println("Shifting continents...");
+    //this.plateTechtonics();
+    
+    System.out.println("Roughing up terrain...");
+    this.rough(64);
+    
+    System.out.println("Smoothing down terrain...");
+    this.smooth(.5);
   }
   
   
@@ -124,9 +159,9 @@ public class Globe { // a class to create a spherical surface and generate terra
             if (ref.altitude >= -256 && randChance(-40 + (int)(Math.pow(ref.altitude,2)/128))) // deeper/higher continents spread faster
             tile.spreadFrom(ref);
           
-          if (tile.altitude == -257 && randChance(-150)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
+          if (tile.altitude == -257 && randChance(-148)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
             tile.startPlate(false); // seeds new plates occasionally
-          else if (tile.altitude == -257 && randChance(-143))
+          else if (tile.altitude == -257 && randChance(-141))
             tile.startPlate(true);
         }
       }
@@ -195,14 +230,70 @@ public class Globe { // a class to create a spherical surface and generate terra
       for (Tile thisTil: thisRow)
         thisTil.altitude = thisTil.temp1;
   }
-//  
-//  
-//  public void randomize() {
-//  }
-//  
-//  
-//  public void smooth() {
-//  }
+  
+  
+  public void acclimate(double amount) { // randomizes the climate a bit
+    for (Tile[] row: map) {
+      for (Tile t: row) {
+        t.temperature += (int)(Math.random()*255*amount-t.temperature*amount);
+        t.rainfall += (int)(Math.random()*255*amount-t.rainfall*amount);
+      }
+    }
+  }
+  
+  
+  public void rough(double amount) { // randomizes the terrain a bit
+    for (Tile[] row: map) {
+      for (Tile t: row) {
+        t.altitude += (int)((Math.random()-.5)*(t.altitude*t.altitude/2048.0*amount));
+      }
+    }
+  }
+  
+  
+  public void smooth(double amount) { // makes terrain more smooth-looking
+    for (Tile[] row: map) {
+      for (Tile til: row) {
+        ArrayList<Tile> adjacent = adjacentTo(til);
+        ArrayList<Tile> nearby = new ArrayList<Tile>();
+        for (Tile adj: adjacent)
+          for (Tile nby: adjacentTo(adj))
+            if (!nby.equals(til))
+              nearby.add(nby);
+        for (Tile adj: adjacent)
+          nearby.remove(adj);
+        
+        til.temp1 = 0;
+        for (Tile adj: adjacent)
+          til.temp1 += 3/2*adj.altitude/adjacent.size();
+        for (Tile nby: nearby)
+          til.temp1 -= 1/2*nby.altitude/nearby.size();
+        til.temp1 = (int)((1-amount)*til.temp1+amount*til.altitude);
+        
+        til.temp2 = 0;
+        for (Tile adj: adjacent)
+          til.temp2 += 3/2*adj.temperature/adjacent.size();
+        for (Tile nby: nearby)
+          til.temp2 -= 1/2*nby.temperature/nearby.size();
+        til.temp2 = (int)((1-amount)*til.temp1+amount*til.temperature);
+        
+        til.temp3 = 0;
+        for (Tile adj: adjacent)
+          til.temp3 += 3/2*adj.rainfall/adjacent.size();
+        for (Tile nby: nearby)
+          til.temp3 -= 1/2*nby.rainfall/nearby.size();
+        til.temp3 = (int)((1-amount)*til.temp1+amount*til.rainfall);
+      }
+    }
+    
+    for (Tile[] row: map) {
+      for (Tile til: row) {
+        til.altitude = til.temp1;
+        til.temperature = til.temp2;
+        til.rainfall = til.temp3;
+      }
+    }
+  }
 //  
 //  
 //  public void orographicEffect() {
@@ -215,14 +306,9 @@ public class Globe { // a class to create a spherical surface and generate terra
 //  
 //  public void rainFall() {
 //  }
-//  
-//  
-//  public void generate() {
-//  }
-//  
-//  
+  
   public Tile getTile(double lat, double lon) { // returns a tile at a given coordinate
-    if (lat < 0 || lat > Math.PI) {
+    if (lat < 0 || lat >= Math.PI) {
       System.out.println("Error accessing "+lat+","+lon);
       return new Tile(-1, -1);
     }
