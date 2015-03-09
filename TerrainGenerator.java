@@ -1,7 +1,11 @@
 public class TerrainGenerator{ // a class to generate and display terrain onto a spherical surface
+  static long startTime = 0; // the time it was when we last checked
+  
+  
+  
   public static void main(String args[])
   {
-    /*Globe world = new Globe(20);
+    Globe world = new Globe(20);
     Map theMap = new Lambert(world, 1200, 600);
     
     world.test();
@@ -9,22 +13,127 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     world.plateTechtonics();
     delay(2000);
     theMap.display("altitude");
-    System.out.println("end");*/
+    System.out.println("end");
     
-    while (true) {
+    /*while (true) {
       Globe world = new Globe(100);
       Map theMap = new Lambert(world, 1200, 600);
       
-      world.generate(theMap);
+      generate(world, theMap);
       
       System.out.println("end");
       delay(20000);
-    }
+    }*/
   }
   
   
-  public static void delay(int mSec) {
+
+/* PRECONDITION: each Map's Globe is world */
+  public static void generate(Globe world, Map[] maps) { // randomly generates a map and simultaneously displays it on several projections
+    for (Map m: maps)
+      m.display("altitude");
+    System.out.println("Generating landmasses...");
+      
+    world.spawnFirstContinent();
+    
+    while (world.any(-257)) {
+      delay(10);
+      world.spawnContinents();
+      for (Map m: maps)
+        m.display("altitude");
+    }
+    
+    System.out.println("Shifting continents...");
+    //world.plateTechtonics();
+    for (Map m: maps)
+      m.display("altitude");
+    
+    System.out.println("Roughing up terrain...");
+    world.rough(64);
+    for (Map m: maps)
+      m.display("altitude");
+    
+    System.out.println("Smoothing down terrain...");
+    world.smooth(.5);
+    for (Map m: maps)
+      m.display("altitude");
+  }
+  
+  
+  /* PRECONDITION: map's Globe is world */
+  public static void generate(Globe world, Map map) { // randomly generates a map and simultaneously displays it
+    map.display("altitude");
+    System.out.println("Generating landmasses...");
+      
+    world.spawnFirstContinent();
+    
+    int t = 0;
+    while (world.any(-257)) {
+      setTimer(0);
+      world.spawnContinents();
+      if (t%10 == 0)
+        map.display("altitude");
+      t ++;
+      waitFor(100);
+    }
+    if (t%10 != 1)
+      map.display("altitude");
+    
+    System.out.println("Shifting continents...");
+    world.plateTechtonics();
+    map.display("altitude");
+    
+    System.out.println("Roughing up and smoothing down terrain...");
+    for (int i = 64; i > 1; i /= 8) { // gradually randomizes and smooths out terrain
+      for (int j = 0; j < i/4; j ++)
+        world.smooth(.4);
+      map.display("altitude");
+      world.rough(i);
+      map.display("altitude");
+    }
+    System.out.println("Roughing...");
+    
+    System.out.println("Generating climate...");
+    world.acclimate(.1);
+    world.orographicEffect();
+    map.display("rainfall");
+    
+    System.out.println("Setting up biomes...");
+    world.biomeAssign();
+    map.display("biome");
+  }
+  
+  
+  public static void generate(Globe world) { // randomly generates a map
+    world.spawnFirstContinent();
+    
+    System.out.println("Generating landmasses...");
+    while (world.any(-257))
+      world.spawnContinents();
+    
+    System.out.println("Shifting continents...");
+    //world.plateTechtonics();
+    
+    System.out.println("Roughing up terrain...");
+    world.rough(64);
+    
+    System.out.println("Smoothing down terrain...");
+    world.smooth(.5);
+  }
+  
+  
+  public static void delay(int mSec) { // waits a number of miliseconds
     long start = System.currentTimeMillis();
     while (System.currentTimeMillis() < start+mSec) {}
+  }
+  
+  
+  public static void setTimer(long mSec) { // sets the timer to a certain time
+    startTime = System.currentTimeMillis() - mSec;
+  }
+  
+  
+  public static void waitFor(long mSec) { // waits for the timer to reach a certain time
+    while (System.currentTimeMillis() - startTime < mSec) {}
   }
 }

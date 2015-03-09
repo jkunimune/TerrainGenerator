@@ -5,15 +5,15 @@ import javax.swing.*;
 
 
 public class Map extends JPanel { // a class to manage the graphic elements of terrain generation
-  final Color[] colors = {new Color(255,70,0), new Color(0,0,200), new Color(200,255,255), new Color(255,255,255), new Color(0,255,0),
-    new Color(255,200,25), new Color(0,150,25), new Color(200,100,50), new Color(200,100,255), new Color(0,25,255), new Color(0,0,0),
-    new Color(255, 255, 200)}; // colors of the different biomes
-  final boolean[][][] key = {{ // contains information for how to draw different biomes
-    {false, false, false, false, false},
-    {false,  true, false,  true, false},
-    {false,  true, false,  true, false},
-    {false, false,  true, false, false},
-    {false, false, false, false, false},},
+  final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(20, 70, 200), new Color(255,255,255), new Color(0,255,0),
+    new Color(255,255,25), new Color(0,150,25), new Color(200,100,50), new Color(200,100,255), new Color(0,25,255), new Color(0,0,0)}; // colors of the biomes
+  final boolean[][][] key = { // contains information for how to draw different biomes
+    {
+      {false, false, false, false, false},
+      {false,  true, false,  true, false},
+      {false,  true, false,  true, false},
+      {false, false,  true, false, false},
+      {false, false, false, false, false},},
     {
       {false, false, false, false, false},
       {false, false, false, false, false},
@@ -82,8 +82,8 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
       {false, false, false, false, false},},};
       
   private BufferedImage img;
-  public int width;
-  public int height;
+  private int width;
+  private int height;
   public Globe glb;
   
   
@@ -129,7 +129,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   /* REDEFINE ABOVE IN SUBLCASSES */
   
   
-  public Color getColorBy(String type, int x, int y) {
+  public Color getColorBy(String type, int x, int y) { // gets the color at a point on the screen
     if (type.equals("biome"))
       return getColorByBiome(x,y);
     else if (type.equals("altitude"))
@@ -153,9 +153,9 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   public Color getColorByAlt(int x, int y) {
     int alt = glb.getTile(getLat(x,y), getLon(x,y)).altitude;
     if (alt < -256) // if altitude is below minimum, return the color of lava
-      return colors[0];
+      return colors[Tile.magma];
     else if (alt >= 256) // if altitude is above maximum, return the color of space
-      return colors[10];
+      return colors[Tile.space];
     else if (alt < 0) // if altitude is below sea level, return a blue that gets darker as one goes deeper
       return new Color(0, 0, 256+alt);
     else // if altitude is above sea level, return a green that gets brighter as one goes higher
@@ -164,22 +164,22 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   
   public Color getColorByRain(int x, int y) {
-    int rain = 255 - glb.getTile(getLat(x,y), getLon(x,y)).rainfall;
-    if (rain >= 256)
+    int dryness = 255 - glb.getTile(getLat(x,y), getLon(x,y)).rainfall;
+    if (dryness < 0)
       return new Color(0, 0, 255);
-    if (rain < 0)
+    if (dryness >= 256)
       return new Color(255, 255, 255);
-    return new Color(rain, rain, 255);
+    return new Color(dryness, dryness, 255); // return a blue that gets darker with rainfall
   }
   
   
   public Color getColorByTemp(int x, int y) {
-    int hotness = 255 - glb.getTile(getLat(x,y), getLon(x,y)).temperature;
-    if (hotness >= 256)
+    int coldness = 255 - glb.getTile(getLat(x,y), getLon(x,y)).temperature;
+    if (coldness >= 256)
       return new Color(255, 0, 0);
-    if (hotness < 0)
+    if (coldness < 0)
       return new Color(255, 255, 255);
-    return new Color(255, hotness, hotness);
+    return new Color(255, coldness, coldness); // return a red that gets darker with temperature
   }
   
   
@@ -195,6 +195,16 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
     if (rain >= 256)
       return new Color(255, 255, 255);
     return new Color(rain, (temp+rain)/2, rain);
+  }
+  
+  
+  public int width() {
+    return width;
+  }
+  
+  
+  public int height() {
+    return height;
   }
   
   
