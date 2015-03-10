@@ -80,7 +80,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
       map.display("altitude");
     
     System.out.println("Shifting continents...");
-    //world.plateTechtonics();
+    world.plateTechtonics();
     map.display("altitude");
     
     System.out.println("Roughing up and smoothing down terrain...");
@@ -94,9 +94,9 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     System.out.println("Roughing...");
     
     System.out.println("Generating climate...");
-    world.acclimate(.2);
-    world.orographicEffect();
-    map.display("rainfall");
+    world.acclimate(.1);
+    world.climateEnhance();
+    map.display("climate");
     
     System.out.println("Setting up biomes...");
     world.biomeAssign();
@@ -112,7 +112,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
       world.spawnContinents();
     
     System.out.println("Shifting continents...");
-    //world.plateTechtonics();
+    world.plateTechtonics();
     
     System.out.println("Roughing up terrain...");
     world.rough(64);

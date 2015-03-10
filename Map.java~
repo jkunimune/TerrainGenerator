@@ -5,8 +5,8 @@ import javax.swing.*;
 
 
 public class Map extends JPanel { // a class to manage the graphic elements of terrain generation
-  final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(0, 50, 150), new Color(255,255,255), new Color(0,255,0),
-    new Color(255,255,25), new Color(0,150,25), new Color(200,100,50), new Color(200,100,255), new Color(0,25,255), new Color(0,0,0)}; // colors of the biomes
+  final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(20, 70, 200), new Color(255,255,255), new Color(0,255,0),
+    new Color(200,255,25), new Color(0,150,25), new Color(200,100,50), new Color(200,100,255), new Color(0,25,255), new Color(0,0,0)}; // colors of the biomes
   final boolean[][][] key = { // contains information for how to draw different biomes
     {
       {false, false, false, false, false},

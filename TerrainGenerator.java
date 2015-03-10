@@ -5,25 +5,24 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
   
   public static void main(String args[])
   {
-    Globe world = new Globe(20);
+    /*Globe world = new Globe(20);
     Map theMap = new Lambert(world, 1200, 600);
-    
     world.test();
     theMap.display("altitude");
     world.plateTechtonics();
     delay(2000);
     theMap.display("altitude");
-    System.out.println("end");
+    System.out.println("end");*/
     
-    /*while (true) {
+    while (true) {
       Globe world = new Globe(100);
-      Map theMap = new Lambert(world, 1200, 600);
+      Map theMap = new Hemispherical(world, 1200, 600);
       
       generate(world, theMap);
       
       System.out.println("end");
       delay(20000);
-    }*/
+    }
   }
   
   
@@ -85,18 +84,17 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     
     System.out.println("Roughing up and smoothing down terrain...");
     for (int i = 64; i > 1; i /= 8) { // gradually randomizes and smooths out terrain
-      for (int j = 0; j < i/4; j ++)
+      for (int j = 0; j < i; j ++)
         world.smooth(.4);
       map.display("altitude");
-      world.rough(i);
+      world.rough(i/128.0);
       map.display("altitude");
     }
-    System.out.println("Roughing...");
     
     System.out.println("Generating climate...");
     world.acclimate(.1);
-    world.orographicEffect();
-    map.display("rainfall");
+    world.climateEnhance();
+    map.display("climate");
     
     System.out.println("Setting up biomes...");
     world.biomeAssign();
@@ -112,7 +110,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
       world.spawnContinents();
     
     System.out.println("Shifting continents...");
-    //world.plateTechtonics();
+    world.plateTechtonics();
     
     System.out.println("Roughing up terrain...");
     world.rough(64);

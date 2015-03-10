@@ -9,7 +9,21 @@ public class Tile { // keeps track of a single point on a globe
   public int temp1; // to store various values only necessary during generation
   public int temp2;
   public int temp3;
-// BIOME KEY: 0:Magma 1:Ocean 2:Ice 3:Tundra 4:Plains 5:Desert 6:Jungle 7:Mountain 8:Snowcap 9:Freshwater 10:Space 11:Star
+  
+  public static final int magma = 0; // biome values
+  public static final int ocean = 1;
+  public static final int ice = 2;
+  public static final int reef = 3;
+  public static final int tundra = 4;
+  public static final int plains = 5;
+  public static final int desert = 6;
+  public static final int jungle = 7;
+  public static final int mountain = 8;
+  public static final int snowcap = 9;
+  public static final int freshwater = 10;
+  public static final int space = 11;
+  
+// BIOME KEY: 0:Magma 1:Ocean 2:Ice 3:Reef 4:Tundra 5:Plains 6:Desert 7:Jungle 8:Mountain 9:Snowcap 10:Freshwater 11:Space
   
   
   

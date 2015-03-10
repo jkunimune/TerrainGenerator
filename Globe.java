@@ -36,16 +36,16 @@ public class Globe { // a class to create a spherical surface and generate terra
       for (int lon = 0; lon < map[lat].length; lon ++) {
         map[lat][lon].altitude = 63;
         map[lat][lon].temp1 = 63;
-        map[lat][lon].temp2 = 157;
+        map[lat][lon].temp2 = 0;
         map[lat][lon].temp3 = 0;
       }
     
-    for (int lat = 0; lat < map.length/2; lat ++)
-      for (int lon = 0; lon < map[lat].length; lon ++) {
+    for (int lat = 0; lat < map.length; lat ++)
+      for (int lon = 0; lon < map[lat].length/2; lon ++) {
         map[lat][lon].altitude = -64;
         map[lat][lon].temp1 = -64;
-        map[lat][lon].temp2 = 157;
-        map[lat][lon].temp3 = 314;
+        map[lat][lon].temp2 = 314;
+        map[lat][lon].temp3 = 0;
       }
   }
   
@@ -115,27 +115,27 @@ public class Globe { // a class to create a spherical surface and generate terra
             Vector omega2 = new Vector(1, thatTil.temp2/100.0, thatTil.temp3/100.0);
             Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
             
-            double rise = 300.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
+            double rise = 1000.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
             
             if (thisTil.altitude < 0) { // if this is ocean
               if (rise < 0) { // if they are going towards each other
                 if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
-                  totalChange += rise/1; // it forms a sea trench
+                  totalChange += rise; // it forms a sea trench
                 }
                 else { // if this is above that one
-                  totalChange -= rise/1; // it forms an island chain
+                  totalChange -= rise; // it forms an island chain
                 }
               }
               else { // if they are going away from each other
-                totalChange -= rise/2; // it forms an ocean rift
+                totalChange += rise/2; // it forms an ocean rift
               }
             }
             else { // if this is land
               if (rise < 0) { // if they are going towards each other
-                totalChange -= rise/1; // it forms a mountain range
+                totalChange -= rise; // it forms a mountain range
               }
               else { // if they are going away from each other
-                totalChange -= rise/1; // it forms a valley
+                totalChange -= rise; // it forms a valley
               }
             }
           }
@@ -165,7 +165,7 @@ public class Globe { // a class to create a spherical surface and generate terra
   public void rough(double amount) { // randomizes the terrain a bit
     for (Tile[] row: map) {
       for (Tile t: row) {
-        t.altitude += (int)((Math.random()-.5)*(t.altitude*t.altitude/2048.0*amount));
+        t.altitude += (int)((Math.random()-.5)*(t.altitude*amount));
       }
     }
   }
@@ -278,21 +278,24 @@ public class Globe { // a class to create a spherical surface and generate terra
           if (til.temperature < 130) { // if cold
             til.biome = Tile.ice;
           }
-          else if (til.temperature < 240) { // if warm
+          else if (til.altitude < -64) { // if super deep
+            til.biome = Tile.trench;
+          }
+          else if (til.temperature < 242) { // if warm
             til.biome = Tile.ocean;
           }
           else { // if hot
             til.biome = Tile.reef;
           }
         }
-        else if (til.altitude < 196) { // if low altitude
+        else if (til.altitude < 64) { // if low altitude
           if (til.temperature < 150) { // if cold
             til.biome = Tile.tundra;
           }
           else if (til.temperature >= 235 && til.rainfall >= 150) { // if hot and wet
             til.biome = Tile.jungle;
           }
-          else if (til.temperature - .35*til.rainfall >= 120) { // if hot and dry
+          else if (til.temperature - .545*til.rainfall >= 110) { // if hot and dry
             til.biome = Tile.desert;
           }
           else { // if neutral
@@ -300,7 +303,7 @@ public class Globe { // a class to create a spherical surface and generate terra
           }
         }
         else { // if mountainous
-          if (til.temperature < 150) { // if cold
+          if (til.temperature < 128) { // if cold
             til.biome = Tile.snowcap;
           }
           else { // if warm
