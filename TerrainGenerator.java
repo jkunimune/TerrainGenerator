@@ -3,17 +3,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
   
   
   
-  public static void main(String args[])
-  {
-    /*Globe world = new Globe(20);
-    Map theMap = new Lambert(world, 1200, 600);
-    world.test();
-    theMap.display("altitude");
-    world.plateTechtonics();
-    delay(2000);
-    theMap.display("altitude");
-    System.out.println("end");*/
-    
+  public static void main(String args[]) {
     while (true) {
       Globe world = new Globe(100);
       Map theMap = new Hemispherical(world, 1200, 600);
