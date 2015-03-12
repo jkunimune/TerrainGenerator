@@ -88,38 +88,39 @@ public class Globe { // a class to create a spherical surface and generate terra
         double totalChange = 0; // keeps track of how much to change the altitude
         ArrayList<Tile> adj = adjacentTo(thisTil);
         for (Tile thatTil: adj) {
-          if (!thatTil.equals(thisTil) && !(thisTil.temp2 == thatTil.temp2 && thisTil.temp3 == thatTil.temp3)) { // assuming they are not the same tile and on different plates
-            final Vector r1 = new Vector(1, thisTil.lat*Math.PI/map.length, thisTil.lon*2*Math.PI/map[thisTil.lat].length);
-            final Vector r2 = new Vector(1, thatTil.lat*Math.PI/map.length, thatTil.lon*2*Math.PI/map[thatTil.lat].length);
-            Vector delTheta = r1.cross(r2);
-            delTheta.setR(r1.angleTo(r2)*radius); // the distance between them
-            
-            Vector omega1 = new Vector(1, thisTil.temp2/100.0, thisTil.temp3/100.0);
-            Vector omega2 = new Vector(1, thatTil.temp2/100.0, thatTil.temp3/100.0);
-            Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
-            
-            double rise = 500.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
-            
-            if (thisTil.altitude < 0) { // if this is ocean
-              if (rise < 0) { // if they are going towards each other
-                if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
-                  totalChange += rise; // it forms a sea trench
-                }
-                else { // if this is above that one
-                  totalChange -= rise; // it forms an island chain
-                }
+          if (thisTil.temp2 == thatTil.temp2 && thisTil.temp3 == thatTil.temp3) // if they are on the same plate
+            continue; // skip this pair
+          
+          final Vector r1 = new Vector(1, thisTil.lat*Math.PI/map.length, thisTil.lon*2*Math.PI/map[thisTil.lat].length);
+          final Vector r2 = new Vector(1, thatTil.lat*Math.PI/map.length, thatTil.lon*2*Math.PI/map[thatTil.lat].length);
+          Vector delTheta = r1.cross(r2);
+          delTheta.setR(r1.angleTo(r2)*radius); // the distance between them
+          
+          Vector omega1 = new Vector(1, thisTil.temp2/100.0, thisTil.temp3/100.0);
+          Vector omega2 = new Vector(1, thatTil.temp2/100.0, thatTil.temp3/100.0);
+          Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
+          
+          double rise = -500.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
+          
+          if (thisTil.altitude < 0) { // if this is ocean
+            if (rise < 0) { // if they are going towards each other
+              if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
+                totalChange += rise; // it forms a sea trench
               }
-              else { // if they are going away from each other
-                totalChange += rise/4; // it forms an ocean rift
+              else { // if this is above that one
+                totalChange -= rise; // it forms an island chain
               }
             }
-            else { // if this is land
-              if (rise < 0) { // if they are going towards each other
-                totalChange -= rise; // it forms a mountain range
-              }
-              else { // if they are going away from each other
-                totalChange -= rise; // it forms a valley
-              }
+            else { // if they are going away from each other
+              totalChange += rise/4; // it forms an ocean rift
+            }
+          }
+          else { // if this is land
+            if (rise < 0) { // if they are going towards each other
+              totalChange -= rise; // it forms a mountain range
+            }
+            else { // if they are going away from each other
+              totalChange -= rise; // it forms a valley
             }
           }
         }
@@ -248,7 +249,7 @@ public class Globe { // a class to create a spherical surface and generate terra
     
     for (Tile[] row: map) { // cools down extreme altitudes
       for (Tile til: row) {
-        til.temperature -= Math.pow(til.altitude,2)/2048;
+        til.temperature -= Math.pow(til.altitude,2)/2000;
       }
     }
   }
@@ -258,7 +259,7 @@ public class Globe { // a class to create a spherical surface and generate terra
     for (Tile[] row: map) {
       for (Tile til: row) {
         if (til.altitude < 0) { // if below sea level
-          if (til.temperature < 130) { // if cold
+          if (til.temperature < 120 + 8*Math.sin(til.rainfall)) { // if cold
             til.biome = Tile.ice;
           }
           else if (til.altitude < -128) { // if super deep
@@ -272,13 +273,13 @@ public class Globe { // a class to create a spherical surface and generate terra
           }
         }
         else if (til.altitude < 128) { // if low altitude
-          if (til.temperature < 150) { // if cold
+          if (til.temperature + 4*Math.sin(til.rainfall) < 140) { // if cold
             til.biome = Tile.tundra;
           }
           else if (til.temperature >= 150 && til.rainfall >= 230) { // if hot and wet
             til.biome = Tile.jungle;
           }
-          else if (til.temperature - .5*til.rainfall >= 110) { // if hot and dry
+          else if ((255-til.temperature)*(255-til.temperature) + (til.rainfall-180)*(til.rainfall-180) < 2700) { // if hot and dry
             til.biome = Tile.desert;
           }
           else { // if neutral
