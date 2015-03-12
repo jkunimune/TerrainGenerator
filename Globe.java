@@ -313,6 +313,21 @@ public class Globe { // a class to create a spherical surface and generate terra
     int x = (int)(lon*map[y].length/(2*Math.PI));
     return map[y][x];
   }
+  
+  
+  public Tile getTileByIndex(int lat, int lon) {
+    return map[lat][lon];
+  }
+  
+  
+  public int latIndex(double lattitude) {
+    return (int)(lattitude*map.length/Math.PI);
+  }
+  
+  
+  public int lonIndex(int lat, double longitude) {
+    return (int)(longitude*map[lat].length/(2*Math.PI));
+  }
 //  
 //  
 //  public Tile[][] getTileMatrix() {

@@ -58,12 +58,12 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     
     int t = 0;
     while (world.any(-257)) {
-      setTimer(0);
+      //setTimer(0);
       world.spawnContinents();
-      if (t%10 == 0)
+      if (t%1 == 0)
         map.display("altitude");
       t ++;
-      waitFor(100);
+      //waitFor(100);
     }
     if (t%10 != 1)
       map.display("altitude");

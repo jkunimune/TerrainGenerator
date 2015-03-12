@@ -15,10 +15,7 @@ public class Hemispherical extends Map { // a realistic globe projection that sh
     for (int x = 0; x < 2*radius; x ++) { // displays western hemisphere
       for (int y = 0; y < 2*radius; y ++) {
         if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius) {
-          double longitude = Math.asin((x-radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + Math.PI/2;
-          double lattitude = Math.acos(1-(double)y/radius);
-          
-          drawPx(x, y, getColorBy(colorScheme, glb.getTile(lattitude, longitude)));
+          drawPx(x, y, getColorBy(colorScheme, x, y));
         }
       }
     }
@@ -26,13 +23,23 @@ public class Hemispherical extends Map { // a realistic globe projection that sh
     for (int x = 2*radius; x < 4*radius; x ++) { // displays eastern hemisphere
       for (int y = 0; y < 2*radius; y ++) {
         if ((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < radius*radius) {
-          double longitude = Math.asin((x-3*radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + 3*Math.PI/2;
-          double lattitude = Math.acos(1-(double)y/radius);
-          
-          drawPx(x, y, getColorBy(colorScheme, glb.getTile(lattitude, longitude)));
+          drawPx(x, y, getColorBy(colorScheme, x, y));
         }
       }
     }
     show();
+  }
+  
+  
+  public double getLat(int x, int y) {
+    return Math.acos(1-(double)y/radius);
+  }
+  
+  
+  public double getLon(int x, int y) {
+    if (x < 2*radius)
+      return Math.asin((x-radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + Math.PI/2;
+    else
+      return Math.asin((x-3*radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + 3*Math.PI/2;
   }
 }

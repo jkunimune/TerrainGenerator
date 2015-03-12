@@ -153,10 +153,10 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   public Color getColorByAlt(int x, int y) {
     int alt = glb.getTile(getLat(x,y), getLon(x,y)).altitude;
-    if (alt < -256) // if altitude is below minimum, return the color of lava
-      return colors[Tile.magma];
-    else if (alt >= 256) // if altitude is above maximum, return the color of space
-      return colors[Tile.space];
+    if (alt < -256) // if altitude is below minimum, return black
+      return Color.black;
+    else if (alt >= 256) // if altitude is above maximum, return white
+      return Color.white;
     else if (alt < 0) // if altitude is below sea level, return a blue that gets darker as one goes deeper
       return new Color(0, 0, 256+alt);
     else // if altitude is above sea level, return a green that gets brighter as one goes higher
