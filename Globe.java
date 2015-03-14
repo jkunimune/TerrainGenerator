@@ -1,4 +1,4 @@
- import java.util.*;
+import java.util.*;
 
 
 
@@ -28,6 +28,13 @@ public class Globe { // a class to create a spherical surface and generate terra
       }
     }
   }
+  
+  
+  public Globe(Globe source) { // copies a preexisting globe
+//    radius = source.getRadius();
+//    map = source.getTileMatrix();
+  }
+  
   
   
   /* Generation Methods */
@@ -63,7 +70,7 @@ public class Globe { // a class to create a spherical surface and generate terra
         if (tile.altitude == -257) {
           ArrayList<Tile> adjacent = adjacentTo(tile);
           for (Tile ref: adjacent) // reads all adjacent tiles to look for land or sea
-            if (ref.altitude >= -256 && randChance(-40 + (int)(Math.pow(ref.altitude,2)/128))) // deeper/higher continents spread faster
+            if (ref.altitude >= -256 && randChance(-43 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
             tile.spreadFrom(ref);
           
           if (tile.altitude == -257 && randChance(-148)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
@@ -105,6 +112,7 @@ public class Globe { // a class to create a spherical surface and generate terra
           if (thisTil.altitude < 0) { // if this is ocean
             if (rise < 0) { // if they are going towards each other
               if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
+                //System.out.println("About to make a trench since this is "+(thatTil.altitude-thisTil.altitude)+" lower than the next one and rise is "+rise);
                 totalChange += rise; // it forms a sea trench
               }
               else { // if this is above that one
@@ -112,15 +120,123 @@ public class Globe { // a class to create a spherical surface and generate terra
               }
             }
             else { // if they are going away from each other
-              totalChange += rise/4; // it forms an ocean rift
+              totalChange += rise*0; // it forms an ocean rift
             }
           }
           else { // if this is land
             if (rise < 0) { // if they are going towards each other
-              totalChange -= rise; // it forms a mountain range
+              totalChange -= rise*0; // it forms a mountain range
             }
             else { // if they are going away from each other
-              totalChange -= rise; // it forms a valley
+              totalChange -= rise*0; // it forms a valley
+            }
+          }
+        }
+        thisTil.temp1 += totalChange;
+      }
+    }
+    
+    for (Tile[] thisRow: map)
+      for (Tile thisTil: thisRow)
+        thisTil.altitude = thisTil.temp1;
+  }
+  
+  
+  public void plateTechtonicsJustChains() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
+    for (Tile[] row: map) {
+      for (Tile thisTil: row) {
+        thisTil.temp1 = thisTil.altitude;
+        double totalChange = 0; // keeps track of how much to change the altitude
+        ArrayList<Tile> adj = adjacentTo(thisTil);
+        for (Tile thatTil: adj) {
+          if (thisTil.temp2 == thatTil.temp2 && thisTil.temp3 == thatTil.temp3) // if they are on the same plate
+            continue; // skip this pair
+          
+          final Vector r1 = new Vector(1, thisTil.lat*Math.PI/map.length, thisTil.lon*2*Math.PI/map[thisTil.lat].length);
+          final Vector r2 = new Vector(1, thatTil.lat*Math.PI/map.length, thatTil.lon*2*Math.PI/map[thatTil.lat].length);
+          Vector delTheta = r1.cross(r2);
+          delTheta.setR(r1.angleTo(r2)*radius); // the distance between them
+          
+          Vector omega1 = new Vector(1, thisTil.temp2/100.0, thisTil.temp3/100.0);
+          Vector omega2 = new Vector(1, thatTil.temp2/100.0, thatTil.temp3/100.0);
+          Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
+          
+          double rise = -500.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
+          
+          if (thisTil.altitude < 0) { // if this is ocean
+            if (rise < 0) { // if they are going towards each other
+              if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
+                //System.out.println("About to make a trench since this is "+(thatTil.altitude-thisTil.altitude)+" lower than the next one and rise is "+rise);
+                totalChange += rise*0; // it forms a sea trench
+              }
+              else { // if this is above that one
+                totalChange -= rise; // it forms an island chain
+              }
+            }
+            else { // if they are going away from each other
+              totalChange += rise*0; // it forms an ocean rift
+            }
+          }
+          else { // if this is land
+            if (rise < 0) { // if they are going towards each other
+              totalChange -= rise*0; // it forms a mountain range
+            }
+            else { // if they are going away from each other
+              totalChange -= rise*0; // it forms a valley
+            }
+          }
+        }
+        thisTil.temp1 += totalChange;
+      }
+    }
+    
+    for (Tile[] thisRow: map)
+      for (Tile thisTil: thisRow)
+        thisTil.altitude = thisTil.temp1;
+  }
+  
+  
+  public void plateTechtonicsJustTrench() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
+    for (Tile[] row: map) {
+      for (Tile thisTil: row) {
+        thisTil.temp1 = thisTil.altitude;
+        double totalChange = 0; // keeps track of how much to change the altitude
+        ArrayList<Tile> adj = adjacentTo(thisTil);
+        for (Tile thatTil: adj) {
+          if (thisTil.temp2 == thatTil.temp2 && thisTil.temp3 == thatTil.temp3) // if they are on the same plate
+            continue; // skip this pair
+          
+          final Vector r1 = new Vector(1, thisTil.lat*Math.PI/map.length, thisTil.lon*2*Math.PI/map[thisTil.lat].length);
+          final Vector r2 = new Vector(1, thatTil.lat*Math.PI/map.length, thatTil.lon*2*Math.PI/map[thatTil.lat].length);
+          Vector delTheta = r1.cross(r2);
+          delTheta.setR(r1.angleTo(r2)*radius); // the distance between them
+          
+          Vector omega1 = new Vector(1, thisTil.temp2/100.0, thisTil.temp3/100.0);
+          Vector omega2 = new Vector(1, thatTil.temp2/100.0, thatTil.temp3/100.0);
+          Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
+          
+          double rise = -500.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
+          
+          if (thisTil.altitude < 0) { // if this is ocean
+            if (rise < 0) { // if they are going towards each other
+              if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
+                //System.out.println("About to make a trench since this is "+(thatTil.altitude-thisTil.altitude)+" lower than the next one and rise is "+rise);
+                totalChange += rise; // it forms a sea trench
+              }
+              else { // if this is above that one
+                totalChange -= rise*0; // it forms an island chain
+              }
+            }
+            else { // if they are going away from each other
+              totalChange += rise*0; // it forms an ocean rift
+            }
+          }
+          else { // if this is land
+            if (rise < 0) { // if they are going towards each other
+              totalChange -= rise*0; // it forms a mountain range
+            }
+            else { // if they are going away from each other
+              totalChange -= rise*0; // it forms a valley
             }
           }
         }
@@ -184,20 +300,6 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
-  public void orographicEffect() { // alters climate such that wet ocean air can blow rain onto dryer regions
-    for (Tile[] row: map) {
-      for (Tile til: row) {
-        if (til.altitude < 0)
-          til.rainfall = 255;
-        else {
-          til.rainfall += moisture(til, -1, 16);
-          til.rainfall += moisture(til, 1, 16);
-        }
-      }
-    }
-  }
-  
-  
   public int moisture(Tile til, int dir, int dist) { // determines how much moisture blows in from a given direction
     if (dist <= 0)
       return 0;
@@ -236,20 +338,15 @@ public class Globe { // a class to create a spherical surface and generate terra
       }
     }
     
-    for (Tile[] row: map) { // applies orographic effect (tiles draw moisture from sea winds)
+    for (Tile[] row: map) {
       for (Tile til: row) {
-        if (til.altitude < 0)
+        if (til.altitude < 0) // applies orographic effect (tiles draw moisture from sea winds)
           til.rainfall = 255;
         else {
           til.rainfall += moisture(til, -1, 16);
           til.rainfall += moisture(til, 1, 16);
         }
-      }
-    }
-    
-    for (Tile[] row: map) { // cools down extreme altitudes
-      for (Tile til: row) {
-        til.temperature -= Math.pow(til.altitude,2)/2000;
+        //til.temperature -= (int)Math.abs(til.altitude) >> 20; // cools down extreme altitudes
       }
     }
   }
@@ -259,7 +356,7 @@ public class Globe { // a class to create a spherical surface and generate terra
     for (Tile[] row: map) {
       for (Tile til: row) {
         if (til.altitude < 0) { // if below sea level
-          if (til.temperature < 120 + 8*Math.sin(til.rainfall)) { // if cold
+          if (til.temperature + 8*Math.sin(til.rainfall) < 120) { // if cold
             til.biome = Tile.ice;
           }
           else if (til.altitude < -128) { // if super deep
@@ -273,13 +370,13 @@ public class Globe { // a class to create a spherical surface and generate terra
           }
         }
         else if (til.altitude < 128) { // if low altitude
-          if (til.temperature + 4*Math.sin(til.rainfall) < 140) { // if cold
+          if (til.temperature + 4*(Math.sin(til.rainfall)) < 140) { // if cold
             til.biome = Tile.tundra;
           }
-          else if (til.temperature >= 150 && til.rainfall >= 230) { // if hot and wet
+          else if (til.temperature >= 150 && til.rainfall >= 229) { // if hot and wet
             til.biome = Tile.jungle;
           }
-          else if ((255-til.temperature)*(255-til.temperature) + (til.rainfall-180)*(til.rainfall-180) < 2700) { // if hot and dry
+          else if ((255-til.temperature)*(255-til.temperature) + (til.rainfall-180)*(til.rainfall-180) < 2600) { // if hot and dry
             til.biome = Tile.desert;
           }
           else { // if neutral
@@ -297,6 +394,7 @@ public class Globe { // a class to create a spherical surface and generate terra
       }
     }
   }
+  
   
   /* Utility Methods */
   public Tile getTile(double lat, double lon) { // returns a tile at a given coordinate

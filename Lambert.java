@@ -8,7 +8,7 @@ public class Lambert extends Map { // an equal area globe projection that distor
     
     for (int x = 0; x < w; x ++) {
       for (int y = 0; y < h; y ++) {
-        if ((x/2*2 == w/10/2*2 || x/2*2 == w*9/10/2*2) && y/7%2 == 0) { // draw dotted lines on sides
+        if ((x>>1<<1 == w/10>>1<<1 || x>>1<<1 == w*9/10>>1<<1) && y/7%2 == 0) { // draw dotted lines on sides
           lats[y][x] = -1;
           lons[y][x] = 0;
         }

@@ -5,13 +5,39 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
   
   public static void main(String args[]) {
     while (true) {
-      Globe world = new Globe(100);
-      Map theMap = new Lambert(world, 1200, 600);
+      Globe start = new Globe(100);
+      Map map = new Lambert(start, 1200, 600);
       
-      generate(world, theMap);
+      map.display("altitude");
+      System.out.println("Generating landmasses...");
+      start.spawnFirstContinent();
+      int t = 0;
+      while (start.any(-257)) {
+        //setTimer(0);
+        start.spawnContinents();
+        if (t%10 == 0)
+          map.display("altitude");
+        t ++;
+        //waitFor(100);
+      }
+      if (t%10 != 1)
+        map.display("altitude");
+      
+      Globe chains = start;
+      Globe trench = start;
+      Map chainM = new Lambert(chains, 1200, 600);
+      Map trencM = new Lambert(trench, 1200, 600);
+      
+      chains.plateTechtonicsJustChains();
+      trench.plateTechtonicsJustTrench();
+      start.plateTechtonics();
+      
+      chainM.display("altitude");
+      trencM.display("altitude");
+      map.display("altitude");
       
       System.out.println("end");
-      delay(20000);
+      delay(200000);
     }
   }
   
@@ -60,7 +86,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     while (world.any(-257)) {
       //setTimer(0);
       world.spawnContinents();
-      if (t%1 == 0)
+      if (t%10 == 0)
         map.display("altitude");
       t ++;
       //waitFor(100);
@@ -73,7 +99,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     map.display("altitude");
     
     System.out.println("Roughing up and smoothing down terrain...");
-    for (int i = 64; i > 1; i /= 8) { // gradually randomizes and smooths out terrain
+    for (int i = 64; i > 1; i >>= 3) { // gradually randomizes and smooths out terrain
       for (int j = 0; j < i; j ++)
         world.smooth(.4);
       map.display("altitude");
@@ -84,7 +110,8 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     System.out.println("Generating climate...");
     world.acclimate(.1);
     world.climateEnhance();
-    map.display("climate");
+    map.display("temperature");
+    delay(1000);
     
     System.out.println("Setting up biomes...");
     world.biomeAssign();

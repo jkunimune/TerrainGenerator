@@ -1,7 +1,7 @@
 public class VectorTest {
   public static void main(String[] args) {
-    Vector u = new Vector(1, Math.PI/2, 3*Math.PI/2);
-    Vector v = new Vector(1, Math.PI/2, 0);
+    Vector u = new Vector(1, Math.PI/2, 7*Math.PI/4);
+    Vector v = new Vector(1, Math.PI/2, Math.PI/4);
     System.out.println("u = "+u+" = "+u.toStringPolar());
     System.out.println("v = "+v+" = "+v.toStringPolar());
     
