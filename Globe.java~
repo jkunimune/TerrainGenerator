@@ -1,4 +1,4 @@
- import java.util.*;
+import java.util.*;
 
 
 
@@ -31,8 +31,8 @@ public class Globe { // a class to create a spherical surface and generate terra
   
   
   public Globe(Globe source) { // copies a preexisting globe
-    radius = source.getRadius();
-    map = source.getTileMatrix();
+//    radius = source.getRadius();
+//    map = source.getTileMatrix();
   }
   
   

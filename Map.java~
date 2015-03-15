@@ -83,18 +83,18 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
       {false, false, false, false, false},},};
       
   private BufferedImage img;
-  private int width;
-  private int height;
+  public int[][] lats; // remembers which tile goes to which pixels (remembr to initialize in subclass constructor)
+  public int[][] lons; // if a lat is -1, the lon is the rgb value of the color to put there
   public Globe glb;
   
   
   
   public Map(Globe newWorld, int w, int h) {
     glb = newWorld;
-    width = w;
-    height = h;
-    img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
-    setPreferredSize(new Dimension(width, height));
+    lats = new int[h][w];
+    lons = new int[h][w];
+    img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
+    setPreferredSize(new Dimension(w, h));
     JFrame frame = new JFrame();
     frame.add(this);
     frame.pack();
@@ -111,48 +111,40 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  /* REDEFINE BELOW IN SUBCLASSES */
   public void display(String colorScheme) { // displays the map
-    for (int x = 0; x < width; x ++)
-      for (int y = 0; y < height; y ++)
+    for (int x = 0; x < width(); x ++)
+      for (int y = 0; y < height(); y ++)
         drawPx(x, y, getColorBy(colorScheme, x, y));
+    show();
   }
-  
-  
-  public double getLat(int x, int y) { // gets a lattitude for a point on the screen based on a default algorithm
-    return y*Math.PI/height;
-  }
-  
-  
-  public double getLon(int x, int y) { // ditto, longitude
-    return x*2*Math.PI/width;
-  }
-  /* REDEFINE ABOVE IN SUBLCASSES */
   
   
   public Color getColorBy(String type, int x, int y) { // gets the color at a point on the screen
-    if (type.equals("biome"))
-      return getColorByBiome(x,y);
+    if (lats[y][x] < 0) // if it is a color, not a tile
+      return new Color(lons[y][x]>>16, lons[y][x]>>8, lons[y][x]); // return a color with the rgb value found
+    
+    if (type.equals("biome")) // otherwise calculate the color from that tile
+      return getColorByBiome(x, y);
     else if (type.equals("altitude"))
-      return getColorByAlt(x,y);
+      return getColorByAlt(x, y);
     else if (type.equals("rainfall"))
-      return getColorByRain(x,y);
+      return getColorByRain(x, y);
     else if (type.equals("temperature"))
-      return getColorByTemp(x,y);
+      return getColorByTemp(x, y);
     else if (type.equals("climate"))
-      return getColorByClimate(x,y);
+      return getColorByClimate(x, y);
     else
       return Color.black;
   }
   
   
   public Color getColorByBiome(int x, int y) {
-    return colors[glb.getTile(getLat(x,y), getLon(x,y)).biome];
+    return colors[glb.getTileByIndex(lats[y][x], lons[y][x]).biome];
   }
   
   
   public Color getColorByAlt(int x, int y) {
-    int alt = glb.getTile(getLat(x,y), getLon(x,y)).altitude;
+    int alt = glb.getTileByIndex(lats[y][x], lons[y][x]).altitude;
     if (alt < -256) // if altitude is below minimum, return black
       return Color.black;
     else if (alt >= 256) // if altitude is above maximum, return white
@@ -165,7 +157,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   
   public Color getColorByRain(int x, int y) {
-    int dryness = 255 - glb.getTile(getLat(x,y), getLon(x,y)).rainfall;
+    int dryness = 255 - glb.getTileByIndex(lats[y][x], lons[y][x]).rainfall;
     if (dryness < 0)
       return new Color(0, 0, 255);
     if (dryness >= 256)
@@ -175,7 +167,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   
   public Color getColorByTemp(int x, int y) {
-    int coldness = 255 - glb.getTile(getLat(x,y), getLon(x,y)).temperature;
+    int coldness = 255 - glb.getTileByIndex(lats[y][x], lons[y][x]).temperature;
     if (coldness >= 256)
       return new Color(255, 0, 0);
     if (coldness < 0)
@@ -185,8 +177,8 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   
   public Color getColorByClimate(int x, int y) {
-    int temp = 255-glb.getTile(getLat(x,y), getLon(x,y)).temperature;
-    int rain = 255-glb.getTile(getLat(x,y), getLon(x,y)).rainfall;
+    int temp = 255-glb.getTileByIndex(lats[y][x], lons[y][x]).temperature;
+    int rain = 255-glb.getTileByIndex(lats[y][x], lons[y][x]).rainfall;
     if (temp < 0)
       return new Color(255, 0, 0);
     if (temp >= 256)
@@ -200,12 +192,12 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   
   public int width() {
-    return width;
+    return lats[0].length;
   }
   
   
   public int height() {
-    return height;
+    return lats.length;
   }
   
   

@@ -133,6 +133,8 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
       return getColorByTemp(x, y);
     else if (type.equals("climate"))
       return getColorByClimate(x, y);
+    else if (type.equals("water"))
+      return getColorByWater(x, y);
     else
       return Color.black;
   }
@@ -188,6 +190,16 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
     if (rain >= 256)
       return new Color(255, 255, 255);
     return new Color(rain, (temp+rain)/2, rain);
+  }
+  
+  
+  public Color getColorByWater(int x, int y) {
+    int dryness = 255 - glb.getTileByIndex(lats[y][x], lons[y][x]).water;
+    if (dryness >= 256)
+      return new Color(255, 0, 0);
+    if (dryness < 0)
+      return new Color(255, 255, 255);
+    return new Color(dryness, dryness, 255); // return a red that gets darker with temperature
   }
   
   
