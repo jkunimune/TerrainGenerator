@@ -107,10 +107,6 @@ public class Globe { // a class to create a spherical surface and generate terra
   
   
   public void plateTechtonics() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
-    int lat1 = -1;
-    int lon1 = -1;
-    int lat2 = -1;
-    int lon2 = -1;
     for (Tile[] row: map) {
       for (Tile thisTil: row) {
         thisTil.temp1 = thisTil.altitude;
@@ -129,157 +125,30 @@ public class Globe { // a class to create a spherical surface and generate terra
           Vector omega2 = new Vector(1, thatTil.temp2/128.0, thatTil.temp3/128.0);
           Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
           
-          double rise = -500.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
-          if (lat1 == -1) {
-            lat1 = thisTil.lat;
-            lon1 = thisTil.lon;
-            lat2 = thatTil.lat;
-            lon2 = thatTil.lon;
-            System.out.println("Rise for "+thisTil+" and "+thatTil+" is "+rise);
-            System.out.println("Now, I know you'll soon be, like, \"what?\", so here\'s why:");
-            System.out.println("delTheta = "+delTheta);
-            System.out.println("delOmega = "+delOmega);
-          }
-          else if (lat2 == thisTil.lat && lon2 == thisTil.lon && lat1 == thatTil.lat && lon1 == thatTil.lon) {
-            System.out.println("Rise for "+thisTil+" and "+thatTil+" is "+rise);
-            System.out.println("Now, I know you'll soon be, like, \"what?\", so here\'s why:");
-            System.out.println("delTheta = "+delTheta);
-            System.out.println("delOmega = "+delOmega);
-          }
-          
-          if (thisTil.altitude-thatTil.altitude == 0)
-            System.out.println("Also, the alt dif is "+(thisTil.altitude-thatTil.altitude)+".");
+          double rise = 1500.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
           
           if (thisTil.altitude < 0) { // if this is ocean
             if (rise < 0) { // if they are going towards each other
               if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
                 totalChange += rise; // it forms a sea trench
               }
-              else { // if this is above that one
+              else if (thisTil.altitude > thatTil.altitude) { // if this is above that one
                 totalChange -= rise; // it forms an island chain
               }
+              else { // if they are going at the same speed
+                totalChange -= rise/8; // it forms a taller rift
+              }
             }
             else { // if they are going away from each other
-              totalChange += rise*0; // it forms an ocean rift
+              totalChange += rise/16; // it forms an ocean rift
             }
           }
           else { // if this is land
             if (rise < 0) { // if they are going towards each other
-              totalChange -= rise*0; // it forms a mountain range
+              totalChange -= rise; // it forms a mountain range
             }
             else { // if they are going away from each other
-              totalChange -= rise*0; // it forms a valley
-            }
-          }
-        }
-        thisTil.temp1 += totalChange;
-      }
-    }
-    
-    for (Tile[] thisRow: map) {
-      for (Tile thisTil: thisRow) {
-        thisTil.altitude = thisTil.temp1;
-      }
-    }
-  }
-  
-  
-  public void plateTechtonicsJustChains() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
-    for (Tile[] row: map) {
-      for (Tile thisTil: row) {
-        thisTil.temp1 = thisTil.altitude;
-        double totalChange = 0; // keeps track of how much to change the altitude
-        ArrayList<Tile> adj = adjacentTo(thisTil);
-        for (Tile thatTil: adj) {
-          if (thisTil.temp2 == thatTil.temp2 && thisTil.temp3 == thatTil.temp3) // if they are on the same plate
-            continue; // skip this pair
-          
-          final Vector r1 = new Vector(1, thisTil.lat*Math.PI/map.length, thisTil.lon*2*Math.PI/map[thisTil.lat].length);
-          final Vector r2 = new Vector(1, thatTil.lat*Math.PI/map.length, thatTil.lon*2*Math.PI/map[thatTil.lat].length);
-          Vector delTheta = r1.cross(r2);
-          delTheta.setR(r1.angleTo(r2)*radius); // the distance between them
-          
-          Vector omega1 = new Vector(1, thisTil.temp2/128.0, thisTil.temp3/128.0);
-          Vector omega2 = new Vector(1, thatTil.temp2/128.0, thatTil.temp3/128.0);
-          Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
-          
-          double rise = -500.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
-          
-          if (thisTil.altitude < 0) { // if this is ocean
-            if (rise < 0) { // if they are going towards each other
-              if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
-                totalChange += rise*0; // it forms a sea trench
-              }
-              else { // if this is above that one
-                totalChange -= rise; // it forms an island chain
-              }
-            }
-            else { // if they are going away from each other
-              totalChange += rise*0; // it forms an ocean rift
-            }
-          }
-          else { // if this is land
-            if (rise < 0) { // if they are going towards each other
-              totalChange -= rise*0; // it forms a mountain range
-            }
-            else { // if they are going away from each other
-              totalChange -= rise*0; // it forms a valley
-            }
-          }
-        }
-        thisTil.temp1 += totalChange;
-      }
-    }
-    
-    for (Tile[] thisRow: map) {
-      for (Tile thisTil: thisRow) {
-        thisTil.altitude = thisTil.temp1;
-      }
-    }
-  }
-  
-  
-  public void plateTechtonicsJustTrench() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
-    for (Tile[] row: map) {
-      for (Tile thisTil: row) {
-        thisTil.temp1 = thisTil.altitude;
-        double totalChange = 0; // keeps track of how much to change the altitude
-        ArrayList<Tile> adj = adjacentTo(thisTil);
-        for (Tile thatTil: adj) {
-          if (thisTil.temp2 == thatTil.temp2 && thisTil.temp3 == thatTil.temp3) // if they are on the same plate
-            continue; // skip this pair
-          
-          final Vector r1 = new Vector(1, thisTil.lat*Math.PI/map.length, thisTil.lon*2*Math.PI/map[thisTil.lat].length);
-          final Vector r2 = new Vector(1, thatTil.lat*Math.PI/map.length, thatTil.lon*2*Math.PI/map[thatTil.lat].length);
-          Vector delTheta = r1.cross(r2);
-          delTheta.setR(r1.angleTo(r2)*radius); // the distance between them
-          
-          Vector omega1 = new Vector(1, thisTil.temp2/128.0, thisTil.temp3/128.0);
-          Vector omega2 = new Vector(1, thatTil.temp2/128.0, thatTil.temp3/128.0);
-          Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
-          
-          double rise = -500.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
-          //System.out.println("Rise for "+thisTil+" and "+thatTil+" is "+rise);
-          
-          if (thisTil.altitude < 0) { // if this is ocean
-            if (rise < 0) { // if they are going towards each other
-              if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
-                totalChange += rise; // it forms a sea trench
-              }
-              else { // if this is above that one
-                totalChange -= rise*0; // it forms an island chain
-              }
-            }
-            else { // if they are going away from each other
-              totalChange += rise*0; // it forms an ocean rift
-            }
-          }
-          else { // if this is land
-            if (rise < 0) { // if they are going towards each other
-              totalChange -= rise*0; // it forms a mountain range
-            }
-            else { // if they are going away from each other
-              totalChange -= rise*0; // it forms a valley
+              totalChange -= rise/2; // it forms a valley
             }
           }
         }
@@ -350,12 +219,13 @@ public class Globe { // a class to create a spherical surface and generate terra
       return 0;
     
     int here;
-    if (til.altitude < 0)  here = dist/8; // if this is an ocean, draw moisture from it
-    else                   here = 0;
+    if (til.altitude < 0)  here = (int)Math.sqrt(dist)>>1; // if this is an ocean, draw moisture from it
+    else if (til.altitude < 64) here = (int)Math.sqrt(dist)>>3; // if not, draw a little bit of moisture from it
+    else here = 0; // if it is a mountain, no moisture
     
     final Tile next = map[til.lat][(til.lon+dir+map[til.lat].length)%map[til.lat].length];
     
-    if (next.altitude >= 127) // if there is a mountain range coming up
+    if (next.altitude >= 64) // if there is a mountain range coming up
       return here;
     else
       return here + moisture(next, dir, dist-1);
@@ -391,7 +261,7 @@ public class Globe { // a class to create a spherical surface and generate terra
           til.rainfall += moisture(til, -1, 16);
           til.rainfall += moisture(til, 1, 16);
         }
-        //til.temperature -= (int)Math.abs(til.altitude) >> 20; // cools down extreme altitudes
+        til.temperature -= (int)Math.abs(til.altitude) >> 3; // cools down extreme altitudes
       }
     }
   }
@@ -404,17 +274,17 @@ public class Globe { // a class to create a spherical surface and generate terra
           if (til.temperature + 8*Math.sin(til.rainfall) < 120) { // if cold
             til.biome = Tile.ice;
           }
-          else if (til.altitude < -128) { // if super deep
+          else if (til.altitude < -64) { // if super deep
             til.biome = Tile.trench;
           }
-          else if (til.temperature < 242) { // if warm
+          else if (til.temperature < 234) { // if warm
             til.biome = Tile.ocean;
           }
           else { // if hot
             til.biome = Tile.reef;
           }
         }
-        else if (til.altitude < 128) { // if low altitude
+        else if (til.altitude < 64) { // if low altitude
           if (til.temperature + 4*(Math.sin(til.rainfall)) < 140) { // if cold
             til.biome = Tile.tundra;
           }
@@ -429,7 +299,7 @@ public class Globe { // a class to create a spherical surface and generate terra
           }
         }
         else { // if mountainous
-          if (til.temperature < 100) { // if cold
+          if (til.temperature + 4*(Math.sin(til.rainfall)) < 140) { // if cold
             til.biome = Tile.snowcap;
           }
           else { // if warm

@@ -5,11 +5,14 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
   
   public static void main(String args[]) {
     while (true) {
-      Globe start = new Globe(100);
-      Map map = new Lambert(start, 800, 500);
+      Globe earth = new Globe(100);
+      Map theMap = new Lambert(earth, 1200, 600);
       
-      map.display("altitude");
-      System.out.println("Generating landmasses...");
+      theMap.display("altitude");
+      
+      generate(earth, theMap);
+      
+      /*System.out.println("Generating landmasses...");
       start.spawnFirstContinent();
       int t = 0;
       while (start.any(-257)) {
@@ -34,10 +37,10 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
       
       chainM.display("altitude");
       trencM.display("altitude");
-      map.display("altitude");
+      map.display("altitude");*/
       
       System.out.println("end");
-      delay(200000);
+      delay(20000);
     }
   }
   

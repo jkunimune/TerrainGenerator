@@ -11,6 +11,7 @@ public class Globe { // a class to create a spherical surface and generate terra
   public Globe(int r) {
     radius = r;
     map = new Tile[(int)(r * Math.PI)][]; // the map is a matrix of tiles with varying width
+    
     map[0] = new Tile[1]; // the top and bottom are of width 1 (the poles)
     map[map.length-1] = new Tile[1];
     
@@ -31,8 +32,25 @@ public class Globe { // a class to create a spherical surface and generate terra
   
   
   public Globe(Globe source) { // copies a preexisting globe
-//    radius = source.getRadius();
-//    map = source.getTileMatrix();
+    radius = source.getRadius();
+    map = new Tile[(int)(radius * Math.PI)][]; // the map is a matrix of tiles with varying width
+    
+    map[0] = new Tile[1]; // the top and bottom are of width 1 (the poles)
+    map[map.length-1] = new Tile[1];
+    
+    for (int lat = 1; lat <= map.length/2; lat ++) {
+      int width = (int)(2*Math.PI * radius * Math.sin(lat*Math.PI/map.length)); // the length of each row is determined with trig
+      width = width / map[lat-1].length * map[lat-1].length; // each row has length divisible with row above it (for convinience)
+      
+      map[lat] = new Tile[width];
+      map[map.length-lat-1] = new Tile[width]; // the top and bottom are symmetrical
+    }
+    
+    for (int lat = 0; lat < map.length; lat ++) { // initializes all elements
+      for (int lon = 0; lon < map[lat].length; lon ++) {
+        map[lat][lon] = new Tile(source.getTileByIndex(lat, lon));
+      }
+    }
   }
   
   
@@ -89,6 +107,10 @@ public class Globe { // a class to create a spherical surface and generate terra
   
   
   public void plateTechtonics() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
+    int lat1 = -1;
+    int lon1 = -1;
+    int lat2 = -1;
+    int lon2 = -1;
     for (Tile[] row: map) {
       for (Tile thisTil: row) {
         thisTil.temp1 = thisTil.altitude;
@@ -103,16 +125,34 @@ public class Globe { // a class to create a spherical surface and generate terra
           Vector delTheta = r1.cross(r2);
           delTheta.setR(r1.angleTo(r2)*radius); // the distance between them
           
-          Vector omega1 = new Vector(1, thisTil.temp2/100.0, thisTil.temp3/100.0);
-          Vector omega2 = new Vector(1, thatTil.temp2/100.0, thatTil.temp3/100.0);
+          Vector omega1 = new Vector(1, thisTil.temp2/128.0, thisTil.temp3/128.0);
+          Vector omega2 = new Vector(1, thatTil.temp2/128.0, thatTil.temp3/128.0);
           Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
           
           double rise = -500.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
+          if (lat1 == -1) {
+            lat1 = thisTil.lat;
+            lon1 = thisTil.lon;
+            lat2 = thatTil.lat;
+            lon2 = thatTil.lon;
+            System.out.println("Rise for "+thisTil+" and "+thatTil+" is "+rise);
+            System.out.println("Now, I know you'll soon be, like, \"what?\", so here\'s why:");
+            System.out.println("delTheta = "+delTheta);
+            System.out.println("delOmega = "+delOmega);
+          }
+          else if (lat2 == thisTil.lat && lon2 == thisTil.lon && lat1 == thatTil.lat && lon1 == thatTil.lon) {
+            System.out.println("Rise for "+thisTil+" and "+thatTil+" is "+rise);
+            System.out.println("Now, I know you'll soon be, like, \"what?\", so here\'s why:");
+            System.out.println("delTheta = "+delTheta);
+            System.out.println("delOmega = "+delOmega);
+          }
+          
+          if (thisTil.altitude-thatTil.altitude == 0)
+            System.out.println("Also, the alt dif is "+(thisTil.altitude-thatTil.altitude)+".");
           
           if (thisTil.altitude < 0) { // if this is ocean
             if (rise < 0) { // if they are going towards each other
               if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
-                //System.out.println("About to make a trench since this is "+(thatTil.altitude-thisTil.altitude)+" lower than the next one and rise is "+rise);
                 totalChange += rise; // it forms a sea trench
               }
               else { // if this is above that one
@@ -136,9 +176,11 @@ public class Globe { // a class to create a spherical surface and generate terra
       }
     }
     
-    for (Tile[] thisRow: map)
-      for (Tile thisTil: thisRow)
+    for (Tile[] thisRow: map) {
+      for (Tile thisTil: thisRow) {
         thisTil.altitude = thisTil.temp1;
+      }
+    }
   }
   
   
@@ -157,8 +199,8 @@ public class Globe { // a class to create a spherical surface and generate terra
           Vector delTheta = r1.cross(r2);
           delTheta.setR(r1.angleTo(r2)*radius); // the distance between them
           
-          Vector omega1 = new Vector(1, thisTil.temp2/100.0, thisTil.temp3/100.0);
-          Vector omega2 = new Vector(1, thatTil.temp2/100.0, thatTil.temp3/100.0);
+          Vector omega1 = new Vector(1, thisTil.temp2/128.0, thisTil.temp3/128.0);
+          Vector omega2 = new Vector(1, thatTil.temp2/128.0, thatTil.temp3/128.0);
           Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
           
           double rise = -500.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
@@ -166,7 +208,6 @@ public class Globe { // a class to create a spherical surface and generate terra
           if (thisTil.altitude < 0) { // if this is ocean
             if (rise < 0) { // if they are going towards each other
               if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
-                //System.out.println("About to make a trench since this is "+(thatTil.altitude-thisTil.altitude)+" lower than the next one and rise is "+rise);
                 totalChange += rise*0; // it forms a sea trench
               }
               else { // if this is above that one
@@ -190,9 +231,11 @@ public class Globe { // a class to create a spherical surface and generate terra
       }
     }
     
-    for (Tile[] thisRow: map)
-      for (Tile thisTil: thisRow)
+    for (Tile[] thisRow: map) {
+      for (Tile thisTil: thisRow) {
         thisTil.altitude = thisTil.temp1;
+      }
+    }
   }
   
   
@@ -211,16 +254,16 @@ public class Globe { // a class to create a spherical surface and generate terra
           Vector delTheta = r1.cross(r2);
           delTheta.setR(r1.angleTo(r2)*radius); // the distance between them
           
-          Vector omega1 = new Vector(1, thisTil.temp2/100.0, thisTil.temp3/100.0);
-          Vector omega2 = new Vector(1, thatTil.temp2/100.0, thatTil.temp3/100.0);
+          Vector omega1 = new Vector(1, thisTil.temp2/128.0, thisTil.temp3/128.0);
+          Vector omega2 = new Vector(1, thatTil.temp2/128.0, thatTil.temp3/128.0);
           Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
           
           double rise = -500.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
+          //System.out.println("Rise for "+thisTil+" and "+thatTil+" is "+rise);
           
           if (thisTil.altitude < 0) { // if this is ocean
             if (rise < 0) { // if they are going towards each other
               if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
-                //System.out.println("About to make a trench since this is "+(thatTil.altitude-thisTil.altitude)+" lower than the next one and rise is "+rise);
                 totalChange += rise; // it forms a sea trench
               }
               else { // if this is above that one
@@ -244,9 +287,11 @@ public class Globe { // a class to create a spherical surface and generate terra
       }
     }
     
-    for (Tile[] thisRow: map)
-      for (Tile thisTil: thisRow)
+    for (Tile[] thisRow: map) {
+      for (Tile thisTil: thisRow) {
         thisTil.altitude = thisTil.temp1;
+      }
+    }
   }
   
   
@@ -418,24 +463,26 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
-  public int latIndex(double lattitude) {
+  public int latIndex(double lattitude) { // converts a lattitude to an index
     return (int)(lattitude*map.length/Math.PI);
   }
   
   
-  public int lonIndex(int lat, double longitude) {
+  public int lonIndex(int lat, double longitude) { // converts an index and a longitude to a secondary index.
     return (int)(longitude*map[lat].length/(2*Math.PI));
   }
-//  
-//  
-//  public Tile[][] getTileMatrix() {
-//  }
-//  
-//  
-//  public int distance(int lat1, int lon1, int lat2, int lon2) {
-//  }
-//  
-//  
+  
+  
+  public Tile[][] getTileMatrix() {
+    return map;
+  }
+  
+  
+  public int getRadius() {
+    return radius;
+  }
+  
+  
   public ArrayList<Tile> adjacentTo(Tile tile) { // returns an arrayList of tiles adjacent to a given tile
     if (tile.lat == 0)
       return new ArrayList<Tile>(Arrays.asList(map[1])); // returns a whole row if it is a pole

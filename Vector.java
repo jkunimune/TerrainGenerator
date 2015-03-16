@@ -101,7 +101,7 @@ public class Vector {
   public Vector cross(Vector that) { // computes cross product with that
     return new Vector(this.getY()*that.getZ() - this.getZ()*that.getY(),
                       this.getZ()*that.getX() - this.getX()*that.getZ(),
-                      this.getX()*that.getY() - this.getY()*that.getZ(), true);
+                      this.getX()*that.getY() - this.getY()*that.getX(), true);
   }
   
   
