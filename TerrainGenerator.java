@@ -12,33 +12,6 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
       
       generate(earth, theMap);
       
-      /*System.out.println("Generating landmasses...");
-      start.spawnFirstContinent();
-      int t = 0;
-      while (start.any(-257)) {
-        //setTimer(0);
-        start.spawnContinents();
-        if (t%10 == 0)
-          map.display("altitude");
-        t ++;
-        //waitFor(100);
-      }
-      if (t%10 != 1)
-        map.display("altitude");
-      
-      Globe chains = new Globe(start);
-      Globe trench = new Globe(start);
-      Map chainM = new Lambert(chains, 800, 500);
-      Map trencM = new Lambert(trench, 800, 500);
-      
-      chains.plateTechtonicsJustChains();
-      trench.plateTechtonicsJustTrench();
-      start.plateTechtonics();
-      
-      chainM.display("altitude");
-      trencM.display("altitude");
-      map.display("altitude");*/
-      
       System.out.println("end");
       delay(20000);
     }
@@ -102,7 +75,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     map.display("altitude");
     
     System.out.println("Roughing up and smoothing down terrain...");
-    for (int i = 64; i > 1; i >>= 3) { // gradually randomizes and smooths out terrain
+    for (int i = 64; i >= 1; i >>= 2) { // gradually randomizes and smooths out terrain
       for (int j = 0; j < i; j ++)
         world.smooth(.4);
       map.display("altitude");
@@ -114,7 +87,13 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     world.acclimate(.1);
     world.climateEnhance();
     map.display("temperature");
-    delay(1000);
+    map.display("rainfall");
+    
+    System.out.println("Raining...");
+    for (int i = 0; i < 32; i ++) {
+      world.rain();
+      map.display("water");
+    }
     
     System.out.println("Setting up biomes...");
     world.biomeAssign();
