@@ -125,7 +125,7 @@ public class Globe { // a class to create a spherical surface and generate terra
           Vector omega2 = new Vector(1, thatTil.temp2/128.0, thatTil.temp3/128.0);
           Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
           
-          double rise = 1000.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
+          double rise = 2000.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
           
           if (thisTil.altitude < 0) { // if this is ocean
             if (rise < 0) { // if they are going towards each other
@@ -133,7 +133,7 @@ public class Globe { // a class to create a spherical surface and generate terra
                 totalChange += rise; // it forms a sea trench
               }
               else if (thisTil.altitude > thatTil.altitude) { // if this is above that one
-                totalChange -= rise; // it forms an island chain
+                totalChange -= rise*3/4; // it forms an island chain
               }
               else { // if they are going at the same speed
                 totalChange -= rise/16; // it forms a taller rift
@@ -148,7 +148,7 @@ public class Globe { // a class to create a spherical surface and generate terra
               totalChange -= rise; // it forms a mountain range
             }
             else { // if they are going away from each other
-              totalChange -= rise/2; // it forms a valley
+              totalChange -= rise/4; // it forms a valley
             }
           }
         }
@@ -235,37 +235,52 @@ public class Globe { // a class to create a spherical surface and generate terra
   public void rain() { // forms, rivers, lakes, valleys, and deltas
     for (Tile[] row: map) {
       for (Tile til: row) {
+        til.water += (til.rainfall>>5) + 1; // it rains
+      }
+    }
+  }
+    
+  public void runoff() {
+    for (Tile[] row: map) {
+      for (Tile til: row) {
         if (til.altitude < 0) // if ocean
-          til.temp1 = -256; // make way to absorb all runoff
+          til.water = -256; // make way to absorb all runoff
         else { // if land
-          til.water += (til.rainfall>>5) + 1; // it rains
-          til.temp1 = til.water; // the water level is temp1
+          til.temp1 = 0; // the change in water level is temp1
           til.temp2 = 0; // the erosion caused by the water is temp2
         }
       }
     }
     
-    for (Tile[] row: map) {
+    for (Tile[] row: map) { // flowy bits
       for (Tile til: row) {
         if (til.altitude >= 0) { // if land
           ArrayList<Tile> destinations = adjacentTo(til);
-          int i = 0; // cycles through all of the adjacent tiles and gradually gives away all of its water
-          while (destinations.size() > 0) {
-            final Tile adj = destinations.get(i%destinations.size());
-            
-            if (adj.altitude + adj.temp1 >= til.altitude + til.temp1) {
-              destinations.remove(i%destinations.size()); // tiles that are higher than this one are not a possible destination
-              i --;
+          Tile lowest = new Tile(-1, -1, 255, 255, 255, 255, 255); // lowest tile to which water can flow
+          //System.out.println("til is at "+til.altitude+" and filled to "+(til.altitude+til.water));
+          for (Tile adj: destinations) {
+            //System.out.println("adj is at "+adj.altitude+" and filled to "+(adj.altitude+adj.water));
+            if (adj.altitude+adj.water >= til.altitude+til.water) // if water would have to flow uphill
+              continue;
+            else if (adj.altitude+adj.water < lowest.altitude+lowest.water) { // if this is the new lowest
+              lowest = adj;
+              //System.out.println("we picked thihs one");
             }
-            
+          }
+          
+          if (lowest.lat != -1) { // if it is a real tile
+            if (lowest.altitude+lowest.water < til.altitude-til.water) { // if there is not enough water to rectify the difference
+              til.temp1 -= til.water; // this loses some of its water
+              lowest.temp1 += til.water; // that gains that water
+              til.temp2 += til.water<<1; // they both gain some erosion
+              lowest.temp2 += til.water<<1;
+            }
             else {
-              til.temp1 --; // this loses some water
-              adj.temp1 ++; // that gains some water
-              til.temp2 ++; // they both gain some erosion
-              adj.temp2 ++;
+              til.temp1 -= ((til.water+til.altitude - lowest.water-lowest.altitude +1) >> 1)-1; // this loses some of its water
+              lowest.temp1 += ((til.water+til.altitude - lowest.water-lowest.altitude +1) >> 1)-1; // that gains that water
+              til.temp2 += til.water+til.altitude - lowest.water-lowest.altitude; // they both gain some erosion
+              lowest.temp2 += til.water+til.altitude - lowest.water-lowest.altitude;
             }
-            
-            i ++;
           }
         }
       }
@@ -274,8 +289,8 @@ public class Globe { // a class to create a spherical surface and generate terra
     for (Tile[] row: map) {
       for (Tile til: row) {
         if (til.altitude >= 0) {
-          til.water = til.temp1;
-          til.altitude -= til.temp2>>8;
+          til.water += til.temp1;
+          til.altitude -= til.temp2>>10;
         }
       }
     }

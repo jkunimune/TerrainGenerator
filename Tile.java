@@ -34,7 +34,19 @@ public class Tile { // keeps track of a single point on a globe
     altitude = -257;
     temperature = 256;
     rainfall = -1;
+    water = 0;
     biome = 0;
+  }
+  
+  
+  public Tile(int newLat, int newLon, int newAlt, int newTemp, int newRain, int newWater, int newBiome) { // initializes with default values
+    lat = newLat;
+    lon = newLon;
+    altitude = newAlt;
+    temperature = newTemp;
+    rainfall = newRain;
+    water = newWater;
+    biome = newBiome;
   }
   
   

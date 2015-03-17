@@ -194,6 +194,8 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   
   public Color getColorByWater(int x, int y) {
+    if (glb.getTileByIndex(lats[y][x], lons[y][x]).altitude < 0)
+      return Color.red;
     int dryness = 255 - glb.getTileByIndex(lats[y][x], lons[y][x]).water;
     if (dryness >= 256)
       return new Color(255, 255, 255);
