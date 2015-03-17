@@ -133,7 +133,7 @@ public class Globe { // a class to create a spherical surface and generate terra
                 totalChange += rise; // it forms a sea trench
               }
               else if (thisTil.altitude > thatTil.altitude) { // if this is above that one
-                totalChange -= rise*3/4; // it forms an island chain
+                totalChange -= rise; // it forms an island chain
               }
               else { // if they are going at the same speed
                 totalChange -= rise/16; // it forms a taller rift
@@ -256,13 +256,13 @@ public class Globe { // a class to create a spherical surface and generate terra
       for (Tile til: row) {
         if (til.altitude >= 0) { // if land
           ArrayList<Tile> destinations = adjacentTo(til);
-          Tile lowest = new Tile(-1, -1, 255, 255, 255, 255, 255); // lowest tile to which water can flow
+          Tile lowest = new Tile(-1, -1, 9001, 9001, 9001, 9001, 9001); // lowest tile to which water can flow
           //System.out.println("til is at "+til.altitude+" and filled to "+(til.altitude+til.water));
           for (Tile adj: destinations) {
             //System.out.println("adj is at "+adj.altitude+" and filled to "+(adj.altitude+adj.water));
             if (adj.altitude+adj.water >= til.altitude+til.water) // if water would have to flow uphill
               continue;
-            else if (adj.altitude+adj.water < lowest.altitude+lowest.water) { // if this is the new lowest
+            else if (adj.altitude < lowest.altitude) { // if this is the new lowest
               lowest = adj;
               //System.out.println("we picked thihs one");
             }
@@ -270,7 +270,7 @@ public class Globe { // a class to create a spherical surface and generate terra
           
           if (lowest.lat != -1) { // if it is a real tile
             if (lowest.altitude+lowest.water < til.altitude-til.water) { // if there is not enough water to rectify the difference
-              til.temp1 -= til.water; // this loses some of its water
+              til.temp1 -= til.water; // this loses all of its water
               lowest.temp1 += til.water; // that gains that water
               til.temp2 += til.water<<1; // they both gain some erosion
               lowest.temp2 += til.water<<1;
@@ -290,7 +290,7 @@ public class Globe { // a class to create a spherical surface and generate terra
       for (Tile til: row) {
         if (til.altitude >= 0) {
           til.water += til.temp1;
-          til.altitude -= til.temp2>>10;
+          til.altitude -= til.temp2>>12;
         }
       }
     }

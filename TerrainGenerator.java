@@ -58,8 +58,10 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     for (int i = 0; i < 32; i ++) {
       world.rain();
       map.display("water");
-      world.runoff();
-      map.display("water");
+      for (int j = 0; j < 16; j ++) {
+        world.runoff();
+        map.display("water");
+      }
     }
     
     System.out.println("Setting up biomes...");
