@@ -86,6 +86,11 @@ public class Tile { // keeps track of a single point on a globe
   }
   
   
+  public int waterLevel() {
+    return altitude+water;
+  }
+  
+  
   public String toString() {
     return "the "+biomeNames[biome]+" tile at "+lat+", "+lon;
   }

@@ -179,7 +179,7 @@ public class Globe { // a class to create a spherical surface and generate terra
   public void rough(double amount) { // randomizes the terrain a bit
     for (Tile[] row: map) {
       for (Tile t: row) {
-        t.altitude += (int)((Math.random()-.5)*(t.altitude*amount));
+        t.altitude += (int)((Math.random()-.5)*amount);
       }
     }
   }
@@ -244,14 +244,18 @@ public class Globe { // a class to create a spherical surface and generate terra
             if (adj.altitude < 0 || adj.altitude+adj.water < lowest.altitude+lowest.water) { // if this is the new lowest
               lowest = adj;
             }
-            else if (adj.altitude+adj.water == lowest.altitude+lowest.water && randChance(0)) { // if it is equal to the lowest
-              lowest = adj; // throw in a random element
-            }
+//            else if (adj.altitude+adj.water == lowest.altitude+lowest.water && randChance(0)) { // if it is equal to the lowest
+//              lowest = adj; // throw in a random element
+//            }
           }
           
-          if (lowest.altitude+lowest.water <= til.altitude+til.water) { // if water can flow
+          if (lowest.altitude+lowest.water < til.altitude+til.water) { // if water can flow
             til.temp1 = lowest.lat; // set the water path from here to there
             til.temp2 = lowest.lon;
+          }
+          else if (lowest.altitude+lowest.water == til.altitude+til.water) { // if there is a lake
+            til.temp1 = -1;
+            til.temp2 = -1;
           }
           else { // if water can't flow
             til.water = lowest.altitude+lowest.water - til.altitude;
@@ -262,7 +266,10 @@ public class Globe { // a class to create a spherical surface and generate terra
         }
       }
     }
-    
+  }
+  
+  
+  public void runoff() {
     for (Tile[] row: map)
       for (Tile til: row)
         til.temp3 = 0;
@@ -285,36 +292,39 @@ public class Globe { // a class to create a spherical surface and generate terra
   
   /* PRECONDITION: all Tiles in lake are at the same height (altitude+water) */
   public void fillLake(ArrayList<Tile> lake) {
-    int height = lake.get(0).altitude+lake.get(0).water;
+    //System.out.println("\nFilling a lake which starts at "+lake);
+    int height = lake.get(0).waterLevel();
+    //System.out.println("The height is "+height);
+    //System.out.println("To be sure, the height of the next one is "+lake.get((int)(Math.random()*lake.size())).waterLevel());
     ArrayList<Tile> shore = new ArrayList<Tile>();
-    for (Tile til: lake)
+    for (Tile til: lake) // defines the shore as all tiles adjacent to and not in the lake
       for (Tile adj: adjacentTo(til))
-        shore.add(adj);
+        if (!lake.contains(adj) && !shore.contains(adj))
+          shore.add(adj);
+    //System.out.println("The shore is "+shore);
     
     Tile low = new Tile(-1, -1, 9001, 9001, 9001, 9001, 9001);
     for (Tile til: shore) {
-      if (!lake.contains(til)) { // if it is in the lake, it doesn't count
-        if (til.altitude < 0) // if lake is next to ocean, forget it
-          return;
-        else if (til.altitude+til.water < height) // if there is an outlet, we are done here
-          return;
-        else if (til.altitude+til.water < low.altitude+low.water) // cycles through shore to find lowest point
-          low = til;
-      }
+      if (til.altitude < 0) // if lake is next to ocean, forget it
+        return;
+      else if (til.altitude+til.water < height) // if there is an outlet, we are done here
+        return;
+      else if (til.altitude+til.water < low.altitude+low.water) // cycles through shore to find lowest point
+        low = til;
     }
     
+    //System.out.println("The lowest point on the shore is at "+low.waterLevel());
+    
     if (low.altitude+low.water > height) { // if the lowest is above this lake
-      for (Tile til: lake) // fill the lake some more and try again
-        til.water = low.altitude+low.water - til.altitude;
+      //System.out.println("Raising the lake level to "+low.waterLevel()+" to match "+low);
+      for (Tile til: lake) { // fill the lake some more and try again
+        til.water = low.waterLevel() - til.altitude;
+      }
       lake.add(low);
       fillLake(lake);
     }
     else if (low.altitude+low.water == height) { // if the lowest is on the same level
-//      System.out.println("Current tiles in lake:");
-//      for (Tile t: lake)
-//        System.out.println(t);
-//      System.out.println("Adding:");
-//      System.out.println(low);
+      //System.out.println("Incorporating "+low);
       lake.add(low); // join the club and try again
       fillLake(lake);
     }
@@ -326,13 +336,15 @@ public class Globe { // a class to create a spherical surface and generate terra
   public void runoffFrom(Tile start, int amount) {
     if (start.altitude < 0) // do not bother with ocean
       return;
-    System.out.println(start);
     
     start.water += amount;
     start.altitude -= amount>>16;
     start.temp3 = 1; // indicate start is checked
     
-    if (map[start.temp1][start.temp2].temp3 == 0) // if the next one is not checked
+    if (start.temp1 < 0) { // if it flows into a lake
+      return; // the river ends here
+    }
+    else if (map[start.temp1][start.temp2].temp3 == 0) // if the next one is not checked
       runoffFrom(map[start.temp1][start.temp2], amount);
     else  System.out.println("JOOWEE! JOOWEE! Rivers are flowing into themselves! FillLake() is not doing its job!");
     

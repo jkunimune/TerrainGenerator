@@ -6,7 +6,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
   public static void main(String args[]) {
     while (true) {
       Globe earth = new Globe(100);
-      Map theMap = new Lambert(earth, 800, 400);
+      Map theMap = new Hemispherical(earth, 800, 400);
       
       theMap.display("altitude");
       
@@ -44,7 +44,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
       for (int j = 0; j < i; j ++)
         world.smooth(.4);
       map.display("altitude");
-      world.rough(i/64.0);
+      world.rough(i/32.0);
       map.display("altitude");
     }
     
