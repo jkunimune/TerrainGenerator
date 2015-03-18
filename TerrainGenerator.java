@@ -55,14 +55,14 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     map.display("rainfall");
     
     System.out.println("Raining...");
-    map.display("biome");
+    map.display("water level");
     delay(5000);
     world.rain();
     System.out.println("Lakes are filled.");
-    map.display("biome");
+    map.display("water level");
     delay(5000);
     world.runoff();
-    map.display("biome");
+    map.display("water level");
     
     System.out.println("Setting up biomes...");
     world.biomeAssign();

@@ -211,11 +211,11 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   public Color getColorByWaterLevel(int x, int y) {
     int height = glb.getTileByIndex(lats[y][x], lons[y][x]).water+glb.getTileByIndex(lats[y][x], lons[y][x]).altitude;
-    if (height >= 512)
+    if (height >= 256)
       return Color.white;
     if (height < 0)
       return Color.black;
-    return new Color(height/2, height/2, height/2); // return a blue that gets darker with temperature
+    return new Color(height, height, height); // return a grey that gets brighter with temperature
   }
   
   

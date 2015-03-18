@@ -292,16 +292,16 @@ public class Globe { // a class to create a spherical surface and generate terra
   
   /* PRECONDITION: all Tiles in lake are at the same height (altitude+water) */
   public void fillLake(ArrayList<Tile> lake) {
-    //System.out.println("\nFilling a lake which starts at "+lake);
+    System.out.println("\nFilling a lake which starts at "+lake);
     int height = lake.get(0).waterLevel();
-    //System.out.println("The height is "+height);
-    //System.out.println("To be sure, the height of the next one is "+lake.get((int)(Math.random()*lake.size())).waterLevel());
+    System.out.println("The height is "+height);
+    System.out.println("To be sure, the height of the next one is "+lake.get((int)(Math.random()*lake.size())).waterLevel());
     ArrayList<Tile> shore = new ArrayList<Tile>();
     for (Tile til: lake) // defines the shore as all tiles adjacent to and not in the lake
       for (Tile adj: adjacentTo(til))
         if (!lake.contains(adj) && !shore.contains(adj))
           shore.add(adj);
-    //System.out.println("The shore is "+shore);
+    System.out.println("The shore is "+shore);
     
     Tile low = new Tile(-1, -1, 9001, 9001, 9001, 9001, 9001);
     for (Tile til: shore) {
@@ -313,18 +313,19 @@ public class Globe { // a class to create a spherical surface and generate terra
         low = til;
     }
     
-    //System.out.println("The lowest point on the shore is at "+low.waterLevel());
+    System.out.println("The lowest point on the shore is at "+low.waterLevel());
     
     if (low.altitude+low.water > height) { // if the lowest is above this lake
-      //System.out.println("Raising the lake level to "+low.waterLevel()+" to match "+low);
+      System.out.println("Raising the lake level to "+low.waterLevel()+" to match "+low);
       for (Tile til: lake) { // fill the lake some more and try again
         til.water = low.waterLevel() - til.altitude;
+        map[til.lat][til.lon].water = low.waterLevel() - til.altitude;
       }
       lake.add(low);
       fillLake(lake);
     }
     else if (low.altitude+low.water == height) { // if the lowest is on the same level
-      //System.out.println("Incorporating "+low);
+      System.out.println("Incorporating "+low);
       lake.add(low); // join the club and try again
       fillLake(lake);
     }
