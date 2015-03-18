@@ -6,7 +6,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
   public static void main(String args[]) {
     while (true) {
       Globe earth = new Globe(100);
-      Map theMap = new Lambert(earth, 1200, 600);
+      Map theMap = new Lambert(earth, 800, 400);
       
       theMap.display("altitude");
       
@@ -15,39 +15,6 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
       System.out.println("end");
       delay(20000);
     }
-  }
-  
-  
-
-/* PRECONDITION: each Map's Globe is world */
-  public static void generate(Globe world, Map[] maps) { // randomly generates a map and simultaneously displays it on several projections
-    for (Map m: maps)
-      m.display("altitude");
-    System.out.println("Generating landmasses...");
-      
-    world.spawnFirstContinent();
-    
-    while (world.any(-257)) {
-      delay(10);
-      world.spawnContinents();
-      for (Map m: maps)
-        m.display("altitude");
-    }
-    
-    System.out.println("Shifting continents...");
-    //world.plateTechtonics();
-    for (Map m: maps)
-      m.display("altitude");
-    
-    System.out.println("Roughing up terrain...");
-    world.rough(64);
-    for (Map m: maps)
-      m.display("altitude");
-    
-    System.out.println("Smoothing down terrain...");
-    world.smooth(.5);
-    for (Map m: maps)
-      m.display("altitude");
   }
   
   
@@ -60,12 +27,10 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     
     int t = 0;
     while (world.any(-257)) {
-      //setTimer(0);
       world.spawnContinents();
       if (t%10 == 0)
         map.display("altitude");
       t ++;
-      //waitFor(100);
     }
     if (t%10 != 1)
       map.display("altitude");
@@ -93,29 +58,15 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     for (int i = 0; i < 32; i ++) {
       world.rain();
       map.display("water");
+      for (int j = 0; j < 16; j ++) {
+        world.runoff();
+        map.display("water");
+      }
     }
     
     System.out.println("Setting up biomes...");
     world.biomeAssign();
     map.display("biome");
-  }
-  
-  
-  public static void generate(Globe world) { // randomly generates a map
-    world.spawnFirstContinent();
-    
-    System.out.println("Generating landmasses...");
-    while (world.any(-257))
-      world.spawnContinents();
-    
-    System.out.println("Shifting continents...");
-    world.plateTechtonics();
-    
-    System.out.println("Roughing up terrain...");
-    world.rough(64);
-    
-    System.out.println("Smoothing down terrain...");
-    world.smooth(.5);
   }
   
   

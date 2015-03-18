@@ -133,7 +133,7 @@ public class Globe { // a class to create a spherical surface and generate terra
                 totalChange += rise; // it forms a sea trench
               }
               else if (thisTil.altitude > thatTil.altitude) { // if this is above that one
-                totalChange -= rise; // it forms an island chain
+                totalChange -= rise*.8; // it forms an island chain
               }
               else { // if they are going at the same speed
                 totalChange -= rise/16; // it forms a taller rift
@@ -233,67 +233,56 @@ public class Globe { // a class to create a spherical surface and generate terra
   
   
   public void rain() { // forms, rivers, lakes, valleys, and deltas
-    for (Tile[] row: map) {
-      for (Tile til: row) {
-        til.water += (til.rainfall>>5) + 1; // it rains
-      }
-    }
-  }
-    
-  public void runoff() {
-    for (Tile[] row: map) {
-      for (Tile til: row) {
-        if (til.altitude < 0) // if ocean
-          til.water = -256; // make way to absorb all runoff
-        else { // if land
-          til.temp1 = 0; // the change in water level is temp1
-          til.temp2 = 0; // the erosion caused by the water is temp2
-        }
-      }
-    }
-    
-    for (Tile[] row: map) { // flowy bits
-      for (Tile til: row) {
+    for (int r = 0; r < map.length; r ++) { // fills all lakes and routes all water
+      for (int c = 0; c < map[r].length; c ++) {
+        Tile til = map[r][c];
         if (til.altitude >= 0) { // if land
           ArrayList<Tile> destinations = adjacentTo(til);
-          Tile lowest = new Tile(-1, -1, 9001, 9001, 9001, 9001, 9001); // lowest tile to which water can flow
-          //System.out.println("til is at "+til.altitude+" and filled to "+(til.altitude+til.water));
+          Tile lowest = destinations.get(0); // lowest tile to which water can flow
+          
           for (Tile adj: destinations) {
-            //System.out.println("adj is at "+adj.altitude+" and filled to "+(adj.altitude+adj.water));
-            if (adj.altitude+adj.water >= til.altitude+til.water) // if water would have to flow uphill
-              continue;
-            else if (adj.altitude < lowest.altitude) { // if this is the new lowest
+            if (adj.altitude < 0 || adj.altitude+adj.water < lowest.altitude+lowest.water) { // if this is the new lowest
               lowest = adj;
-              //System.out.println("we picked thihs one");
             }
           }
           
-          if (lowest.lat != -1) { // if it is a real tile
-            if (lowest.altitude+lowest.water < til.altitude-til.water) { // if there is not enough water to rectify the difference
-              til.temp1 -= til.water; // this loses all of its water
-              lowest.temp1 += til.water; // that gains that water
-              til.temp2 += til.water<<1; // they both gain some erosion
-              lowest.temp2 += til.water<<1;
-            }
-            else {
-              til.temp1 -= ((til.water+til.altitude - lowest.water-lowest.altitude +1) >> 1)-1; // this loses some of its water
-              lowest.temp1 += ((til.water+til.altitude - lowest.water-lowest.altitude +1) >> 1)-1; // that gains that water
-              til.temp2 += til.water+til.altitude - lowest.water-lowest.altitude; // they both gain some erosion
-              lowest.temp2 += til.water+til.altitude - lowest.water-lowest.altitude;
-            }
+          if (lowest.altitude+lowest.water <= til.altitude+til.water) { // if water can flow
+            til.temp1 = lowest.lat; // set the water path from here to there
+            til.temp2 = lowest.lon;
+          }
+          else { // if water can't flow
+            til.water = lowest.altitude+lowest.water - til.altitude; // fill the tile in so it can
+            r = 0; // start over
+            c = 0;
           }
         }
       }
     }
     
+    for (Tile[] row: map)
+      for (Tile til: row)
+        til.temp3 = 0;
+    
     for (Tile[] row: map) {
       for (Tile til: row) {
-        if (til.altitude >= 0) {
-          til.water += til.temp1;
-          til.altitude -= til.temp2>>12;
-        }
+        runoffFrom(til, (til.rainfall>>5)+1); // fills rivers
       }
     }
+  }
+  
+  
+  public void runoffFrom(Tile start, int amount) {
+    if (start.altitude < 0) // do not bother with ocean
+      return;
+    
+    start.water += amount;
+    start.altitude -= amount>>10;
+    start.temp3 = 1; // indicate start is checked
+    
+    if (map[start.temp1][start.temp2].temp3 == 0) // if the next one is not checked
+      runoffFrom(map[start.temp1][start.temp2], amount);
+    
+    start.temp3 = 0;
   }
   
   

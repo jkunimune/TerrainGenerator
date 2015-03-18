@@ -44,7 +44,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
       for (int j = 0; j < i; j ++)
         world.smooth(.4);
       map.display("altitude");
-      world.rough(i/128.0);
+      world.rough(i/64.0);
       map.display("altitude");
     }
     
@@ -55,14 +55,9 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     map.display("rainfall");
     
     System.out.println("Raining...");
-    for (int i = 0; i < 32; i ++) {
-      world.rain();
-      map.display("water");
-      for (int j = 0; j < 16; j ++) {
-        world.runoff();
-        map.display("water");
-      }
-    }
+    world.rain();
+    map.display("water");
+    delay(10000);
     
     System.out.println("Setting up biomes...");
     world.biomeAssign();
