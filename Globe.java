@@ -133,7 +133,7 @@ public class Globe { // a class to create a spherical surface and generate terra
                 totalChange += rise; // it forms a sea trench
               }
               else if (thisTil.altitude > thatTil.altitude) { // if this is above that one
-                totalChange -= rise*.8; // it forms an island chain
+                totalChange -= rise*.75; // it forms an island chain
               }
               else { // if they are going at the same speed
                 totalChange -= rise/16; // it forms a taller rift
@@ -244,6 +244,9 @@ public class Globe { // a class to create a spherical surface and generate terra
             if (adj.altitude < 0 || adj.altitude+adj.water < lowest.altitude+lowest.water) { // if this is the new lowest
               lowest = adj;
             }
+            else if (adj.altitude+adj.water == lowest.altitude+lowest.water && randChance(0)) { // if it is equal to the lowest
+              lowest = adj; // throw in a random element
+            }
           }
           
           if (lowest.altitude+lowest.water <= til.altitude+til.water) { // if water can flow
@@ -251,7 +254,8 @@ public class Globe { // a class to create a spherical surface and generate terra
             til.temp2 = lowest.lon;
           }
           else { // if water can't flow
-            til.water = lowest.altitude+lowest.water - til.altitude; // fill the tile in so it can
+            til.water = lowest.altitude+lowest.water - til.altitude;
+            fillLake(til, lowest); // fill in the area so it can
             r = 0; // start over
             c = 0;
           }
@@ -265,22 +269,72 @@ public class Globe { // a class to create a spherical surface and generate terra
     
     for (Tile[] row: map) {
       for (Tile til: row) {
-        runoffFrom(til, (til.rainfall>>5)+1); // fills rivers
+        runoffFrom(til, (til.rainfall>>6)+1); // fills rivers
       }
     }
+  }
+  
+  
+  public void fillLake(Tile seed, Tile adj) {
+    ArrayList<Tile> lake = new ArrayList<Tile>();
+    lake.add(seed);
+    lake.add(adj);
+    fillLake(lake);
+  }
+  
+  
+  /* PRECONDITION: all Tiles in lake are at the same height (altitude+water) */
+  public void fillLake(ArrayList<Tile> lake) {
+    int height = lake.get(0).altitude+lake.get(0).water;
+    ArrayList<Tile> shore = new ArrayList<Tile>();
+    for (Tile til: lake)
+      for (Tile adj: adjacentTo(til))
+        shore.add(adj);
+    
+    Tile low = new Tile(-1, -1, 9001, 9001, 9001, 9001, 9001);
+    for (Tile til: shore) {
+      if (!lake.contains(til)) { // if it is in the lake, it doesn't count
+        if (til.altitude < 0) // if lake is next to ocean, forget it
+          return;
+        else if (til.altitude+til.water < height) // if there is an outlet, we are done here
+          return;
+        else if (til.altitude+til.water < low.altitude+low.water) // cycles through shore to find lowest point
+          low = til;
+      }
+    }
+    
+    if (low.altitude+low.water > height) { // if the lowest is above this lake
+      for (Tile til: lake) // fill the lake some more and try again
+        til.water = low.altitude+low.water - til.altitude;
+      lake.add(low);
+      fillLake(lake);
+    }
+    else if (low.altitude+low.water == height) { // if the lowest is on the same level
+//      System.out.println("Current tiles in lake:");
+//      for (Tile t: lake)
+//        System.out.println(t);
+//      System.out.println("Adding:");
+//      System.out.println(low);
+      lake.add(low); // join the club and try again
+      fillLake(lake);
+    }
+    else
+      System.out.println("This should not trigger.  If you are reading this, an outlet was incorporated into the lake.  Gravity must be broken.");
   }
   
   
   public void runoffFrom(Tile start, int amount) {
     if (start.altitude < 0) // do not bother with ocean
       return;
+    System.out.println(start);
     
     start.water += amount;
-    start.altitude -= amount>>10;
+    start.altitude -= amount>>16;
     start.temp3 = 1; // indicate start is checked
     
     if (map[start.temp1][start.temp2].temp3 == 0) // if the next one is not checked
       runoffFrom(map[start.temp1][start.temp2], amount);
+    else  System.out.println("JOOWEE! JOOWEE! Rivers are flowing into themselves! FillLake() is not doing its job!");
     
     start.temp3 = 0;
   }
@@ -333,6 +387,9 @@ public class Globe { // a class to create a spherical surface and generate terra
           else { // if hot
             til.biome = Tile.reef;
           }
+        }
+        else if (til.water > 128) { // if has freshwater on it
+          til.biome = Tile.freshwater;
         }
         else if (til.altitude < 64) { // if low altitude
           if (til.temperature + 4*(Math.sin(til.rainfall)) < 140) { // if cold
