@@ -153,11 +153,13 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
       return Color.black;
     else if (alt >= 256) // if altitude is above maximum, return white
       return Color.white;
-    else if (alt < 0) // if altitude is below sea level, return a blue that gets darker as one goes deeper
-      return new Color(0, 0, 256+alt);
+    else if (alt < -128) // if altitude is deep, return a blue that gets blacker as oneg oes deeper
+      return new Color(0, 0, alt*2+512);
+    else if (alt < 0) // if altitude is below sea level, return a blue that gets brighter as one goes deeper
+      return new Color(0, alt+128, 255);
     else if (alt < 128) // if altitude is above sea level, return a green that gets brighter as one goes higher
       return new Color(0, alt+128, 0);
-    else
+    else // if altitude is high, return a green that gets whiter as one goes higher
       return new Color(alt*2-256, 255, alt*2-256);
   }
   

@@ -133,10 +133,12 @@ public class Globe { // a class to create a spherical surface and generate terra
                 totalChange += rise; // it forms a sea trench
               }
               else if (thisTil.altitude > thatTil.altitude) { // if this is above that one
-                totalChange -= rise*.75; // it forms an island chain
+                totalChange -= rise*.76; // it forms an island chain
               }
               else { // if they are going at the same speed
-                totalChange -= rise/16; // it forms a taller rift
+                if (Math.random() < .5)  totalChange += rise/2.0; // it forms a random type thing
+                else                     totalChange -= rise/2.0;
+                
               }
             }
             else { // if they are going away from each other
@@ -286,7 +288,7 @@ public class Globe { // a class to create a spherical surface and generate terra
     
     for (Tile[] row: map) {
       for (Tile til: row) {
-        runoffFrom(til, (til.rainfall>>2)+1); // fills rivers
+        runoffFrom(til, til.rainfall*.001); // fills rivers
       }
     }
   }
@@ -313,7 +315,7 @@ public class Globe { // a class to create a spherical surface and generate terra
           shore.add(adj);
     //System.out.println("The shore is "+shore);
     
-    Tile low = new Tile(-1, -1, 9001, 9001, 9001, 9001, 9001);
+    Tile low = shore.get(0);
     for (Tile til: shore)
       if (til.altitude+til.water < low.altitude+low.water) // cycles through shore to find lowest point
         low = til;
@@ -345,16 +347,15 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
-  public void runoffFrom(Tile start, int amount) {
+  public void runoffFrom(Tile start, double amount) {
     if (start.altitude < 0) // do not bother with ocean
       return;
     
     start.water += amount;
-    start.altitude -= amount>>16;
     start.temp3 = 1; // indicate start is checked
     
-    if (start.temp1 < 0) // if it flows into a lake
-      return; // the river ends here
+    if (start.temp1 < 0) // if temp1 is not set
+      System.out.println("Warning: a river flowed into the void"); // throw error message
     else if (map[start.temp1][start.temp2].temp3 == 0) // if the next one is not checked
       runoffFrom(map[start.temp1][start.temp2], amount);
     else  System.out.println("JOOWEE! JOOWEE! Rivers are flowing into themselves! FillLake() is not doing its job!");
@@ -411,7 +412,7 @@ public class Globe { // a class to create a spherical surface and generate terra
             til.biome = Tile.reef;
           }
         }
-        else if (til.water > 150) { // if has freshwater on it
+        else if (til.water > 16) { // if has freshwater on it
           til.biome = Tile.freshwater;
         }
         else if (til.altitude < 64) { // if low altitude

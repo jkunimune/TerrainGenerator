@@ -135,6 +135,8 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
       return getColorByClimate(x, y);
     else if (type.equals("water"))
       return getColorByWater(x, y);
+    else if (type.equals("water level"))
+      return getColorByWaterLevel(x, y);
     else
       return new Color(255, 0, 150);
   }
@@ -153,8 +155,10 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
       return Color.white;
     else if (alt < 0) // if altitude is below sea level, return a blue that gets darker as one goes deeper
       return new Color(0, 0, 256+alt);
-    else // if altitude is above sea level, return a green that gets brighter as one goes higher
-      return new Color(alt, 255, alt);
+    else if (alt < 128) // if altitude is above sea level, return a green that gets brighter as one goes higher
+      return new Color(0, alt+128, 0);
+    else
+      return new Color(alt*2-256, 255, alt*2-256);
   }
   
   
@@ -202,6 +206,16 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
     if (dryness < 0)
       return new Color(0, 0, 255);
     return new Color(dryness, dryness, 255); // return a blue that gets darker with temperature
+  }
+  
+  
+  public Color getColorByWaterLevel(int x, int y) {
+    int height = glb.getTileByIndex(lats[y][x], lons[y][x]).water+glb.getTileByIndex(lats[y][x], lons[y][x]).altitude;
+    if (height >= 256)
+      return Color.white;
+    if (height < 0)
+      return Color.black;
+    return new Color(height, height, height); // return a grey that gets brighter with temperature
   }
   
   
