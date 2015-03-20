@@ -1,2 +1,105 @@
+import java.util.*;
+
+
+
 public class Civi {
+  public final String[] vowels = {"a", "e", "i", "o", "u", "y", "ae", "ai", "aw", "ar", "ay", "ea", "ee", "er", "ia", "ie", "io", "ir", "oa", "oe",
+    "oi", "ou", "oo", "or"};
+  public final String[] consonants = {"", "qu", "w", "r", "t", "th", "tr", "y", "p", "ph", "pl", "pr", "s", "sh", "shr", "st", "str", "d", "dr", "f",
+    "fl", "fr", "g", "gh", "gr", "h", "j", "k", "kh", "kl", "l", "ll", "z", "zh", "x", "c", "ch", "cl", "ck", "cr", "cz", "v", "vr", "b", "br", "bl",
+    "n", "nr", "m", "mr"};
+  
+  public ArrayList<Tile> land; // all of the tiles it owns
+  private Tile captial; // its capital city
+  private String name; // its name
+  private String capName; // its captial's name
+  private int spreadRate; // how fast it spreads
+  private int scienceRate; // how fast it advances
+  private int scienceLevel; // how much science it has
+  private int militaryLevel; // how much military it has
+  private int warChance; // how likely it is to wage war
+  
+  
+  
+  public Civi(Tile start) {
+    captial = start; // set capital and territory
+    land = new ArrayList<Tile>(1);
+    land.add(start);
+    
+    spreadRate = (int)(Math.random()*255); // randomize stats
+    scienceRate = (int)(Math.random()*255);
+    scienceLevel = 0;
+    militaryLevel = (int)(Math.random()*255);
+    warChance = (int)(Math.random()*255);
+    
+    name = ""; // create a name
+    int t = (int)(Math.random()*2);
+    if (t%2 == 0)  name += vowels[(int)(Math.random()*vowels.length)].toUpperCase();
+    else           name += consonants[(int)(Math.random()*consonants.length)].toUpperCase();
+    
+    do {
+      if (t%2 == 0)  name += vowels[(int)(Math.random()*vowels.length)];
+      else           name += consonants[(int)(Math.random()*consonants.length)];
+      t++;
+    } while (t%2 != 0 || Math.random() < .8);
+    
+    switch ((int)(Math.random()*Math.random()*5)) { // puts an ending onto it
+      case 1:
+        name += "an";
+        break;
+      case 2:
+        name += consonants[(int)(Math.random()*consonants.length)];
+        break;
+      case 3:
+        break;
+      case 4:
+        name += "land";
+        break;
+      default:
+        name += "ia";
+        break;
+    }
+    
+    capName = ""; // create a captial name
+    t = (int)(Math.random()*2);
+    if (t%2 == 0)  capName += vowels[(int)(Math.random()*vowels.length)].toUpperCase();
+    else           capName += consonants[(int)(Math.random()*consonants.length)].toUpperCase();
+    
+    do {
+      if (t%2 == 0)  capName += vowels[(int)(Math.random()*vowels.length)];
+      else           capName += consonants[(int)(Math.random()*consonants.length)];
+      t++;
+    } while (t%2 != 0 || Math.random() < .7);
+    
+    switch ((int)(Math.random()*Math.random()*5)) { // puts an ending onto it
+      case 1:
+        capName += "town";
+        break;
+      case 2:
+        capName += consonants[(int)(Math.random()*consonants.length)];
+        break;
+      case 3:
+        break;
+      case 4:
+        capName += "ville";
+        break;
+      default:
+        capName += " City";
+        break;
+    }
+    
+    System.out.println(this+" has been founded in the city of "+capName); // announces the civi's arrival
+  }
+  
+  
+  public String toString() { // names empire based on characteristics
+    if (spreadRate > scienceRate && spreadRate > militaryLevel && spreadRate > warChance) // if this Civi is known for is massive territory
+      return "The Great Empire of "+name;
+    else if (scienceRate > militaryLevel && scienceRate > warChance) // if this Civi is known for its technological prowess
+      return "The Glorious Empire of "+name;
+    else if (militaryLevel > warChance) // if this Civi is known for its powerful military
+      return "The Powerful Empire of "+name;
+    else // if this Civi is a warmonger
+      return "The Mighty Empire of "+name;
+  }
 }

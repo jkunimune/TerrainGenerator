@@ -6,15 +6,7 @@ public class CiviHD { // the driver for my final project
   
   public static void main(String args[]) {
     while (true) {
-      Planet earth = new Planet(100);
-      Map theMap = new Hemispherical(earth, 800, 400);
-      
-      theMap.display("altitude");
-      
-      generate(earth, theMap);
-      
-      System.out.println("end");
-      delay(20000);
+      Civi test = new Civi(new Tile(0,0));
     }
   }
   
