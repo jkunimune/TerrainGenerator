@@ -133,7 +133,7 @@ public class Globe { // a class to create a spherical surface and generate terra
                 totalChange += rise; // it forms a sea trench
               }
               else if (thisTil.altitude > thatTil.altitude) { // if this is above that one
-                totalChange -= rise*.76; // it forms an island chain
+                totalChange -= rise*.77; // it forms an island chain
               }
               else { // if they are going at the same speed
                 if (Math.random() < .5)  totalChange += rise/2.0; // it forms a random type thing
@@ -288,7 +288,7 @@ public class Globe { // a class to create a spherical surface and generate terra
     
     for (Tile[] row: map) {
       for (Tile til: row) {
-        runoffFrom(til, til.rainfall*.001); // fills rivers
+        runoffFrom(til, til.rainfall*.0045); // fills rivers
       }
     }
   }

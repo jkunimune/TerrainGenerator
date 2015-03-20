@@ -1,4 +1,5 @@
-public class TerrainGenerator{ // a class to generate and display terrain onto a spherical surface
+// by Justin Kunimune
+public class CiviHD { // the driver for my final project
   static long startTime = 0; // the time it was when we last checked
   
   
