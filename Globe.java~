@@ -136,7 +136,9 @@ public class Globe { // a class to create a spherical surface and generate terra
                 totalChange -= rise*.76; // it forms an island chain
               }
               else { // if they are going at the same speed
-                totalChange -= rise/16; // it forms a taller rift
+                if (Math.random() < .5)  totalChange += rise/2.0; // it forms a random type thing
+                else                     totalChange -= rise/2.0;
+                
               }
             }
             else { // if they are going away from each other
@@ -286,7 +288,7 @@ public class Globe { // a class to create a spherical surface and generate terra
     
     for (Tile[] row: map) {
       for (Tile til: row) {
-        runoffFrom(til, (til.rainfall>>1)+1); // fills rivers
+        runoffFrom(til, til.rainfall*.001); // fills rivers
       }
     }
   }
@@ -345,12 +347,11 @@ public class Globe { // a class to create a spherical surface and generate terra
   }
   
   
-  public void runoffFrom(Tile start, int amount) {
+  public void runoffFrom(Tile start, double amount) {
     if (start.altitude < 0) // do not bother with ocean
       return;
     
     start.water += amount;
-    start.altitude -= amount>>16;
     start.temp3 = 1; // indicate start is checked
     
     if (start.temp1 < 0) // if temp1 is not set
@@ -411,7 +412,7 @@ public class Globe { // a class to create a spherical surface and generate terra
             til.biome = Tile.reef;
           }
         }
-        else if (til.water > 255) { // if has freshwater on it
+        else if (til.water > 16) { // if has freshwater on it
           til.biome = Tile.freshwater;
         }
         else if (til.altitude < 64) { // if low altitude
