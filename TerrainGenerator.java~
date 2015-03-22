@@ -5,7 +5,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
   
   public static void main(String args[]) {
     while (true) {
-      Globe earth = new Globe(100);
+      Planet earth = new Planet(100);
       Map theMap = new Hemispherical(earth, 800, 400);
       
       theMap.display("altitude");
@@ -19,7 +19,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
   
   
   /* PRECONDITION: map's Globe is world */
-  public static void generate(Globe world, Map map) { // randomly generates a map and simultaneously displays it
+  public static void generate(Planet world, Map map) { // randomly generates a map and simultaneously displays it
     map.display("altitude");
     System.out.println("Generating landmasses...");
       

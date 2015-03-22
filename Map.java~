@@ -5,6 +5,13 @@ import javax.swing.*;
 
 
 public class Map extends JPanel { // a class to manage the graphic elements of terrain generation
+  public static final int biome = 0;
+  public static final int altitude = 1;
+  public static final int temperature = 2;
+  public static final int rainfall = 3;
+  public static final int climate = 4;
+  public static final int water = 5;
+  public static final int waterLevel = 6;
   final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(20, 70, 200), new Color(0,0,150),
     new Color(255,255,255), new Color(0,255,0), new Color(200,255,25), new Color(0,150,25), new Color(200,100,50), new Color(200,100,255),
     new Color(0,25,255), new Color(0,0,0)}; // colors of the biomes
@@ -111,7 +118,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public void display(String colorScheme) { // displays the map
+  public void display(int colorScheme) { // displays the map
     for (int x = 0; x < width(); x ++)
       for (int y = 0; y < height(); y ++)
         drawPx(x, y, getColorBy(colorScheme, x, y));
@@ -119,26 +126,28 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public Color getColorBy(String type, int x, int y) { // gets the color at a point on the screen
+  public Color getColorBy(int type, int x, int y) { // gets the color at a point on the screen
     if (lats[y][x] < 0) // if it is a color, not a tile
       return new Color(lons[y][x]>>16, lons[y][x]>>8, lons[y][x]); // return a color with the rgb value found
     
-    if (type.equals("biome")) // otherwise calculate the color from that tile
-      return getColorByBiome(x, y);
-    else if (type.equals("altitude"))
-      return getColorByAlt(x, y);
-    else if (type.equals("rainfall"))
-      return getColorByRain(x, y);
-    else if (type.equals("temperature"))
-      return getColorByTemp(x, y);
-    else if (type.equals("climate"))
-      return getColorByClimate(x, y);
-    else if (type.equals("water"))
-      return getColorByWater(x, y);
-    else if (type.equals("water level"))
-      return getColorByWaterLevel(x, y);
-    else
-      return new Color(255, 0, 150);
+    switch (type) {
+      case biome: // otherwise calculate the color from that tile
+        return getColorByBiome(x, y);
+      case altitude:
+        return getColorByAlt(x, y);
+      case rainfall:
+        return getColorByRain(x, y);
+      case temperature:
+        return getColorByTemp(x, y);
+      case climate:
+        return getColorByClimate(x, y);
+      case water:
+        return getColorByWater(x, y);
+      case waterLevel:
+        return getColorByWaterLevel(x, y);
+      default:
+        return new Color(255, 0, 150);
+    }
   }
   
   
@@ -153,10 +162,8 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
       return Color.black;
     else if (alt >= 256) // if altitude is above maximum, return white
       return Color.white;
-    else if (alt < -128) // if altitude is deep, return a blue that gets blacker as oneg oes deeper
-      return new Color(0, 0, alt*2+512);
-    else if (alt < 0) // if altitude is below sea level, return a blue that gets brighter as one goes deeper
-      return new Color(0, alt+128, 255);
+    else if (alt < 0) // if altitude is deep, return a blue that gets blacker as oneg oes deeper
+      return new Color(0, 0, alt+256);
     else if (alt < 128) // if altitude is above sea level, return a green that gets brighter as one goes higher
       return new Color(0, alt+128, 0);
     else // if altitude is high, return a green that gets whiter as one goes higher

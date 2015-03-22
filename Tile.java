@@ -1,3 +1,7 @@
+import java.util.*;
+
+
+
 public class Tile { // keeps track of a single point on a globe
   public int lat; // lattitude (actually an array index)
   public int lon; // longitude (actually an array index)
@@ -7,7 +11,7 @@ public class Tile { // keeps track of a single point on a globe
   public int water; // the freshwater level from 0 to 255
   public int biome; // see key below
   public int settlement; // how settled it is
-  public Civi owner;
+  public ArrayList<Civi> owners;
   public int temp1; // to store various values only necessary during generation
   public int temp2;
   public int temp3;

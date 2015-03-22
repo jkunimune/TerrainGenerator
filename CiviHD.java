@@ -1,19 +1,29 @@
 // by Justin Kunimune
+
+
+
+import java.util.*;
+
+
+
+
 public class CiviHD { // the driver for my final project
   static long startTime = 0; // the time it was when we last checked
   
   
   
   public static void main(String args[]) {
+    ArrayList<Civi> civis = new ArrayList<Civi>();
+    
     while (true) {
-      Civi test = new Civi(new Tile(0,0));
+      Civi test = new Civi(new Tile(0,0), civis);
     }
   }
   
   
   /* PRECONDITION: map's Globe is world */
   public static void generate(Planet world, Map map) { // randomly generates a map and simultaneously displays it
-    map.display("altitude");
+    map.display(Map.altitude);
     System.out.println("Generating landmasses...");
       
     world.spawnFirstContinent();
@@ -22,40 +32,40 @@ public class CiviHD { // the driver for my final project
     while (world.any(-257)) {
       world.spawnContinents();
       if (t%10 == 0)
-        map.display("altitude");
+        map.display(Map.altitude);
       t ++;
     }
     if (t%10 != 1)
-      map.display("altitude");
+      map.display(Map.altitude);
     
     System.out.println("Shifting continents...");
     world.plateTechtonics();
-    map.display("altitude");
+    map.display(Map.altitude);
     
     System.out.println("Roughing up and smoothing down terrain...");
     for (int i = 64; i >= 1; i >>= 2) { // gradually randomizes and smooths out terrain
       for (int j = 0; j < i; j ++)
         world.smooth(.4);
-      map.display("altitude");
+      map.display(Map.altitude);
       world.rough(i*1.2);
-      map.display("altitude");
+      map.display(Map.altitude);
     }
     
     System.out.println("Generating climate...");
     world.acclimate(.1);
     world.climateEnhance();
-    map.display("temperature");
-    map.display("rainfall");
+    map.display(Map.temperature);
+    map.display(Map.rainfall);
     
     System.out.println("Raining...");
     world.rain();
     world.runoff();
-    map.display("water");
+    map.display(Map.water);
     delay(2000);
     
     System.out.println("Setting up biomes...");
     world.biomeAssign();
-    map.display("biome");
+    map.display(Map.biome);
   }
   
   
