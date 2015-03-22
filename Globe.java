@@ -55,7 +55,7 @@ public class Globe { // a spherical surface
   
   
   
-  public Tile getTile(double lat, double lon) { // returns a tile at a given coordinate
+  public final Tile getTile(double lat, double lon) { // returns a tile at a given coordinate
     if (lat < 0 || lat >= Math.PI) {
       System.out.println("Error accessing "+lat+","+lon);
       return new Tile(-1, -1);
@@ -71,32 +71,33 @@ public class Globe { // a spherical surface
   }
   
   
-  public Tile getTileByIndex(int lat, int lon) {
+  public final Tile getTileByIndex(int lat, int lon) {
     return map[lat][lon];
   }
   
   
-  public int latIndex(double lattitude) { // converts a lattitude to an index
+  public final int latIndex(double lattitude) { // converts a lattitude to an index
     return (int)(lattitude*map.length/Math.PI);
   }
   
   
-  public int lonIndex(int lat, double longitude) { // converts an index and a longitude to a secondary index.
+  public final int lonIndex(int lat, double longitude) { // converts an index and a longitude to a secondary index.
+    longitude = (longitude + 2*Math.PI) % (2*Math.PI); // makes longitude valid
     return (int)(longitude*map[lat].length/(2*Math.PI));
   }
   
   
-  public Tile[][] getTileMatrix() {
+  public final Tile[][] getTileMatrix() {
     return map;
   }
   
   
-  public int getRadius() {
+  public final int getRadius() {
     return radius;
   }
   
   
-  public ArrayList<Tile> adjacentTo(Tile tile) { // returns an arrayList of tiles adjacent to a given tile
+  public final ArrayList<Tile> adjacentTo(Tile tile) { // returns an arrayList of tiles adjacent to a given tile
     if (tile.lat == 0)
       return new ArrayList<Tile>(Arrays.asList(map[1])); // returns a whole row if it is a pole
     if (tile.lat == map.length-1)
@@ -121,7 +122,7 @@ public class Globe { // a spherical surface
   }
   
   
-  public boolean any(int testAlt) { // checks if any of a given altitude exists on the map
+  public final boolean any(int testAlt) { // checks if any of a given altitude exists on the map
     for (Tile[] row: map)
       for (Tile t: row)
         if (t.altitude == testAlt)
@@ -130,7 +131,7 @@ public class Globe { // a spherical surface
   }
   
   
-  public boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
+  public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
     return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
   }
 }

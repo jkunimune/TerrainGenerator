@@ -1,9 +1,9 @@
-public class TerrainGenerator{ // a class to generate and display terrain onto a spherical surface
+public final class TerrainGenerator{ // a class to generate and display terrain onto a spherical surface
   static long startTime = 0; // the time it was when we last checked
   
   
   
-  public static void main(String args[]) {
+  public static final void main(String args[]) {
     while (true) {
       Planet earth = new Planet(100);
       Map theMap = new Hemispherical(earth, 800, 400);
@@ -19,7 +19,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
   
   
   /* PRECONDITION: map's Globe is world */
-  public static void generate(Planet world, Map map) { // randomly generates a map and simultaneously displays it
+  public static final void generate(Planet world, Map map) { // randomly generates a map and simultaneously displays it
     map.display(Map.altitude);
     System.out.println("Generating landmasses...");
       
@@ -66,18 +66,18 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
   }
   
   
-  public static void delay(int mSec) { // waits a number of miliseconds
+  public static final void delay(int mSec) { // waits a number of miliseconds
     long start = System.currentTimeMillis();
     while (System.currentTimeMillis() < start+mSec) {}
   }
   
   
-  public static void setTimer(long mSec) { // sets the timer to a certain time
+  public static final void setTimer(long mSec) { // sets the timer to a certain time
     startTime = System.currentTimeMillis() - mSec;
   }
   
   
-  public static void waitFor(long mSec) { // waits for the timer to reach a certain time
+  public static final void waitFor(long mSec) { // waits for the timer to reach a certain time
     while (System.currentTimeMillis() - startTime < mSec) {}
   }
 }

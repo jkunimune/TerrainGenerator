@@ -109,7 +109,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public void drawPx(int x, int y, Color z) { // draws a pixel to the buffered image
+  public final void drawPx(int x, int y, Color z) { // draws a pixel to the buffered image
     Graphics g = img.getGraphics();
     g.setColor(z);
     g.drawLine(x, y, x, y);
@@ -219,7 +219,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   
   public Color getColorByWaterLevel(int x, int y) {
-    int height = glb.getTileByIndex(lats[y][x], lons[y][x]).water+glb.getTileByIndex(lats[y][x], lons[y][x]).altitude;
+    int height = glb.getTileByIndex(lats[y][x], lons[y][x]).waterLevel();
     if (height >= 256)
       return Color.white;
     if (height < 0)
@@ -228,12 +228,26 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public int width() {
+  public Color getColorByTerritory(int x, int y) {
+    Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
+    
+    if (til.altitude < 0) // the ocean is black
+      return Color.black;
+    
+    else if (til.owners.size() > 0) // if it has been claimed
+      return til.owners.get(0).emblem(); // show country color
+    
+    else
+      return Color.white; // unclaimed land is white
+  }
+  
+  
+  public final int width() {
     return lats[0].length;
   }
   
   
-  public int height() {
+  public final int height() {
     return lats.length;
   }
   

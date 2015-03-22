@@ -8,7 +8,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
       Planet earth = new Planet(100);
       Map theMap = new Hemispherical(earth, 800, 400);
       
-      theMap.display("altitude");
+      theMap.display(Map.altitude);
       
       generate(earth, theMap);
       
@@ -20,7 +20,7 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
   
   /* PRECONDITION: map's Globe is world */
   public static void generate(Planet world, Map map) { // randomly generates a map and simultaneously displays it
-    map.display("altitude");
+    map.display(Map.altitude);
     System.out.println("Generating landmasses...");
       
     world.spawnFirstContinent();
@@ -29,40 +29,40 @@ public class TerrainGenerator{ // a class to generate and display terrain onto a
     while (world.any(-257)) {
       world.spawnContinents();
       if (t%10 == 0)
-        map.display("altitude");
+        map.display(Map.altitude);
       t ++;
     }
     if (t%10 != 1)
-      map.display("altitude");
+      map.display(Map.altitude);
     
     System.out.println("Shifting continents...");
     world.plateTechtonics();
-    map.display("altitude");
+    map.display(Map.altitude);
     
     System.out.println("Roughing up and smoothing down terrain...");
     for (int i = 64; i >= 1; i >>= 2) { // gradually randomizes and smooths out terrain
       for (int j = 0; j < i; j ++)
         world.smooth(.4);
-      map.display("altitude");
+      map.display(Map.altitude);
       world.rough(i*1.2);
-      map.display("altitude");
+      map.display(Map.altitude);
     }
     
     System.out.println("Generating climate...");
     world.acclimate(.1);
     world.climateEnhance();
-    map.display("temperature");
-    map.display("rainfall");
+    map.display(Map.temperature);
+    map.display(Map.rainfall);
     
     System.out.println("Raining...");
     world.rain();
     world.runoff();
-    map.display("water");
+    map.display(Map.water);
     delay(2000);
     
     System.out.println("Setting up biomes...");
     world.biomeAssign();
-    map.display("biome");
+    map.display(Map.biome);
   }
   
   

@@ -12,17 +12,23 @@ public class CiviHD { // the driver for my final project
   
   
   
-  public static void main(String args[]) {
-    ArrayList<Civi> civis = new ArrayList<Civi>();
+  public static final void main(String args[]) {
+    Planet protoEarth = new Planet(100);
+    Map theMap = new Polar(protoEarth, 400, 400);
+    generate(protoEarth, theMap);
     
-    while (true) {
-      Civi test = new Civi(new Tile(0,0), civis);
-    }
+    World earth = new World(protoEarth);
+    
+    theMap.display(Map.territory);
+    earth.test();
+    theMap.display(Map.territory);
+    System.out.println("end");
   }
   
   
+  
   /* PRECONDITION: map's Globe is world */
-  public static void generate(Planet world, Map map) { // randomly generates a map and simultaneously displays it
+  public static final void generate(Planet world, Map map) { // randomly generates a map and simultaneously displays it
     map.display(Map.altitude);
     System.out.println("Generating landmasses...");
       
@@ -69,18 +75,18 @@ public class CiviHD { // the driver for my final project
   }
   
   
-  public static void delay(int mSec) { // waits a number of miliseconds
+  public static final void delay(int mSec) { // waits a number of miliseconds
     long start = System.currentTimeMillis();
     while (System.currentTimeMillis() < start+mSec) {}
   }
   
   
-  public static void setTimer(long mSec) { // sets the timer to a certain time
+  public static final void setTimer(long mSec) { // sets the timer to a certain time
     startTime = System.currentTimeMillis() - mSec;
   }
   
   
-  public static void waitFor(long mSec) { // waits for the timer to reach a certain time
+  public static final void waitFor(long mSec) { // waits for the timer to reach a certain time
     while (System.currentTimeMillis() - startTime < mSec) {}
   }
 }

@@ -5,13 +5,14 @@ import javax.swing.*;
 
 
 public class Map extends JPanel { // a class to manage the graphic elements of terrain generation
-  public static final int biome = 0;
+  public static final int biome = 0; // colorscheme codes
   public static final int altitude = 1;
   public static final int temperature = 2;
   public static final int rainfall = 3;
   public static final int climate = 4;
   public static final int water = 5;
   public static final int waterLevel = 6;
+  public static final int territory = 7;
   final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(20, 70, 200), new Color(0,0,150),
     new Color(255,255,255), new Color(0,255,0), new Color(200,255,25), new Color(0,150,25), new Color(200,100,50), new Color(200,100,255),
     new Color(0,25,255), new Color(0,0,0)}; // colors of the biomes
@@ -109,7 +110,8 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public void drawPx(int x, int y, Color z) { // draws a pixel to the buffered image
+  
+  public final void drawPx(int x, int y, Color z) { // draws a pixel to the buffered image
     Graphics g = img.getGraphics();
     g.setColor(z);
     g.drawLine(x, y, x, y);
@@ -128,7 +130,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   public Color getColorBy(int type, int x, int y) { // gets the color at a point on the screen
     if (lats[y][x] < 0) // if it is a color, not a tile
-      return new Color(lons[y][x]>>16, lons[y][x]>>8, lons[y][x]); // return a color with the rgb value found
+      return new Color(lons[y][x]>>16, lons[y][x]%65536>>8, lons[y][x]%256); // return a color with the rgb value found
     
     switch (type) {
       case biome: // otherwise calculate the color from that tile
@@ -145,6 +147,8 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
         return getColorByWater(x, y);
       case waterLevel:
         return getColorByWaterLevel(x, y);
+      case territory:
+        return getColorByTerritory(x, y);
       default:
         return new Color(255, 0, 150);
     }
@@ -242,12 +246,17 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public int width() {
+  public void setGlobe(Globe newGlb) {
+    glb = newGlb;
+  }
+  
+  
+  public final int width() {
     return lats[0].length;
   }
   
   
-  public int height() {
+  public final int height() {
     return lats.length;
   }
   
