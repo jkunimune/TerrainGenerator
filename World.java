@@ -90,7 +90,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     ArrayList<Tile> adjacent = adjacentTo(til);
     for (Tile adj: adjacent)
       if (adj.altitude < 0 || adj.biome == Tile.freshwater) // civis spawn a lot near rivers and oceans
-        chance = -110;
+        chance = -120;
     
     switch (til.biome) {
       case Tile.magma:
