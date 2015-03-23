@@ -14,15 +14,17 @@ public class CiviHD { // the driver for my final project
   
   public static final void main(String args[]) {
     Planet protoEarth = new Planet(100);
-    Map theMap = new Polar(protoEarth, 400, 400);
+    Map theMap = new Lambert(protoEarth, 600, 300);
     generate(protoEarth, theMap);
     
     World earth = new World(protoEarth);
     
-    theMap.display(Map.territory);
-    earth.test();
-    theMap.display(Map.territory);
-    System.out.println("end");
+    while (true) {
+      setTimer(0);
+      earth.update();
+      theMap.display(Map.territory);
+      waitFor(100);
+    }
   }
   
   
@@ -67,11 +69,12 @@ public class CiviHD { // the driver for my final project
     world.rain();
     world.runoff();
     map.display(Map.water);
-    delay(2000);
     
     System.out.println("Setting up biomes...");
     world.biomeAssign();
     map.display(Map.biome);
+    
+    System.out.println("Done!");
   }
   
   

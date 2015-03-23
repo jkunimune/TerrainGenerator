@@ -10,7 +10,7 @@ public class Tile { // keeps track of a single point on a globe
   public int rainfall; // measure of how wet a climate is from 0 (parched) to 255 (Kauai)
   public int water; // the freshwater level from 0 to 255
   public int biome; // see key below
-  public int settlement; // how settled it is
+  public int ownership; // how settled it is
   public ArrayList<Civi> owners;
   public int temp1; // to store various values only necessary during generation
   public int temp2;
@@ -42,10 +42,12 @@ public class Tile { // keeps track of a single point on a globe
     rainfall = -1;
     water = 0;
     biome = 0;
+    ownership = 0;
+    owners = new ArrayList<Civi>(1);
   }
   
   
-  public Tile(int newLat, int newLon, int newAlt, int newTemp, int newRain, int newWater, int newBiome) { // initializes with default values
+  public Tile(int newLat, int newLon, int newAlt, int newTemp, int newRain, int newWater, int newBiome) { // initializes with given values
     lat = newLat;
     lon = newLon;
     altitude = newAlt;
@@ -53,6 +55,8 @@ public class Tile { // keeps track of a single point on a globe
     rainfall = newRain;
     water = newWater;
     biome = newBiome;
+    ownership = 0;
+    owners = new ArrayList<Civi>(1);
   }
   
   
@@ -67,6 +71,8 @@ public class Tile { // keeps track of a single point on a globe
     temp1 = source.temp1;
     temp2 = source.temp2;
     temp3 = source.temp3;
+    ownership = source.ownership;
+    owners = source.owners;
   }
   
   

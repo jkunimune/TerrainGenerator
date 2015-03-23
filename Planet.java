@@ -39,6 +39,8 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     
     System.out.println("Setting up biomes...");
     this.biomeAssign();
+    
+    System.out.println("Done!");
   }
   
   
@@ -51,15 +53,15 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   
   public final void randomize() { // randomizes each tile for testing purposes
     for (Tile[] row: map)
-    for (Tile t: row)
-      t.randomize();
+      for (Tile t: row)
+        t.randomize();
   }
   
   
   public final void setAllAlt(int alt) {
     for (Tile[] row: map)
-    for (Tile t: row)
-      t.altitude = alt;
+      for (Tile t: row)
+        t.altitude = alt;
   }
   
   
@@ -122,8 +124,8 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
                 totalChange -= rise*.77; // it forms an island chain
               }
               else { // if they are going at the same speed
-                if (Math.random() < .5)  totalChange += rise/2.0; // it forms a random type thing
-                else                     totalChange -= rise/2.0;
+                if (Math.random() < .5)  totalChange += rise/4.0; // it forms a random type thing
+                else                     totalChange -= rise/4.0;
                 
               }
             }

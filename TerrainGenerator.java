@@ -58,7 +58,6 @@ public final class TerrainGenerator{ // a class to generate and display terrain 
     world.rain();
     world.runoff();
     map.display(Map.water);
-    delay(2000);
     
     System.out.println("Setting up biomes...");
     world.biomeAssign();

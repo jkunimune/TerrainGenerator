@@ -9,6 +9,8 @@ public class Civi {
   public final String[] consonants = {"Qu", "W", "R", "RR", "Ry", "T", "T", "Th", "Tr", "Y", "P", "P", "Ph", "Pl", "Pr", "Pp", "Py", "S", "Sh", "Shr", "St",
     "Str", "D", "D", "Dr", "F", "F", "Fl", "Fr", "G", "Gh", "Gr", "H", "J", "K", "K", "Kh", "Kl", "Ky", "L", "Ll", "Z", "Zh", "X", "C", "Ch", "Cl", "Ck", "Cr",
     "Cz", "V", "Vr", "B", "B", "Br", "Bl", "N", "Nr", "M", "Mr", "'"};
+  public final int classical = 4096;
+  public final int ironAge = 8192;
   
   public ArrayList<Tile> land; // all of the tiles it owns
   private Tile captial; // its capital city
@@ -21,11 +23,14 @@ public class Civi {
   private int scienceLevel; // how much science it has
   private int militaryLevel; // how much military it has
   private int warChance; // how likely it is to wage war
+  private int deathTimer; // how soon it will die (negative means apocalype is in progress)
   
   
   
   public Civi(Tile start, ArrayList<Civi> existing) {
     captial = start; // set capital and territory
+    start.owners.add(this);
+    start.ownership = 2;
     land = new ArrayList<Tile>(1);
     land.add(start);
     homeBiome = start.biome;
@@ -38,10 +43,73 @@ public class Civi {
     scienceLevel = 0;
     militaryLevel = (int)(Math.random()*255);
     warChance = (int)(Math.random()*255);
+    deathTimer = 1024 + (int)(Math.random()*1024);
     
     name = newName(); // picks a custom name
     capName = newCapName();
     System.out.println(this+" has been founded in "+capName+"!"); // announces the civi's arrival
+  }
+  
+  
+  
+  public void advance() { // naturally alters stats
+    deathTimer -= (int)(Math.random()*2);
+    warChance += (int)(Math.random()*7-3.5);
+    militaryLevel += (int)(Math.random()*7-3.5);
+    scienceLevel += scienceRate;
+    scienceRate += (int)(Math.random()*7-3.5);
+    spreadRate += (int)(Math.random()*7-3.5);
+  }
+  
+  
+  public boolean wants(Tile til) { // decides whether civi can claim a tile
+    int chance = -30;
+    switch (til.biome) {
+      case Tile.magma:
+        return false;
+      case Tile.ocean:
+        if (scienceLevel < ironAge)  return false; // civis spread slow in ocean (after iron age)
+        else                         chance -= 12;
+        break;
+      case Tile.ice:
+        if (scienceLevel < ironAge)  return false; // slower in ice (after iron age)
+        else                         chance -= 16;
+        break;
+      case Tile.reef:
+        if (scienceLevel < ironAge)  return false; // not as slow in reefs (after iron age)
+        else                         chance -= 8;
+        break;
+      case Tile.trench:
+        if (scienceLevel < ironAge)  return false; // slow in trenches (after iron age)
+        else                         chance -= 8;
+        break;
+      case Tile.tundra:
+        chance -= 4; // kind of slow in tundra
+        break;
+      case Tile.plains:
+        break; // normal speed in plains
+      case Tile.desert:
+        chance += 16; // really fast in desert
+        break;
+      case Tile.jungle:
+        chance -= 4; // kind of slow in jungle
+        break;
+      case Tile.mountain:
+        chance -= 8; // slow over mountains
+        break;
+      case Tile.snowcap:
+        chance -= 12; // even slower over mountains
+        break;
+      case Tile.freshwater:
+        chance -= 16; // super slow over rivers
+        break;
+      case Tile.space:
+        return false;
+    }
+    if (homeBiome == til.biome) // civis spread fastest in their home biome
+      chance += 8;
+    
+    return randChance(chance);
   }
   
   
@@ -96,7 +164,7 @@ public class Civi {
         t++;
       } while (t%2 != 0 || Math.random() < .3);
       
-      switch ((int)(Math.pow(Math.random(),1.3)*5)) { // puts an ending onto it
+      switch ((int)(Math.pow(Math.random(),1.2)*5)) { // puts an ending onto it
         case 1:
           output += "town";
           break;
@@ -155,9 +223,9 @@ public class Civi {
       return 511+emblem.getBlue();
     else if (emblem.getGreen() < 255 && emblem.getBlue() == 255) // aquamarine
       return 1022-emblem.getGreen();
-    else if (emblem.getBlue() == 255 && emblem.getRed() < 255) // teal
+    else if (emblem.getBlue() == 255 && emblem.getRed() < 255) // purple
       return 1022+emblem.getRed();
-    else if (emblem.getBlue() < 255 && emblem.getRed() == 255) // aquamarine
+    else if (emblem.getBlue() < 255 && emblem.getRed() == 255) // maroon
       return 1533-emblem.getBlue();
     else
       return -1;
@@ -166,6 +234,11 @@ public class Civi {
   
   public Color emblem() {
     return emblem;
+  }
+  
+  
+  public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
+    return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
   }
   
   

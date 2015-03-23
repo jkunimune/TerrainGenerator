@@ -22,6 +22,10 @@ public class Polar extends Map { // an equal-distant map centered on the north p
             else             lons[y][x] = g.lonIndex(lats[y][x], 3*Math.PI/2);
           }
         }
+        else if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < (3+radius)*(3+radius)) { // if it is on the edge of the circle
+          lats[y][x] = -1;
+          lons[y][x] = 0;
+        }
         else {
           lats[y][x] = -1;
           lons[y][x] = 16777215;

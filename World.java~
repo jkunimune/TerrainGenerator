@@ -15,11 +15,53 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   public World(Globe g) {
     super(g);
+    civis = new ArrayList<Civi>();
   }
   
   
   
-  public void update() { // updates the world a year or so
-    return;
+  public final void update() { // updates the world a frame
+    naturallyDisast();
+    endWar();
+    fight();
+    startWar();
+    startRevolution();
+    spread();
+    
+    for (Civi c: civis)
+      c.advance();
+  }
+  
+  
+  public final void spread() { // causes Civis to claim terriory
+  }
+  
+  
+  public final void startWar() { // causes Civis to wage war on others
+  }
+  
+  
+  public final void startRevolution() { // causes Civis to simultaneously spawn inside an existing one and wage war on the parent Civi
+  }
+  
+  
+  public final void fight() { // handles redistribution of territory due to war
+  }
+  
+  
+  public final void endWar() { // causes peace treaties
+  }
+  
+  
+  public final void naturallyDisast() { // causes natural disasters
+  }
+  
+  
+  public final void test() {
+    civis.add(new Civi(map[0][0], civis));
+    
+    for (Tile[] row: map)
+      for (Tile til: row)
+        til.owners.add(civis.get(0));
   }
 }
