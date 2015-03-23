@@ -4,11 +4,12 @@ import java.awt.*;
 
 
 public class Civi {
-  public final String[] vowels = {"A", "E", "I", "O", "U", "A", "E", "I", "O", "U", "Y", "Ae", "Ai", "Aw", "Ar", "Ay", "Ea", "Ee", "Er", "Ia", "Ie", "Io", "Ir", "Oa", "Oe",
-    "Oi", "Ou", "Oo", "Oo", "Or"}; // vowels and consonants for name generation
-  public final String[] consonants = {"Qu", "W", "R", "RR", "Ry", "T", "T", "Th", "Tr", "Y", "P", "P", "Ph", "Pl", "Pr", "Pp", "Py", "S", "Sh", "Shr", "St",
-    "Str", "D", "D", "Dr", "F", "F", "Fl", "Fr", "G", "Gh", "Gr", "H", "J", "K", "K", "Kh", "Kl", "Ky", "L", "Ll", "Z", "Zh", "X", "C", "Ch", "Cl", "Ck", "Cr",
-    "Cz", "V", "Vr", "B", "B", "Br", "Bl", "N", "Nr", "M", "Mr", "'"};
+  public final String[] vowels = {"E", "E", "A", "E", "A", "E", "I", "A", "E", "I", "O", "U", "A", "E", "I", "O", "U", "A", "E", "I", "O", "U", "Y", "Ae", "Ai", "Aw",
+    "Ar", "Ay", "Ea", "Ee", "Er", "Ia", "Ie", "Io", "Ir", "Oa", "Oe", "Oi", "Ou", "Oo", "Oo", "Or", "Ol", "Ow"}; // vowels and consonants for name generation
+  public final String[] consonants = {"Qu", "W", "R", "RR", "Ry", "T", "T", "T", "T", "Th", "Tr", "Y", "P", "P", "P", "Ph", "Pl", "Pr", "Pp", "Py", "Ps",
+    "S", "S", "S", "S", "Sh", "Sh", "Sh", "Shr", "St", "Str", "D", "D", "D", "Dr", "F", "F", "F", "Fl", "Fr", "G", "G", "G", "Gh", "Gr", "H", "H", "J",
+    "J", "K", "K", "K", "K", "Kh", "Kl", "Ky", "Ks", "L", "L", "L", "Ll", "Lh", "Z", "Z", "Z", "Zh", "X", "C", "Ch", "Cl", "Cr","Cz", "V", "Vr", "B",
+    "B", "Br", "Bl", "Bs", "N", "N", "N", "N", "Nr", "Ng", "Nj", "Nh", "M", "M", "M", "M", "Mr", "'"};
   public final int classical = 8192; // science values of the different ages
   public final int iron = 16384;
   public final int imperialist = 24576;
@@ -69,7 +70,7 @@ public class Civi {
   
   
   public boolean wants(Tile til) { // decides whether civi can claim a tile
-    int chance = 0;
+    int chance = (spreadRate>>4)-20;
     switch (til.biome) {
       case Tile.magma:
         return false;
@@ -130,7 +131,7 @@ public class Civi {
       if (t%2 == 0)  output += vowels[(int)(Math.random()*vowels.length)].toLowerCase();
       else           output += consonants[(int)(Math.random()*consonants.length)].toLowerCase();
       t++;
-    } while (t%2 != 0 || Math.random() < .4);
+    } while (t%2 != 0 || Math.random() < .3);
     
     switch ((int)(Math.pow(Math.random(),2)*5)) { // puts an ending onto it
       case 1:
@@ -168,23 +169,20 @@ public class Civi {
         if (t%2 == 0)  output += vowels[(int)(Math.random()*vowels.length)].toLowerCase();
         else           output += consonants[(int)(Math.random()*consonants.length)].toLowerCase();
         t++;
-      } while (t%2 != 0 || Math.random() < .3);
+      } while (Math.random() < .2);
       
-      switch ((int)(Math.pow(Math.random(),1.2)*5)) { // puts an ending onto it
+      switch ((int)(Math.pow(Math.random(),1.4)*4)) { // puts an ending onto it
         case 1:
-          output += "town";
+          output += " City";
           break;
         case 2:
-          output = "The City of " + output + vowels[(int)(Math.random()*vowels.length)].toLowerCase();
+          output += "town";
           break;
         case 3:
-          output = "The City of " + output;
-          break;
-        case 4:
           output += "ville";
           break;
         default:
-          output += " City";
+          output = "The City of " + output;
           break;
       }
     }
@@ -193,46 +191,55 @@ public class Civi {
   }
   
   
-  public int chooseColor(int tolerance, ArrayList<Civi> existing) {
-    int hue = (int)(Math.random()*1530);
+  public int chooseColor(int intolerance, ArrayList<Civi> existing) {
+    int hue = (int)(Math.random()*1530+1);
     
-    for (Civi c: existing)
-      if (Math.abs(hue-c.hueNumber()) < tolerance)
-        hue = chooseColor(tolerance-1, existing); // makes sure the color is not too close to any existing ones
+    for (Civi c: existing) {
+      if (Math.abs(hue-c.hueNumber()) < intolerance) {
+        hue = chooseColor(intolerance-1, existing); // makes sure the color is not too close to any existing ones
+        break;
+      }
+    }
     
     return hue;
   }
   
   
-  public Color intToColor(int hue) {
-    if (hue < 256)
-      return new Color(255, hue, 0); // converts hue to color
-    else if (hue < 512)
-      return new Color(511-hue, 255, 0);
-    else if (hue < 767)
-      return new Color(0, 255, hue-511);
-    else if (hue < 1023)
-      return new Color(0, 1022-hue, 255);
-    else if (hue < 1278)
-      return new Color(hue-1022, 0, 255);
+  public Color intToColor(int hue) { // converts hue to color
+    if (hue <= 255 && hue > 0)
+      return new Color(255, hue, 0); // orange
+    else if (hue <= 510)
+      return new Color(510-hue, 255, 0); // chartreuse
+    else if (hue <= 765)
+      return new Color(0, 255, hue-510); // teal
+    else if (hue <= 1020)
+      return new Color(0, 1020-hue, 255); // aquamarine
+    else if (hue <= 1275)
+      return new Color(hue-1020, 0, 255); // purple
     else
-      return new Color(255, 0, 1533-hue);
+      return new Color(255, 0, 1530-hue); // maroon
   }
   
   
   public int hueNumber() {
-    if (emblem.getRed() == 255 && emblem.getGreen() < 255) // orange
+    if (emblem.getRed() == 255 && emblem.getGreen() <= 255 && emblem.getGreen() > 0) // orange
       return emblem.getGreen();
+    
     else if (emblem.getRed() < 255 && emblem.getGreen() == 255) // chartreuse
-      return 511-emblem.getRed();
-    else if (emblem.getGreen() == 255 && emblem.getBlue() < 255) // teal
-      return 511+emblem.getBlue();
+      return 510-emblem.getRed();
+    
+    else if (emblem.getGreen() == 255 && emblem.getBlue() <= 255) // teal
+      return 510+emblem.getBlue();
+    
     else if (emblem.getGreen() < 255 && emblem.getBlue() == 255) // aquamarine
-      return 1022-emblem.getGreen();
-    else if (emblem.getBlue() == 255 && emblem.getRed() < 255) // purple
-      return 1022+emblem.getRed();
+      return 1020-emblem.getGreen();
+    
+    else if (emblem.getBlue() == 255 && emblem.getRed() <= 255) // purple
+      return 1020+emblem.getRed();
+    
     else if (emblem.getBlue() < 255 && emblem.getRed() == 255) // maroon
-      return 1533-emblem.getBlue();
+      return 1530-emblem.getBlue();
+    
     else
       return -1;
   }

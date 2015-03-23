@@ -70,7 +70,7 @@ public class Civi {
   
   
   public boolean wants(Tile til) { // decides whether civi can claim a tile
-    int chance = (spreadRate>>4)-20;
+    int chance = (spreadRate>>3)-30;
     switch (til.biome) {
       case Tile.magma:
         return false;
