@@ -5,12 +5,18 @@ import java.awt.*;
 
 public class Civi {
   public final String[] vowels = {"A", "E", "I", "O", "U", "A", "E", "I", "O", "U", "Y", "Ae", "Ai", "Aw", "Ar", "Ay", "Ea", "Ee", "Er", "Ia", "Ie", "Io", "Ir", "Oa", "Oe",
-    "Oi", "Ou", "Oo", "Oo", "Or"};
+    "Oi", "Ou", "Oo", "Oo", "Or"}; // vowels and consonants for name generation
   public final String[] consonants = {"Qu", "W", "R", "RR", "Ry", "T", "T", "Th", "Tr", "Y", "P", "P", "Ph", "Pl", "Pr", "Pp", "Py", "S", "Sh", "Shr", "St",
     "Str", "D", "D", "Dr", "F", "F", "Fl", "Fr", "G", "Gh", "Gr", "H", "J", "K", "K", "Kh", "Kl", "Ky", "L", "Ll", "Z", "Zh", "X", "C", "Ch", "Cl", "Ck", "Cr",
     "Cz", "V", "Vr", "B", "B", "Br", "Bl", "N", "Nr", "M", "Mr", "'"};
-  public final int classical = 4096;
-  public final int ironAge = 8192;
+  public final int classical = 8192; // science values of the different ages
+  public final int iron = 16384;
+  public final int imperialist = 24576;
+  public final int industrial = 32768;
+  public final int modern = 40960;
+  public final int space = 49152;
+  public final int prosperity = 57344;
+  public final int apocalypse = 65536;
   
   public ArrayList<Tile> land; // all of the tiles it owns
   private Tile captial; // its capital city
@@ -63,25 +69,25 @@ public class Civi {
   
   
   public boolean wants(Tile til) { // decides whether civi can claim a tile
-    int chance = -30;
+    int chance = 0;
     switch (til.biome) {
       case Tile.magma:
         return false;
       case Tile.ocean:
-        if (scienceLevel < ironAge)  return false; // civis spread slow in ocean (after iron age)
-        else                         chance -= 12;
-        break;
-      case Tile.ice:
-        if (scienceLevel < ironAge)  return false; // slower in ice (after iron age)
+        if (scienceLevel < iron)  return false; // civis spread slow in ocean (after iron age)
         else                         chance -= 16;
         break;
+      case Tile.ice:
+        if (scienceLevel < iron)  return false; // slower in ice (after iron age)
+        else                         chance -= 20;
+        break;
       case Tile.reef:
-        if (scienceLevel < ironAge)  return false; // not as slow in reefs (after iron age)
-        else                         chance -= 8;
+        if (scienceLevel < iron)  return false; // not as slow in reefs (after iron age)
+        else                         chance -= 12;
         break;
       case Tile.trench:
-        if (scienceLevel < ironAge)  return false; // slow in trenches (after iron age)
-        else                         chance -= 8;
+        if (scienceLevel < iron)  return false; // slow in trenches (after iron age)
+        else                         chance -= 16;
         break;
       case Tile.tundra:
         chance -= 4; // kind of slow in tundra
@@ -192,7 +198,7 @@ public class Civi {
     
     for (Civi c: existing)
       if (Math.abs(hue-c.hueNumber()) < tolerance)
-        hue = chooseColor(tolerance>>1, existing); // makes sure the color is not too close to any existing ones
+        hue = chooseColor(tolerance-1, existing); // makes sure the color is not too close to any existing ones
     
     return hue;
   }

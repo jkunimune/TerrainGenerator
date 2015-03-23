@@ -35,11 +35,14 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   public final void spread() { // causes Civis to claim terriory
     for (Tile[] row: map) { // for each tile in map
       for (Tile til: row) {
+        til.temp1 = -1;
         ArrayList<Tile> adjacent = adjacentTo(til);
         for (Tile adj: adjacent) { // for all adjacent tiles
           if (adj.ownership > 0 && til.ownership == 0) { // if that one is settled and this is not
-            if (adj.owners.get(0).wants(til)) // if they want this tile
-              til.getsTakenBy(adj.owners.get(0));
+            if (adj.owners.get(0).wants(til)) { // if they want this tile
+              til.temp1 = adj.lat;
+              til.temp2 = adj.lon;
+            }
           }
         }
         
@@ -48,6 +51,11 @@ public final class World extends Globe { // a subclass of Globe to handle all po
         }
       }
     }
+    
+    for (Tile[] row: map)
+      for (Tile til: row)
+        if (til.temp1 != -1)
+          til.getsTakenBy(map[til.temp1][til.temp2].owners.get(0));
   }
   
   
@@ -77,12 +85,12 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final boolean settlersLike(Tile til) { // determines whether to found a civi
-    int chance = -9001;
+    int chance = -150;
     
     ArrayList<Tile> adjacent = adjacentTo(til);
     for (Tile adj: adjacent)
       if (adj.altitude < 0 || adj.biome == Tile.freshwater) // civis spawn a lot near rivers and oceans
-        chance = -80;
+        chance = -110;
     
     switch (til.biome) {
       case Tile.magma:

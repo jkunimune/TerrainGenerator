@@ -40,7 +40,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     System.out.println("Setting up biomes...");
     this.biomeAssign();
     
-    System.out.println("Done!");
+    System.out.println("Done!\n");
   }
   
   

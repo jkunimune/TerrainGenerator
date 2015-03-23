@@ -74,7 +74,8 @@ public class CiviHD { // the driver for my final project
     world.biomeAssign();
     map.display(Map.biome);
     
-    System.out.println("Done!");
+    System.out.println("Done!\n");
+    delay(3000);
   }
   
   
