@@ -14,7 +14,7 @@ public class CiviHD { // the driver for my final project
   
   public static final void main(String args[]) {
     Planet protoEarth = new Planet(100);
-    Map theMap = new Lambert(protoEarth, 600, 300);
+    Map theMap = new Sinusoidal(protoEarth, 600, 400);
     generate(protoEarth, theMap);
     
     World earth = new World(protoEarth);

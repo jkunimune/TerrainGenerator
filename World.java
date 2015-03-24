@@ -10,12 +10,18 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   public World(int r) {
     super(r);
     civis = new ArrayList<Civi>();
+    
+    while (civis.size() == 0) // skips ahead to the founding of the first civi
+      spread();
   }
   
   
   public World(Globe g) {
     super(g);
     civis = new ArrayList<Civi>();
+    
+    while (civis.size() == 0) // skips ahead to the founding of the first civi
+      spread();
   }
   
   

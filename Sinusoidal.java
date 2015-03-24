@@ -9,14 +9,14 @@ public class Sinusoidal extends Map { // an equal-area projection that is shaped
           lons[y][x] = g.lonIndex(lats[y][x], Math.PI * (x-w/2.0) / (Math.sin(Math.PI*y/h)*w/2.0));
         }
         
-        else if (Math.abs(x-w/2.0) < Math.sin(Math.PI*y/h)*w/2 + 3) { // if it is on the edge
+        else if (Math.abs(x-w/2.0) - 3 < Math.sin(Math.PI*(y+2)/(h+4))*w/2.0) { // if it is on the edge
           lats[y][x] = -1;
-          lons[y][x] = 0;
+          lons[y][x] = 4144959;
         }
         
         else { // if it is outside the sine curve
-          lats[y][x] = -1;
-          lons[y][x] = 16777215;
+          lats[y][x] = g.latIndex(Math.PI*y/h);
+          lons[y][x] = g.lonIndex(lats[y][x], Math.PI * (x-w/2.0) / (Math.sin(Math.PI*y/h)*w/2.0));
         }
       }
     }

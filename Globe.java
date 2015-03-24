@@ -82,7 +82,11 @@ public class Globe { // a spherical surface
   
   
   public final int lonIndex(int lat, double longitude) { // converts an index and a longitude to a secondary index.
-    longitude = (longitude + 2*Math.PI) % (2*Math.PI); // makes longitude valid
+    if (longitude < 0) // makes longitude valid
+      longitude = 2*Math.PI - ((-longitude)%(2*Math.PI));
+    if (longitude >= 2*Math.PI)
+      longitude = longitude%(2*Math.PI);
+    
     return (int)(longitude*map[lat].length/(2*Math.PI));
   }
   
