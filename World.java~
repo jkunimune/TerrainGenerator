@@ -44,7 +44,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
         til.temp1 = -1;
         ArrayList<Tile> adjacent = adjacentTo(til);
         for (Tile adj: adjacent) { // for all adjacent tiles
-          if (adj.ownership > 0 && til.ownership == 0) { // if that one is settled and this is not
+          if (adj.development > 0 && til.development == 0) { // if that one is settled and this is not
             if (adj.owners.get(0).wants(til)) { // if they want this tile
               til.temp1 = adj.lat;
               til.temp2 = adj.lon;
@@ -52,9 +52,10 @@ public final class World extends Globe { // a subclass of Globe to handle all po
           }
         }
         
-        if (til.ownership == 0 && settlersLike(til)) {
-          civis.add(new Civi(til, civis));
-        }
+        if (til.development == 0 && settlersLike(til))
+          civis.add(new Civi(til, civis, this));
+        else if (til.development > 0)
+          til.owners.get(0).tryUpgrade(til);
       }
     }
     
@@ -82,7 +83,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void test() {
-    civis.add(new Civi(map[0][0], civis));
+    civis.add(new Civi(map[0][0], civis, this));
     
     for (Tile[] row: map)
       for (Tile til: row)
@@ -91,46 +92,14 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final boolean settlersLike(Tile til) { // determines whether to found a civi
-    int chance = -150;
+    if (til.altitude < 0 || til.biome == Tile.freshwater) // civis may not start on ocean or river
+      return false;
     
     ArrayList<Tile> adjacent = adjacentTo(til);
     for (Tile adj: adjacent)
       if (adj.altitude < 0 || adj.biome == Tile.freshwater) // civis spawn a lot near rivers and oceans
-        chance = -120;
+        return randChance(-120);
     
-    switch (til.biome) {
-      case Tile.magma:
-        return false;
-      case Tile.ocean:
-        return false; // sea biomes are not viable start locations
-      case Tile.ice:
-        return false;
-      case Tile.reef:
-        return false;
-      case Tile.trench:
-        return false;
-      case Tile.tundra:
-        break; // tundra has normal fertility
-      case Tile.plains:
-        chance += 4; // plains have normal fertility
-        break;
-      case Tile.desert:
-        chance -= 4; // deserts are not very fertile
-        break;
-      case Tile.jungle:
-        chance += 4; // jungles have extra fertility
-        break;
-      case Tile.mountain:
-        break; // mountains have normal fertility
-      case Tile.snowcap:
-        chance -= 4; // snowcaps are extra unfertile
-        break;
-      case Tile.freshwater:
-        return false; // while rivers are great places to settle next to, they may not be settled on
-      case Tile.space:
-        return false;
-    }
-    
-    return randChance(chance);
+    return randChance(-150);
   }
 }

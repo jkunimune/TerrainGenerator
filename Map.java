@@ -234,7 +234,9 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   public Color getColorByTerritory(int x, int y) {
     Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
-    /*switch (til.development) {
+//    if (glb.randChance(-100))
+//      System.out.println("I see a development of "+til.development+" at "+x+", "+y);
+    switch (til.development) {
       case 0: // unclaimed
         if (til.altitude < 0) // unsettled ocean is black
           return Color.black;
@@ -262,13 +264,16 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
                          255- ((255-til.owners.get(0).emblem().getBlue()) >>1)); // return lightened tile
       default:
         return new Color(255, 127, 0);
-    }*/
-    if (til.owners.size() > 0)
-      return til.owners.get(0).emblem();
-    else if (til.altitude < 0)
-      return Color.black;
-    else
-      return Color.white;
+    }
+//    if (til.owners.size() > 0) {
+//      if (til.development > 0)
+//        System.out.println(til.development);
+//      return til.owners.get(0).emblem();
+//    }
+//    else if (til.altitude < 0)
+//      return Color.black;
+//    else
+//      return Color.white;
   }
   
   

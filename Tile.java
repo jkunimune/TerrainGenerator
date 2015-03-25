@@ -44,7 +44,7 @@ public final class Tile { // keeps track of a single point on a globe
     water = 0;
     biome = 0;
     development = 0;
-    owners = new ArrayList<Civi>(1);
+    owners = new ArrayList<Civi>(0);
   }
   
   
@@ -57,7 +57,7 @@ public final class Tile { // keeps track of a single point on a globe
     water = newWater;
     biome = newBiome;
     development = 0;
-    owners = new ArrayList<Civi>(1);
+    owners = new ArrayList<Civi>(0);
   }
   
   

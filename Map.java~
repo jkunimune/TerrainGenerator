@@ -234,15 +234,41 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   public Color getColorByTerritory(int x, int y) {
     Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
-    
-    if (til.altitude < 0) // the ocean is black
+    /*switch (til.development) {
+      case 0: // unclaimed
+        if (til.altitude < 0) // unsettled ocean is black
+          return Color.black;
+        else
+          return Color.white; // unclaimed land is white
+        
+      case 1: // territory
+        for (int i = -2; i < 3; i ++)
+          for (int j = -2; j < 3; j ++)
+            if (!til.owners.equals(glb.getTileByIndex(lats[y][x], lons[y][x]).owners)) // if it is near a tile owned by someone else or near ocean
+              return til.owners.get(0).emblem();
+        return Color.white; // inside of territory is white
+        
+      case 2: // settlement
+        return til.owners.get(0).emblem();
+        
+      case 3: // urban area
+        return new Color(til.owners.get(0).emblem().getRed()>>1,
+                         til.owners.get(0).emblem().getGreen()>>1,
+                         til.owners.get(0).emblem().getBlue()>>1); // return darkened tile
+        
+      case 4: // utopia
+        return new Color(255- ((255-til.owners.get(0).emblem().getRed()) >>1), 
+                         255- ((255-til.owners.get(0).emblem().getGreen()) >>1), 
+                         255- ((255-til.owners.get(0).emblem().getBlue()) >>1)); // return lightened tile
+      default:
+        return new Color(255, 127, 0);
+    }*/
+    if (til.owners.size() > 0)
+      return til.owners.get(0).emblem();
+    else if (til.altitude < 0)
       return Color.black;
-    
-    else if (til.owners.size() > 0) // if it has been claimed
-      return til.owners.get(0).emblem(); // show country color
-    
     else
-      return Color.white; // unclaimed land is white
+      return Color.white;
   }
   
   

@@ -1,5 +1,6 @@
 import java.util.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 
 
@@ -18,7 +19,10 @@ public class Civi {
   public final int space = 49152;
   public final int prosperity = 57344;
   public final int apocalypse = 65536;
+  public final int[] explorabilityOf = {0, -46, -50, -42, -46, -34, -30, -14, -34, -38, -42, -46, 0}; // how quickly civis spread over biomes
+  public final int[] fertilityOf = {0, -44, -52, -40, -52, -48, -40, -56, -36, -44, -45, -36, 0}; // how quickly civis develop them
   
+  public World world; // the world it belongs to
   public ArrayList<Tile> land; // all of the tiles it owns
   private Tile captial; // its capital city
   private String name; // its name
@@ -34,10 +38,13 @@ public class Civi {
   
   
   
-  public Civi(Tile start, ArrayList<Civi> existing) {
+  public Civi(Tile start, ArrayList<Civi> existing, World wholeNewWorld) {
+    world = wholeNewWorld;
+    
     captial = start; // set capital and territory
     start.owners.add(this);
-    start.ownership = 2;
+    start.development = 2;
+    start.capital = true;
     land = new ArrayList<Tile>(1);
     land.add(start);
     homeBiome = start.biome;
@@ -70,53 +77,81 @@ public class Civi {
   
   
   public boolean wants(Tile til) { // decides whether civi can claim a tile
-    int chance = (spreadRate>>3)-30;
-    switch (til.biome) {
-      case Tile.magma:
-        return false;
-      case Tile.ocean:
-        if (scienceLevel < iron)  return false; // civis spread slow in ocean (after iron age)
-        else                         chance -= 16;
-        break;
-      case Tile.ice:
-        if (scienceLevel < iron)  return false; // slower in ice (after iron age)
-        else                         chance -= 20;
-        break;
-      case Tile.reef:
-        if (scienceLevel < iron)  return false; // not as slow in reefs (after iron age)
-        else                         chance -= 12;
-        break;
-      case Tile.trench:
-        if (scienceLevel < iron)  return false; // slow in trenches (after iron age)
-        else                         chance -= 16;
-        break;
-      case Tile.tundra:
-        chance -= 4; // kind of slow in tundra
-        break;
-      case Tile.plains:
-        break; // normal speed in plains
-      case Tile.desert:
-        chance += 16; // really fast in desert
-        break;
-      case Tile.jungle:
-        chance -= 4; // kind of slow in jungle
-        break;
-      case Tile.mountain:
-        chance -= 8; // slow over mountains
-        break;
-      case Tile.snowcap:
-        chance -= 12; // even slower over mountains
-        break;
-      case Tile.freshwater:
-        chance -= 16; // super slow over rivers
-        break;
-      case Tile.space:
-        return false;
-    }
+    if (til.altitude < 0 && scienceLevel < iron) // civis may not claim ocean prior to the iron age
+      return false;
+    
+    int chance = explorabilityOf[til.biome] + (spreadRate>>3);
+    
     if (homeBiome == til.biome) // civis spread fastest in their home biome
-      chance += 8;
+      chance += 12;
     
     return randChance(chance);
+  }
+  
+  
+  public void tryUpgrade(Tile til) { // decides if a tile is ready to be upgraded
+    switch (til.development) {
+      case 1: // til is territory applying for settlement
+        if ((til.altitude < 0 || til.biome == Tile.freshwater) && scienceLevel < space) // water biomes may not be settled prior to the space era
+          return;
+        
+        ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
+        int waterAdjacency = 0; // if it is adjacent to water
+        int settledAdjacency = 0; // how much settlement it is adjacent to
+        for (Tile adj: adjacent) {
+          if (adj.development > 1)
+            settledAdjacency ++;
+          if (adj.altitude < 0 || adj.biome == Tile.freshwater)
+            waterAdjacency = 10;
+        }
+        
+        for (int i = 0; i < settledAdjacency; i ++)
+          if (randChance(fertilityOf[til.biome] + waterAdjacency))
+            til.development ++;
+        
+        if (til.development == 1 && scienceLevel >= imperialist && randChance(fertilityOf[til.biome]+waterAdjacency-20)) // if still unsettled and civi is in imperialist age
+          til.development ++; // it might get settled
+        return;
+        
+      case 2: // til is settlement applying for urbanization
+        if (scienceLevel < industrial) // urbanization may not happen prior to industrial era
+          return;
+        
+        adjacent = world.adjacentTo(til); // counts all adjacent tiles
+        waterAdjacency = -20; // if it is adjacent to water
+        int urbanAdjacency = 0; // how much urbanization it is adjacent to
+        
+        for (Tile adj: adjacent) {
+          if (adj.development > 2)
+            urbanAdjacency ++;
+          if (adj.altitude < 0 || adj.biome == Tile.freshwater)
+            waterAdjacency = -5;
+        }
+        
+        for (int i = 0; i <= urbanAdjacency; i ++) // urbanization is like settlement but adjacency does not matter as much
+          if (randChance(fertilityOf[til.biome] + waterAdjacency))
+            til.development ++;
+        return;
+        
+      case 3: // til is urban applying for utopia
+        if (scienceLevel < prosperity) // utopianization is not possible before prosperity age
+          return;
+        
+        ArrayList<Tile> adjacento = world.adjacentTo(til); // counts all adjacent tiles
+        int utopiaAdjacency = 0; // how much utopia it is adjacent to
+        
+        for (Tile adj: adjacento)
+          if (adj.development > 3)
+            utopiaAdjacency ++;
+        
+        if (utopiaAdjacency > 0) // if it is adjacent to utopia
+          if (randChance(-10-5*utopiaAdjacency))
+            til.development ++;
+        else // it it needs to seed
+          if (randChance(-30))
+            til.development ++;
+        return;
+    }
   }
   
   

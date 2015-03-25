@@ -38,7 +38,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   }
   
   
-  public final void spread() { // causes Civis to claim terriory
+  public final void spread() { // handles everything that involves iterating through all Tiles
     for (Tile[] row: map) { // for each tile in map
       for (Tile til: row) {
         til.temp1 = -1;
@@ -56,6 +56,9 @@ public final class World extends Globe { // a subclass of Globe to handle all po
           civis.add(new Civi(til, civis, this));
         else if (til.development > 0)
           til.owners.get(0).tryUpgrade(til);
+        
+//        if (randChance(-100))
+//          System.out.println(til+" has "+til.owners.size()+" owners and a development of "+til.development);
       }
     }
     
