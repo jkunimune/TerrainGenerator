@@ -244,11 +244,17 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
           return Color.white; // unclaimed land is white
         
       case 1: // territory
-        for (int i = -2; i < 3; i ++)
-          for (int j = -2; j < 3; j ++)
-            if (!til.owners.equals(glb.getTileByIndex(lats[y][x], lons[y][x]).owners)) // if it is near a tile owned by someone else or near ocean
+        if (til.altitude < 0)
+          return Color.black;
+        
+        for (int i = -1; i < 2; i ++)
+          for (int j = -1; j < 2; j ++)
+            if (y+i >= 0 && y+i < lats.length && x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
+            if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) ||
+                glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) // if it is near a tile owned by someone else or near ocean
               return til.owners.get(0).emblem();
-        return Color.white; // inside of territory is white
+        
+        return Color.white;
         
       case 2: // settlement
         return til.owners.get(0).emblem();

@@ -40,7 +40,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     System.out.println("Setting up biomes...");
     this.biomeAssign();
     
-    System.out.println("Done!");
+    System.out.println("Done!\n");
   }
   
   
@@ -53,15 +53,15 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   
   public final void randomize() { // randomizes each tile for testing purposes
     for (Tile[] row: map)
-    for (Tile t: row)
-      t.randomize();
+      for (Tile t: row)
+        t.randomize();
   }
   
   
   public final void setAllAlt(int alt) {
     for (Tile[] row: map)
-    for (Tile t: row)
-      t.altitude = alt;
+      for (Tile t: row)
+        t.altitude = alt;
   }
   
   

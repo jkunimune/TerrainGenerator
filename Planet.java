@@ -130,7 +130,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
               }
             }
             else { // if they are going away from each other
-              totalChange += rise/32; // it forms an ocean rift
+              totalChange += rise/64; // it forms an ocean rift
             }
           }
           else { // if this is land

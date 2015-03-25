@@ -20,11 +20,11 @@ public class Civi {
   public final int prosperity = 57344;
   public final int apocalypse = 65536;
   public final int[] explorabilityOf = {0, -46, -50, -42, -46, -34, -30, -14, -34, -38, -42, -46, 0}; // how quickly civis spread over biomes
-  public final int[] fertilityOf = {0, -44, -52, -40, -52, -48, -40, -56, -36, -44, -45, -36, 0}; // how quickly civis develop them
+  public final int[] fertilityOf =     {0, -36, -44, -32, -36, -18, -10, -26, -06, -14, -15, -06, 0}; // how quickly civis develop them
   
   public World world; // the world it belongs to
   public ArrayList<Tile> land; // all of the tiles it owns
-  private Tile captial; // its capital city
+  private Tile capital; // its capital city
   private String name; // its name
   private String capName; // its captial's name
   private Color emblem; // its special color
@@ -41,7 +41,7 @@ public class Civi {
   public Civi(Tile start, ArrayList<Civi> existing, World wholeNewWorld) {
     world = wholeNewWorld;
     
-    captial = start; // set capital and territory
+    capital = start; // set capital and territory
     start.owners.add(this);
     start.development = 2;
     start.capital = true;
@@ -72,6 +72,10 @@ public class Civi {
     militaryLevel += (int)(Math.random()*7-3.5);
     scienceLevel += scienceRate;
     scienceRate += (int)(Math.random()*7-3.5);
+    if (scienceLevel >= prosperity) // automatically urbanizes or utopianizes capital when possible
+      capital.development = 4;
+    else if (scienceLevel >= industrial)
+      capital.development = 3;
     spreadRate += (int)(Math.random()*7-3.5);
   }
   
@@ -99,18 +103,18 @@ public class Civi {
         int waterAdjacency = 0; // if it is adjacent to water
         int settledAdjacency = 0; // how much settlement it is adjacent to
         for (Tile adj: adjacent) {
-          if (adj.development > 1)
+          if (adj.development > 1 && adj.owners.equals(til.owners))
             settledAdjacency ++;
           if (adj.altitude < 0 || adj.biome == Tile.freshwater)
-            waterAdjacency = 10;
+            waterAdjacency = 30;
         }
         
         for (int i = 0; i < settledAdjacency; i ++)
           if (randChance(fertilityOf[til.biome] + waterAdjacency))
-            til.development ++;
+            til.development = 2;
         
-        if (til.development == 1 && scienceLevel >= imperialist && randChance(fertilityOf[til.biome]+waterAdjacency-20)) // if still unsettled and civi is in imperialist age
-          til.development ++; // it might get settled
+        if (til.development == 1 && scienceLevel >= imperialist && randChance(fertilityOf[til.biome]+waterAdjacency-100)) // if still unsettled and civi is in imperialist age
+          til.development = 2; // it might get settled
         return;
         
       case 2: // til is settlement applying for urbanization
@@ -122,15 +126,19 @@ public class Civi {
         int urbanAdjacency = 0; // how much urbanization it is adjacent to
         
         for (Tile adj: adjacent) {
-          if (adj.development > 2)
+          if (adj.development > 2) // cities can spread from civi to civi
             urbanAdjacency ++;
           if (adj.altitude < 0 || adj.biome == Tile.freshwater)
-            waterAdjacency = -5;
+            waterAdjacency = 5;
         }
         
-        for (int i = 0; i <= urbanAdjacency; i ++) // urbanization is like settlement but adjacency does not matter as much
-          if (randChance(fertilityOf[til.biome] + waterAdjacency))
-            til.development ++;
+        for (int i = 0; i < urbanAdjacency; i ++) // urbanization is like settlement but adjacency does not matter as much
+          if (randChance(-40))
+            til.development = 3;
+        
+        if (til.development == 2 && randChance(waterAdjacency-90)) // if still unurbanized
+          til.development = 3; // it might get urbanized
+                
         return;
         
       case 3: // til is urban applying for utopia
@@ -141,15 +149,17 @@ public class Civi {
         int utopiaAdjacency = 0; // how much utopia it is adjacent to
         
         for (Tile adj: adjacento)
-          if (adj.development > 3)
+          if (adj.development > 3 && adj.owners.equals(til.owners))
             utopiaAdjacency ++;
         
-        if (utopiaAdjacency > 0) // if it is adjacent to utopia
-          if (randChance(-10-5*utopiaAdjacency))
-            til.development ++;
-        else // it it needs to seed
-          if (randChance(-30))
-            til.development ++;
+        if (utopiaAdjacency > 0) { // if it is adjacent to utopia
+          if (randChance(100-100*utopiaAdjacency)) // utopia spreads not in circles, but in fractally spires that spread best in big urban areas
+            til.development = 4;
+        }
+        else { // it it needs to seed
+          if (randChance(-100))
+            til.development = 4;
+        }
         return;
     }
   }
