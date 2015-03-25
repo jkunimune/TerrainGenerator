@@ -5,12 +5,12 @@ import java.util.ArrayList;
 
 
 public class Civi {
-  public final String[] vowels = {"E", "E", "A", "E", "A", "E", "I", "A", "E", "I", "O", "U", "A", "E", "I", "O", "U", "A", "E", "I", "O", "U", "Y", "Ae", "Ai", "Aw",
-    "Ar", "Ay", "Ea", "Ee", "Er", "Ia", "Ie", "Io", "Ir", "Oa", "Oe", "Oi", "Ou", "Oo", "Oo", "Or", "Ol", "Ow"}; // vowels and consonants for name generation
+  public final String[] vowels = {"A", "A", "A", "E", "A", "E", "I", "A", "E", "I", "O", "U", "A", "E", "I", "O", "U", "A", "E", "I", "O", "U", "Y",
+    "Ae", "Ai", "Ao", "Aw", "Ar", "Ay", "Ea", "Ee", "Er", "Ia", "Ie", "Io", "Ir", "Oa", "Oe", "Oi", "Ou", "Oo", "Oo", "Or", "Ol", "Ow"}; // vowels and consonants for name generation
   public final String[] consonants = {"Qu", "W", "R", "RR", "Ry", "T", "T", "T", "T", "Th", "Tr", "Y", "P", "P", "P", "Ph", "Pl", "Pr", "Pp", "Py", "Ps",
     "S", "S", "S", "S", "Sh", "Sh", "Sh", "Shr", "St", "Str", "D", "D", "D", "Dr", "F", "F", "F", "Fl", "Fr", "G", "G", "G", "Gh", "Gr", "H", "H", "J",
     "J", "K", "K", "K", "K", "Kh", "Kl", "Ky", "Ks", "L", "L", "L", "Ll", "Lh", "Z", "Z", "Z", "Zh", "X", "C", "Ch", "Cl", "Cr","Cz", "V", "Vr", "B",
-    "B", "Br", "Bl", "Bs", "N", "N", "N", "N", "Nr", "Ng", "Nj", "Nh", "M", "M", "M", "M", "Mr", "'"};
+    "B", "Br", "Bl", "Bs", "N", "N", "N", "N", "Nr", "Nt", "Nst", "Nstr", "Ng", "Nj", "Nh", "M", "M", "M", "M", "Mr", "'"};
   public final int classical = 8192; // science values of the different ages
   public final int iron = 16384;
   public final int imperialist = 24576;
@@ -20,11 +20,11 @@ public class Civi {
   public final int prosperity = 57344;
   public final int apocalypse = 65536;
   public final int[] explorabilityOf = {0, -46, -50, -42, -46, -34, -30, -14, -34, -38, -42, -46, 0}; // how quickly civis spread over biomes
-  public final int[] fertilityOf = {0, -44, -52, -40, -52, -48, -40, -56, -36, -44, -45, -36, 0}; // how quickly civis develop them
+  public final int[] fertilityOf =     {0, -36, -44, -32, -36, -18, -10, -26, -06, -14, -15, -06, 0}; // how quickly civis develop them
   
   public World world; // the world it belongs to
   public ArrayList<Tile> land; // all of the tiles it owns
-  private Tile captial; // its capital city
+  private Tile capital; // its capital city
   private String name; // its name
   private String capName; // its captial's name
   private Color emblem; // its special color
@@ -35,13 +35,14 @@ public class Civi {
   private int militaryLevel; // how much military it has
   private int warChance; // how likely it is to wage war
   private int deathTimer; // how soon it will die (negative means apocalype is in progress)
+  public ArrayList<Civi> atWarWith;
   
   
   
   public Civi(Tile start, ArrayList<Civi> existing, World wholeNewWorld) {
     world = wholeNewWorld;
     
-    captial = start; // set capital and territory
+    capital = start; // set capital and territory
     start.owners.add(this);
     start.development = 2;
     start.capital = true;
@@ -59,6 +60,8 @@ public class Civi {
     warChance = (int)(Math.random()*255);
     deathTimer = 1024 + (int)(Math.random()*1024);
     
+    atWarWith = new ArrayList<Civi>(0);
+    
     name = newName(); // picks a custom name
     capName = newCapName();
     System.out.println(this+" has been founded in "+capName+"!"); // announces the civi's arrival
@@ -70,9 +73,16 @@ public class Civi {
     deathTimer -= (int)(Math.random()*2);
     warChance += (int)(Math.random()*7-3.5);
     militaryLevel += (int)(Math.random()*7-3.5);
-    scienceLevel += scienceRate;
     scienceRate += (int)(Math.random()*7-3.5);
     spreadRate += (int)(Math.random()*7-3.5);
+    
+    scienceLevel += scienceRate;
+    if (scienceLevel >= apocalypse && scienceLevel < apocalypse+scienceRate)
+      deathTimer = 0;
+    else if (scienceLevel >= prosperity && scienceLevel < prosperity+scienceRate) // automatically urbanizes or utopianizes capital when possible and starts apocalypse when necessary
+      capital.development = 4;
+    else if (scienceLevel >= industrial && scienceLevel < industrial+scienceRate)
+      capital.development = 3;
   }
   
   
@@ -90,68 +100,93 @@ public class Civi {
   
   
   public void tryUpgrade(Tile til) { // decides if a tile is ready to be upgraded
-    switch (til.development) {
-      case 1: // til is territory applying for settlement
-        if ((til.altitude < 0 || til.biome == Tile.freshwater) && scienceLevel < space) // water biomes may not be settled prior to the space era
+    if (deathTimer >= 0) {
+      switch (til.development) {
+        case 1: // til is territory applying for settlement
+          if ((til.altitude < 0 || til.biome == Tile.freshwater) && scienceLevel < space) // water biomes may not be settled prior to the space era
+            return;
+          
+          ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
+          int waterAdjacency = 0; // if it is adjacent to water
+          int settledAdjacency = 0; // how much settlement it is adjacent to
+          for (Tile adj: adjacent) {
+            if (adj.development > 1 && adj.owners.equals(til.owners))
+              settledAdjacency ++;
+            if (adj.altitude < 0 || adj.biome == Tile.freshwater)
+              waterAdjacency = 30;
+          }
+        
+          for (int i = 0; i < settledAdjacency; i ++)
+            if (randChance(fertilityOf[til.biome] + waterAdjacency))
+              til.development = 2;
+        
+          if (til.development == 1 && scienceLevel >= imperialist && randChance(fertilityOf[til.biome]+waterAdjacency-100)) // if still unsettled and civi is in imperialist age
+            til.development = 2; // it might get settled
           return;
         
-        ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
-        int waterAdjacency = 0; // if it is adjacent to water
-        int settledAdjacency = 0; // how much settlement it is adjacent to
-        for (Tile adj: adjacent) {
-          if (adj.development > 1)
-            settledAdjacency ++;
-          if (adj.altitude < 0 || adj.biome == Tile.freshwater)
-            waterAdjacency = 10;
-        }
+        case 2: // til is settlement applying for urbanization
+          if (scienceLevel < industrial) // urbanization may not happen prior to industrial era
+            return;
+          
+          adjacent = world.adjacentTo(til); // counts all adjacent tiles
+          waterAdjacency = -20; // if it is adjacent to water
+          int urbanAdjacency = 0; // how much urbanization it is adjacent to
+          
+          for (Tile adj: adjacent) {
+            if (adj.development > 2) // cities can spread from civi to civi
+              urbanAdjacency ++;
+            if (adj.altitude < 0 || adj.biome == Tile.freshwater)
+              waterAdjacency = 5;
+          }
         
-        for (int i = 0; i < settledAdjacency; i ++)
-          if (randChance(fertilityOf[til.biome] + waterAdjacency))
-            til.development ++;
+          for (int i = 0; i < urbanAdjacency; i ++) // urbanization is like settlement but adjacency does not matter as much
+            if (randChance(-40))
+              til.development = 3;
         
-        if (til.development == 1 && scienceLevel >= imperialist && randChance(fertilityOf[til.biome]+waterAdjacency-20)) // if still unsettled and civi is in imperialist age
-          til.development ++; // it might get settled
-        return;
-        
-      case 2: // til is settlement applying for urbanization
-        if (scienceLevel < industrial) // urbanization may not happen prior to industrial era
+          if (til.development == 2 && randChance(waterAdjacency-90)) // if still unurbanized
+            til.development = 3; // it might get urbanized
           return;
         
-        adjacent = world.adjacentTo(til); // counts all adjacent tiles
-        waterAdjacency = -20; // if it is adjacent to water
-        int urbanAdjacency = 0; // how much urbanization it is adjacent to
+        case 3: // til is urban applying for utopia
+          if (scienceLevel < prosperity) // utopianization is not possible before prosperity age
+            return;
+          
+          ArrayList<Tile> adjacento = world.adjacentTo(til); // counts all adjacent tiles
+          int utopiaAdjacency = 0; // how much utopia it is adjacent to
+          
+          for (Tile adj: adjacento)
+            if (adj.development > 3 && adj.owners.equals(til.owners))
+              utopiaAdjacency ++;
         
-        for (Tile adj: adjacent) {
-          if (adj.development > 2)
-            urbanAdjacency ++;
-          if (adj.altitude < 0 || adj.biome == Tile.freshwater)
-            waterAdjacency = -5;
-        }
-        
-        for (int i = 0; i <= urbanAdjacency; i ++) // urbanization is like settlement but adjacency does not matter as much
-          if (randChance(fertilityOf[til.biome] + waterAdjacency))
-            til.development ++;
-        return;
-        
-      case 3: // til is urban applying for utopia
-        if (scienceLevel < prosperity) // utopianization is not possible before prosperity age
+          if (utopiaAdjacency > 0) { // if it is adjacent to utopia
+            if (randChance(100-100*utopiaAdjacency)) // utopia spreads not in circles, but in fractally spires that spread best in big urban areas
+              til.development = 4;
+          }
+          else { // it it needs to seed
+            if (randChance(-100))
+              til.development = 4;
+          }
           return;
-        
-        ArrayList<Tile> adjacento = world.adjacentTo(til); // counts all adjacent tiles
-        int utopiaAdjacency = 0; // how much utopia it is adjacent to
-        
-        for (Tile adj: adjacento)
-          if (adj.development > 3)
-            utopiaAdjacency ++;
-        
-        if (utopiaAdjacency > 0) // if it is adjacent to utopia
-          if (randChance(-10-5*utopiaAdjacency))
-            til.development ++;
-        else // it it needs to seed
-          if (randChance(-30))
-            til.development ++;
-        return;
+      }
     }
+    else { // if this is the apocalypse
+      ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
+      for (Tile adj: adjacent) {
+        if (adj.development < til.development && randChance(-deathTimer>>2)) { // causes lands to be undeveloped during apocalypse
+          til.anarchize();
+        }
+      }
+      if (randChance(-deathTimer>>2 - 30))
+        til.anarchize();
+    }
+  }
+  
+  
+  public void takes(Tile t) {
+    t.owners.add(this);
+    t.development = 1;
+    land.add(t);
+    deathTimer -= 2;
   }
   
   

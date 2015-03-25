@@ -18,6 +18,7 @@ public class CiviHD { // the driver for my final project
     generate(protoEarth, theMap);
     
     World earth = new World(protoEarth);
+    theMap.setGlobe(earth);
     
     while (true) {
       setTimer(0);

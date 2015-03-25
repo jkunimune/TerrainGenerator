@@ -32,40 +32,62 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     startWar();
     startRevolution();
     spread();
+    cleanse();
     
     for (Civi c: civis)
       c.advance();
   }
   
   
+  public final void cleanse() { // removes dead civis from the game
+    for (int i = civis.size()-1; i >= 0; i --) {
+      final Civi c = civis.get(i);
+      if (c.capital.development == 0) { // if it has lost its capital
+        for (Tile t: c.land) {
+          t.owners.remove(c);
+          if (t.owners.size() == 0) // tells all owned tiles that their nation is dead
+            t.development = 0;
+        }
+        c.capital.isCapital = false;
+        System.out.println(c+" has fallen.");
+        civis.remove(c);
+      }
+    }
+  }
+  
+  
   public final void spread() { // handles everything that involves iterating through all Tiles
     for (Tile[] row: map) { // for each tile in map
       for (Tile til: row) {
-        til.temp1 = -1;
+        til.temp1 = -1; // temp1 and temp2 are the indices of til's new owner
+        til.temp3 = 0; // temp3 is whether it gets upgraded this turn
         ArrayList<Tile> adjacent = adjacentTo(til);
         for (Tile adj: adjacent) { // for all adjacent tiles
           if (adj.development > 0 && til.development == 0) { // if that one is settled and this is not
             if (adj.owners.get(0).wants(til)) { // if they want this tile
               til.temp1 = adj.lat;
               til.temp2 = adj.lon;
+              til.temp3 = 1;
             }
           }
         }
         
-        if (til.development == 0 && settlersLike(til))
+        if (til.development == 0 && settlersLike(til)) // spawns new civis
           civis.add(new Civi(til, civis, this));
-        else if (til.development > 0)
-          til.owners.get(0).tryUpgrade(til);
-        
-//        if (randChance(-100))
-//          System.out.println(til+" has "+til.owners.size()+" owners and a development of "+til.development);
+        else if (til.development > 0 && til.owners.get(0).canUpgrade(til)) // upgrades tiles
+          til.temp3 = 1;
       }
     }
     
-    for (Tile[] row: map)
-      for (Tile til: row)
-        if (til.temp1 != -1)
-          til.getsTakenBy(map[til.temp1][til.temp2].owners.get(0));
+    for (Tile[] row: map) { // asssigns all new values
+      for (Tile til: row) {
+        if (til.temp1 != -1 && map[til.temp1][til.temp2].owners.size() > 0)
+          map[til.temp1][til.temp2].owners.get(0).takes(til);
+        
+        else if (til.temp3 > 0 && til.owners.size() > 0)
+          til.development ++;
+      }
+    }
   }
   
   

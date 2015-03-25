@@ -12,7 +12,7 @@ public final class Tile { // keeps track of a single point on a globe
   public int biome; // see key below
   public int development; // how settled it is
   public ArrayList<Civi> owners;
-  public boolean capital; // if it is a capital city
+  public boolean isCapital; // if it is a capital city
   public int temp1; // to store various values only necessary during generation
   public int temp2;
   public int temp3;
@@ -44,7 +44,7 @@ public final class Tile { // keeps track of a single point on a globe
     water = 0;
     biome = 0;
     development = 0;
-    owners = new ArrayList<Civi>(0);
+    owners = new ArrayList<Civi>(1);
   }
   
   
@@ -57,7 +57,7 @@ public final class Tile { // keeps track of a single point on a globe
     water = newWater;
     biome = newBiome;
     development = 0;
-    owners = new ArrayList<Civi>(0);
+    owners = new ArrayList<Civi>(1);
   }
   
   
@@ -96,13 +96,6 @@ public final class Tile { // keeps track of a single point on a globe
     else      temp1 = (int)(Math.random()*16+56); // randomizes altitude from 56 to 72
     temp2 = (int)(Math.random()*Math.PI*128); // randomizes drift velocity
     temp3 = (int)(Math.random()*2*Math.PI*128); // these numbers represent a vector, so they are coordinates representing a point on the axis of the plate's rotation, which also goes through the center of the sphere
-  }
-  
-  
-  public final void getsTakenBy(Civi c) {
-    owners.add(c);
-    development = 1;
-    c.land.add(this);
   }
   
   
