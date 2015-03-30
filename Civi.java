@@ -21,7 +21,7 @@ public class Civi {
   public final int prosperity = 57344;
   public final int apocalypse = 65536;
   public final int[] explorabilityOf = {0, -46, -50, -42, -46, -34, -30, -14, -34, -38, -42, -46, 0}; // how quickly civis spread over biomes
-  public final int[] fertilityOf =     {0, -36, -44, -32, -36, -18, -10, -26, -06, -14, -15, -06, 0}; // how quickly civis develop them
+  public final int[] fertilityOf =     {0, -44, -52, -40, -44, -18, -10, -26, -06, -14, -15, -06, 0}; // how quickly civis develop them
   
   public World world; // the world it belongs to
   public ArrayList<Tile> land; // all of the tiles it owns
@@ -83,6 +83,8 @@ public class Civi {
       deathTimer = 0;
     else if (scienceLevel >= prosperity && scienceLevel < prosperity+scienceRate) // automatically urbanizes or utopianizes capital when possible and starts apocalypse when necessary
       capital.development = 4;
+    else if (scienceLevel >= space && scienceLevel < space+scienceRate)
+      spreadRate <<= 1; // doubles spreadRate upon entering the space age
     else if (scienceLevel >= industrial && scienceLevel < industrial+scienceRate)
       capital.development = 3;
     
@@ -179,11 +181,12 @@ public class Civi {
     else { // if this is the apocalypse, don't upgrade
       ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
       for (Tile adj: adjacent) {
-        if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>4) - 50)) { // causes lands to be undeveloped during apocalypse
-          loseGraspOn(til);
+        if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>7) - 40)) { // causes lands to be undeveloped during apocalypse
+          if (!til.isCapital || randChance(-20)) // captials are less likely to be lost
+            loseGraspOn(til);
         }
       }
-      if (randChance(-(deathTimer>>4) - 100))
+      if (!til.isCapital && randChance(-(deathTimer>>7) - 100))
         loseGraspOn(til);
       return false; // nothing may be upgraded during the apocalypse
     }

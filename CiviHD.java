@@ -18,7 +18,7 @@ public class CiviHD { // the driver for my final project
     generate(protoEarth, topographical);
     
     World earth = new World(protoEarth);
-    Map political = new Sinusoidal(earth, 500, 500);
+    Map political = new SimpleSinusoidal(earth, 500, 500);
     
     while (true) {
       setTimer(0);
