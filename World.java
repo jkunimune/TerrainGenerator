@@ -84,7 +84,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   public final void spread(Tile til) { // causes civis to spawn and claim territory
     til.temp1 = -1; // temp1 and temp2 are the indices of til's new owner
     
-    ArrayList<Tile> adjacent = adjacentTo(til);
+    final ArrayList<Tile> adjacent = adjacentTo(til);
     
     for (Tile adj: adjacent) { // for all adjacent tiles
       if (adj.development > 0 && til.development == 0) { // if that one is settled and this is not
@@ -110,10 +110,11 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void startWar(Tile til) { // causes Civis to wage war on others
-    if (til.owners.size() == 1 && til.owners.get(0).wantsWar()) // Tiles occasionally decide to wage war on neighbors
-      if (borderAt(til))
-        System.out.println("Let there be war!");
-      
+    if (til.owners.size() == 1 && til.owners.get(0).wantsWar()) { // Tiles occasionally decide to wage war on neighbors
+      final Tile adj = borderAt(til);
+      if (adj.lat != -1) // if there is a border
+        wageWar(til.owners.get(0), adj.owners.get(0), adj);
+    }
   }
   
   
@@ -129,12 +130,27 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   }
   
   
-  public final boolean borderAt(Tile til) { // decides if there is an international border here
-    ArrayList<Tile> adjacentList = adjacentTo(til);
+  public final void wageWar(Civi agg, Civi vic, Tile start) { // starts a war between two civis at a Tile
+    agg.atWarWith.add(vic); // civis know with whom they are at war
+    vic.atWarWith.add(agg);
+    
+    for (int i = 0; i < 10; i ++) // calls a random region between the empires into dispute
+      for (Tile[] row: map)
+        for (Tile til: row)
+          if (til.owners.size() >= 2 && til.owners.contains(agg) && til.owners.contains(vic))
+            for (Tile adj: adjacentTo(til))
+              if (adj.owners.size() == 1 && til.owners.get(0).equals(vic))
+                if (agg.canInvade(til))
+                  agg.takes(til);
+  }
+  
+  
+  public final Tile borderAt(Tile til) { // decides if there is an international border here
+    final ArrayList<Tile> adjacentList = adjacentTo(til);
     for (Tile adj: adjacentList)
       if (adj.owners.size() == 1 && !adj.owners.equals(til.owners))
-        return true;
-    return false;
+        return adj;
+    return new Tile(-1, -1);
   }
   
   

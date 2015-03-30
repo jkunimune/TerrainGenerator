@@ -110,6 +110,10 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void startWar(Tile til) { // causes Civis to wage war on others
+    if (til.owners.size() == 1 && til.owners.get(0).wantsWar()) // Tiles occasionally decide to wage war on neighbors
+      if (borderAt(til))
+        System.out.println("Let there be war!");
+      
   }
   
   
@@ -122,6 +126,15 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void naturallyDisast(Tile til) { // causes natural disasters
+  }
+  
+  
+  public final boolean borderAt(Tile til) { // decides if there is an international border here
+    ArrayList<Tile> adjacentList = adjacentTo(til);
+    for (Tile adj: adjacentList)
+      if (adj.owners.size() == 1 && !adj.owners.equals(til.owners))
+        return true;
+    return false;
   }
   
   
