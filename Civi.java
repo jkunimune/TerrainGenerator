@@ -6,11 +6,12 @@ import java.util.ArrayList;
 
 public class Civi {
   public final String[] vowels = {"A", "A", "A", "E", "A", "E", "I", "A", "E", "I", "O", "U", "A", "E", "I", "O", "U", "A", "E", "I", "O", "U", "Y",
-    "Ae", "Ai", "Ao", "Aw", "Ar", "Ay", "Ea", "Ee", "Er", "Ia", "Ie", "Io", "Ir", "Oa", "Oe", "Oi", "Ou", "Oo", "Oo", "Or", "Ol", "Ow"}; // vowels and consonants for name generation
-  public final String[] consonants = {"Qu", "W", "R", "RR", "Ry", "T", "T", "T", "T", "Th", "Tr", "Y", "P", "P", "P", "Ph", "Pl", "Pr", "Pp", "Py", "Ps",
-    "S", "S", "S", "S", "Sh", "Sh", "Sh", "Shr", "St", "Str", "D", "D", "D", "Dr", "F", "F", "F", "Fl", "Fr", "G", "G", "G", "Gh", "Gr", "H", "H", "J",
-    "J", "K", "K", "K", "K", "Kh", "Kl", "Ky", "Ks", "L", "L", "L", "Ll", "Lh", "Z", "Z", "Z", "Zh", "X", "C", "Ch", "Cl", "Cr","Cz", "V", "Vr", "B",
-    "B", "Br", "Bl", "Bs", "N", "N", "N", "N", "Nr", "Nt", "Nst", "Nstr", "Ng", "Nj", "Nh", "M", "M", "M", "M", "Mr", "'"};
+    "Ae", "Ai", "Ao", "Aw", "Ar", "Ay", "Ea", "Ee", "Er", "Ey", "Ia", "Ie", "Io", "Ir", "Oa", "Oe", "Oi", "Ou", "Oo", "Oo", "Or", "Ol", "Ow"}; // vowels and consonants for name generation
+  public final String[] consonants = {"Qu", "W", "R", "R", "RR", "Ry", "T", "T", "T", "T", "T", "Th", "Th", "Tr", "Y", "P", "P", "P", "P", "Ph", "Pl",
+    "Pr", "Pp", "Py", "Ps", "S", "S", "S", "S", "S", "Sh", "Sh", "Sh", "Shr", "St", "Str", "D", "D", "D", "D", "Dr", "F", "F", "F", "F", "Fl", "Fr", "G",
+    "G", "G", "G", "Gh", "Gr", "H", "H", "H", "J", "J", "J", "K", "K", "K", "K", "K", "Kh", "Kl", "Ky", "Ks", "L", "L", "L", "L", "Ll", "Lh", "Z", "Z",
+    "Z", "Z", "Zh", "X", "C", "Ch", "Cl", "Cr","Cz", "V", "V", "Vr", "B", "B", "B", "B", "Br", "Bl", "Bs", "N", "N", "N", "N", "N", "Nr", "Nt", "Nst",
+    "Nstr", "Ng", "Nj", "Nh", "M", "M", "M", "M", "M", "Mr", "'"};
   public final int classical = 8192; // science values of the different ages
   public final int iron = 16384;
   public final int imperialist = 24576;

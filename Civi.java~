@@ -24,7 +24,7 @@ public class Civi {
   
   public World world; // the world it belongs to
   public ArrayList<Tile> land; // all of the tiles it owns
-  private Tile capital; // its capital city
+  public Tile capital; // its capital city
   private String name; // its name
   private String capName; // its captial's name
   private Color emblem; // its special color
@@ -45,7 +45,7 @@ public class Civi {
     capital = start; // set capital and territory
     start.owners.add(this);
     start.development = 2;
-    start.capital = true;
+    start.isCapital = true;
     land = new ArrayList<Tile>(1);
     land.add(start);
     homeBiome = start.biome;
@@ -58,7 +58,7 @@ public class Civi {
     scienceLevel = 0;
     militaryLevel = (int)(Math.random()*255);
     warChance = (int)(Math.random()*255);
-    deathTimer = 1024 + (int)(Math.random()*1024);
+    deathTimer = 8192 + (int)(Math.random()*8192);
     
     atWarWith = new ArrayList<Civi>(0);
     
@@ -70,6 +70,7 @@ public class Civi {
   
   
   public void advance() { // naturally alters stats
+    boolean apocalypseBefore = deathTimer <= 0;
     deathTimer -= (int)(Math.random()*2);
     warChance += (int)(Math.random()*7-3.5);
     militaryLevel += (int)(Math.random()*7-3.5);
@@ -83,6 +84,9 @@ public class Civi {
       capital.development = 4;
     else if (scienceLevel >= industrial && scienceLevel < industrial+scienceRate)
       capital.development = 3;
+    
+    if (!apocalypseBefore && deathTimer <= 0) // announces when the apocalypse starts
+      System.out.println(this+" has begun to crumble!");
   }
   
   
@@ -99,12 +103,12 @@ public class Civi {
   }
   
   
-  public void tryUpgrade(Tile til) { // decides if a tile is ready to be upgraded
+  public boolean canUpgrade(Tile til) { // decides if a tile is ready to be upgraded
     if (deathTimer >= 0) {
       switch (til.development) {
         case 1: // til is territory applying for settlement
           if ((til.altitude < 0 || til.biome == Tile.freshwater) && scienceLevel < space) // water biomes may not be settled prior to the space era
-            return;
+            return false;
           
           ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
           int waterAdjacency = 0; // if it is adjacent to water
@@ -118,15 +122,15 @@ public class Civi {
         
           for (int i = 0; i < settledAdjacency; i ++)
             if (randChance(fertilityOf[til.biome] + waterAdjacency))
-              til.development = 2;
+              return true;
         
           if (til.development == 1 && scienceLevel >= imperialist && randChance(fertilityOf[til.biome]+waterAdjacency-100)) // if still unsettled and civi is in imperialist age
-            til.development = 2; // it might get settled
-          return;
+            return true; // it might get settled
+          return false;
         
         case 2: // til is settlement applying for urbanization
           if (scienceLevel < industrial) // urbanization may not happen prior to industrial era
-            return;
+            return false;
           
           adjacent = world.adjacentTo(til); // counts all adjacent tiles
           waterAdjacency = -20; // if it is adjacent to water
@@ -141,15 +145,15 @@ public class Civi {
         
           for (int i = 0; i < urbanAdjacency; i ++) // urbanization is like settlement but adjacency does not matter as much
             if (randChance(-40))
-              til.development = 3;
+              return true;
         
           if (til.development == 2 && randChance(waterAdjacency-90)) // if still unurbanized
-            til.development = 3; // it might get urbanized
-          return;
+            return true; // it might get urbanized
+          return false;
         
         case 3: // til is urban applying for utopia
           if (scienceLevel < prosperity) // utopianization is not possible before prosperity age
-            return;
+            return false;
           
           ArrayList<Tile> adjacento = world.adjacentTo(til); // counts all adjacent tiles
           int utopiaAdjacency = 0; // how much utopia it is adjacent to
@@ -159,25 +163,28 @@ public class Civi {
               utopiaAdjacency ++;
         
           if (utopiaAdjacency > 0) { // if it is adjacent to utopia
-            if (randChance(100-100*utopiaAdjacency)) // utopia spreads not in circles, but in fractally spires that spread best in big urban areas
-              til.development = 4;
+            if (randChance(10-10*utopiaAdjacency)) // utopia spreads not in circles, but in fractally spires that spread best in big urban areas
+              return true;
           }
           else { // it it needs to seed
-            if (randChance(-100))
-              til.development = 4;
+            if (randChance(-80))
+              return true;
           }
-          return;
+          return false;
+        default:
+          return false;
       }
     }
-    else { // if this is the apocalypse
+    else { // if this is the apocalypse, don't upgrade
       ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
       for (Tile adj: adjacent) {
-        if (adj.development < til.development && randChance(-deathTimer>>2)) { // causes lands to be undeveloped during apocalypse
-          til.anarchize();
+        if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>4) - 50)) { // causes lands to be undeveloped during apocalypse
+          loseGraspOn(til);
         }
       }
-      if (randChance(-deathTimer>>2 - 30))
-        til.anarchize();
+      if (randChance(-(deathTimer>>4) - 100))
+        loseGraspOn(til);
+      return false; // nothing may be upgraded during the apocalypse
     }
   }
   
@@ -186,7 +193,19 @@ public class Civi {
     t.owners.add(this);
     t.development = 1;
     land.add(t);
-    deathTimer -= 2;
+    deathTimer --;
+  }
+  
+  
+  public void loseGraspOn(Tile t) { // undevelop or remobe a tile from this empire
+    if (t.development == 2 || t.development == 3)
+      t.development = 1;
+    else {
+      t.owners.remove(this);
+      if (t.owners.size() == 0)
+        t.development = 0;
+      land.remove(t);
+    }
   }
   
   
