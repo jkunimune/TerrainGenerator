@@ -191,11 +191,28 @@ public class Civi {
   }
   
   
-  public void takes(Tile t) {
+  public boolean canInvade(Tile til) {
+    if (til.biome == homeBiome)
+      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] + 10);
+    else
+      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] - 10);
+  }
+  
+  
+  public boolean cannotDefend(Tile til) {
+    if (til.biome == homeBiome)
+      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 10);
+    else
+      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] - 10);
+  }
+  
+  
+  public void takes(Tile t) { // add a tile to this empire
     t.owners.add(this);
-    t.development = 1;
+    if (t.development == 0)
+      t.development = 1;
     land.add(t);
-    deathTimer -= 2;
+    deathTimer -= 3;
   }
   
   
@@ -211,8 +228,16 @@ public class Civi {
   }
   
   
+  public void failsToDefend(Tile t) { // lose a tile to another empire
+    t.owners.remove(this);
+    if (t.owners.size() == 0)
+      t.development = 0;
+    land.remove(t);
+  }
+  
+  
   public boolean wantsWar() { // if the Civi feels like starting a war
-    return randChance((warChance>>4) - 120);
+    return randChance((warChance>>3) - 120);
   }
   
   

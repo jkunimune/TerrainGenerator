@@ -137,7 +137,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     
     agg.takes(start);
     
-    for (int i = 0; i < 50; i ++) // calls a random region between the empires into dispute
+    for (int i = 0; i < 10; i ++) // calls a random region between the empires into dispute
       for (Tile[] row: map)
         for (Tile til: row)
           if (til.owners.size() >= 2 && til.owners.contains(agg) && til.owners.contains(vic)) // if til is disputed

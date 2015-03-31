@@ -65,7 +65,7 @@ public class Civi {
     
     name = newName(); // picks a custom name
     capName = newCapName();
-    System.out.println(this+" has been founded in "+capName+"!"); // announces the civi's arrival
+    System.out.println(this+" ("+colorName()+") has been founded in "+capName+"!"); // announces the civi's arrival
   }
   
   
@@ -363,6 +363,28 @@ public class Civi {
     
     else
       return -1;
+  }
+  
+  
+  public final String colorName() {
+    if (emblem.getRed() >= 128 && emblem.getBlue() < 128 && emblem.getGreen() < 64)
+      return "red";
+    else if (emblem.getRed() == 255 && emblem.getBlue() >= 128 && emblem.getGreen() < 128)
+      return "magenta";
+    else if (emblem.getRed() >= 128 && emblem.getBlue() >= 128 && emblem.getGreen() < 128)
+      return "violet";
+    else if (emblem.getRed() < 128 && emblem.getBlue() >= 128 && emblem.getGreen() < 196)
+      return "blue";
+    else if (emblem.getRed() < 128 && emblem.getBlue() >= 128 && emblem.getGreen() >= 196)
+      return "cyan";
+    else if (emblem.getRed() < 128 && emblem.getBlue() < 128 && emblem.getGreen() >= 128)
+      return "green";
+    else if (emblem.getRed() >= 128 && emblem.getBlue() < 128 && emblem.getGreen() >= 196)
+      return "yellow";
+    else if (emblem.getRed() >= 128 && emblem.getBlue() < 128 && emblem.getGreen() >= 64)
+      return "orange";
+    else
+      return "unaccounted color";
   }
   
   
