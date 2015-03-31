@@ -387,7 +387,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     for (Tile[] row: map) {
       for (Tile til: row) {
         if (til.altitude < 0) { // if below sea level
-          if (til.temperature + 8*Math.sin(til.rainfall) < 120) { // if cold
+          if (til.temperature + 8*Math.sin(til.rainfall) < 100) { // if cold
             til.biome = Tile.ice;
           }
           else if (til.altitude < -64) { // if super deep

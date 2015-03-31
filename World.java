@@ -111,8 +111,8 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   public final void startWar(Tile til) { // causes Civis to wage war on others
     if (til.owners.size() == 1 && til.owners.get(0).wantsWar()) { // Tiles occasionally decide to wage war on neighbors
-      final Tile adj = borderAt(til);
-      if (adj.lat != -1) // if there is a border
+      final Tile adj = landBorderAt(til);
+      if (adj.lat != -1 && adj.altitude >= 0) // if there is a border
         wageWar(til.owners.get(0), adj.owners.get(0), adj);
     }
   }
@@ -131,24 +131,27 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void wageWar(Civi agg, Civi vic, Tile start) { // starts a war between two civis at a Tile
+    System.out.println(agg+" has invaded "+vic+"!");
     agg.atWarWith.add(vic); // civis know with whom they are at war
     vic.atWarWith.add(agg);
     
-    for (int i = 0; i < 10; i ++) // calls a random region between the empires into dispute
+    agg.takes(start);
+    
+    for (int i = 0; i < 50; i ++) // calls a random region between the empires into dispute
       for (Tile[] row: map)
         for (Tile til: row)
-          if (til.owners.size() >= 2 && til.owners.contains(agg) && til.owners.contains(vic))
+          if (til.owners.size() >= 2 && til.owners.contains(agg) && til.owners.contains(vic)) // if til is disputed
             for (Tile adj: adjacentTo(til))
               if (adj.owners.size() == 1 && til.owners.get(0).equals(vic))
                 if (agg.canInvade(til))
-                  agg.takes(til);
+                  agg.takes(adj);
   }
   
   
-  public final Tile borderAt(Tile til) { // decides if there is an international border here
+  public final Tile landBorderAt(Tile til) { // decides if there is a land international border here
     final ArrayList<Tile> adjacentList = adjacentTo(til);
     for (Tile adj: adjacentList)
-      if (adj.owners.size() == 1 && !adj.owners.equals(til.owners))
+      if (adj.altitude >= 0 && adj.owners.size() == 1 && !adj.owners.equals(til.owners))
         return adj;
     return new Tile(-1, -1);
   }
@@ -156,10 +159,16 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   public final void test() {
     civis.add(new Civi(map[0][0], civis, this));
+    civis.add(new Civi(map[0][0], civis, this));
     
-    for (Tile[] row: map)
-      for (Tile til: row)
-        til.owners.add(civis.get(0));
+    for (Tile[] row: map) {
+      for (Tile til: row) {
+        if (til.lat > 100)
+          civis.get(0).takes(til);
+        if (til.lat < 200)
+          civis.get(1).takes(til);
+      }
+    }
   }
   
   

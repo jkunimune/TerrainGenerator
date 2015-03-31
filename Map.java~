@@ -234,8 +234,6 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   public Color getColorByTerritory(int x, int y) {
     Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
-//    if (glb.randChance(-100))
-//      System.out.println("I see a development of "+til.development+" at "+x+", "+y);
     switch (til.development) {
       case 0: // unclaimed
         if (til.altitude < 0) // unsettled ocean is black
@@ -247,12 +245,20 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
         if (til.altitude < 0)
           return Color.black;
         
-        for (int i = -1; i < 2; i ++)
-          for (int j = -1; j < 2; j ++)
-            if (y+i >= 0 && y+i < lats.length && x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
-            if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) ||
-                glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) // if it is near a tile owned by someone else or near ocean
-              return til.owners.get(0).emblem();
+        for (int i = -3; i <= 3; i ++) {
+          if (y+i >= 0 && y+i < lats.length) { // if in bounds
+            for (int j = -3; j <= 3; j ++) {
+              if (i*i + j*j <= 9) { // if in circle
+                if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) { // if in bounds
+                  if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) ||
+                      glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) { // if it is near a tile owned by someone else or near ocean
+                    return til.owners.get(0).emblem();
+                  }
+                }
+              }
+            }
+          }
+        }
         
         return Color.white;
         
@@ -271,15 +277,6 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
       default:
         return new Color(255, 127, 0);
     }
-//    if (til.owners.size() > 0) {
-//      if (til.development > 0)
-//        System.out.println(til.development);
-//      return til.owners.get(0).emblem();
-//    }
-//    else if (til.altitude < 0)
-//      return Color.black;
-//    else
-//      return Color.white;
   }
   
   

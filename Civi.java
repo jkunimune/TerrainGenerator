@@ -212,7 +212,7 @@ public class Civi {
     if (t.development == 0)
       t.development = 1;
     land.add(t);
-    deathTimer -= 2;
+    deathTimer -= 3;
   }
   
   

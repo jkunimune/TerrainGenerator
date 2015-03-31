@@ -233,49 +233,48 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   
   public Color getColorByTerritory(int x, int y) {
-    Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
-    switch (til.development) {
-      case 0: // unclaimed
-        if (til.altitude < 0) // unsettled ocean is black
+    final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
+    
+    if (til.development == 0) {
+      if (til.altitude < 0) // unsettled ocean is black
+        return Color.black;
+      else
+        return Color.white; // unclaimed land is white
+    }
+    else {
+      final Civi civ = til.owners.get((x+y >>2) % til.owners.size());
+      
+      switch (til.development) {
+        case 1: // territory
+          if (til.altitude < 0)
           return Color.black;
-        else
-          return Color.white; // unclaimed land is white
-        
-      case 1: // territory
-        if (til.altitude < 0)
-          return Color.black;
-        
-        for (int i = -3; i <= 3; i ++) {
-          if (y+i >= 0 && y+i < lats.length) { // if in bounds
-            for (int j = -3; j <= 3; j ++) {
-              if (i*i + j*j <= 9) { // if in circle
-                if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) { // if in bounds
-                  if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) ||
-                      glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) { // if it is near a tile owned by someone else or near ocean
-                    return til.owners.get(0).emblem();
-                  }
-                }
-              }
-            }
-          }
-        }
-        
-        return Color.white;
-        
-      case 2: // settlement
-        return til.owners.get(0).emblem();
-        
-      case 3: // urban area
-        return new Color(til.owners.get(0).emblem().getRed()>>1,
-                         til.owners.get(0).emblem().getGreen()>>1,
-                         til.owners.get(0).emblem().getBlue()>>1); // return darkened tile
-        
-      case 4: // utopia
-        return new Color(255- ((255-til.owners.get(0).emblem().getRed()) >>1), 
-                         255- ((255-til.owners.get(0).emblem().getGreen()) >>1), 
-                         255- ((255-til.owners.get(0).emblem().getBlue()) >>1)); // return lightened tile
-      default:
-        return new Color(255, 127, 0);
+          
+          for (int i = -3; i <= 3; i ++)
+            if (y+i >= 0 && y+i < lats.length) // if in bounds
+              for (int j = -3; j <= 3; j ++)
+                if (i*i + j*j <= 9) // if in circle
+                  if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
+                    if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) ||
+                        glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) // if it is near a tile owned by someone else or near ocean
+                      return civ.emblem();
+          
+          return Color.white;
+          
+        case 2: // settlement
+          return civ.emblem();
+          
+        case 3: // urban area
+          return new Color(civ.emblem().getRed()>>1,
+                           civ.emblem().getGreen()>>1,
+                           civ.emblem().getBlue()>>1); // return darkened tile
+          
+        case 4: // utopia
+          return new Color(255- ((255-civ.emblem().getRed()) >>1), 
+                           255- ((255-civ.emblem().getGreen()) >>1), 
+                           255- ((255-civ.emblem().getBlue()) >>1)); // return lightened tile
+        default:
+          return new Color(255, 127, 0);
+      }
     }
   }
   
