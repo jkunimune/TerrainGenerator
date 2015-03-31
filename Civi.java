@@ -12,14 +12,14 @@ public class Civi {
     "G", "G", "G", "Gh", "Gr", "H", "H", "H", "J", "J", "J", "K", "K", "K", "K", "K", "Kh", "Kl", "Ky", "Ks", "L", "L", "L", "L", "Ll", "Lh", "Z", "Z",
     "Z", "Z", "Zh", "X", "C", "Ch", "Cl", "Cr","Cz", "V", "V", "Vr", "B", "B", "B", "B", "Br", "Bl", "Bs", "N", "N", "N", "N", "N", "Nr", "Nt", "Nst",
     "Nstr", "Ng", "Nj", "Nh", "M", "M", "M", "M", "M", "Mr", "'"};
-  public final int classical = 8192; // science values of the different ages
-  public final int iron = 16384;
-  public final int imperialist = 24576;
-  public final int industrial = 32768;
-  public final int modern = 40960;
-  public final int space = 49152;
-  public final int prosperity = 57344;
-  public final int apocalypse = 65536;
+  public final int classical = 16384; // science values of the different ages
+  public final int iron = 32768;
+  public final int imperialist = 49152;
+  public final int industrial = 65536;
+  public final int modern = 81920;
+  public final int space = 98304;
+  public final int prosperity = 114688;
+  public final int apocalypse = 131072;
   public final int[] explorabilityOf = {0, -46, -50, -42, -46, -34, -30, -14, -34, -46, -54, -46, 0}; // how quickly civis spread over biomes
   public final int[] fertilityOf =     {0, -36, -44, -32, -36, -18, -10, -26, -06, -14, -15, -06, 0}; // how quickly civis develop them
   
@@ -37,6 +37,8 @@ public class Civi {
   private int warChance; // how likely it is to wage war
   private int deathTimer; // how soon it will die (negative means apocalype is in progress)
   public ArrayList<Civi> atWarWith;
+  
+  private boolean apocalypseBefore;
   
   
   
@@ -59,19 +61,20 @@ public class Civi {
     scienceLevel = 0;
     militaryLevel = (int)(Math.random()*255);
     warChance = (int)(Math.random()*255);
-    deathTimer = 32768 + (int)(Math.random()*32768);
+    deathTimer = 65536 + (int)(Math.random()*65536);
     
     atWarWith = new ArrayList<Civi>(0);
     
     name = newName(); // picks a custom name
     capName = newCapName();
     System.out.println(this+" ("+colorName()+") has been founded in "+capName+"!"); // announces the civi's arrival
+    
+    apocalypseBefore = false;
   }
   
   
   
   public void advance() { // naturally alters stats
-    final boolean apocalypseBefore = deathTimer <= 0;
     deathTimer --;
     warChance += (int)(Math.random()*7-3.5);
     militaryLevel += (int)(Math.random()*7-3.5);
@@ -86,8 +89,9 @@ public class Civi {
     else if (scienceLevel >= industrial && scienceLevel < industrial+scienceRate)
       capital.development = 3;
     
-    if (!apocalypseBefore && deathTimer <= 0) // announces when the apocalypse starts
-      System.out.println(this+" has begun to crumble!");
+    //if (!apocalypseBefore && deathTimer <= 0) // announces when the apocalypse starts
+    //  System.out.println(this+" has begun to crumble!");
+    //apocalypseBefore = deathTimer <= 0;
   }
   
   
@@ -184,7 +188,7 @@ public class Civi {
             loseGraspOn(til);
         }
       }
-      if (!til.isCapital && randChance(-(deathTimer>>7) - 100))
+      if (!til.isCapital && randChance(-(deathTimer>>8) - 100))
         loseGraspOn(til);
       return false; // nothing may be upgraded during the apocalypse
     }
@@ -193,9 +197,9 @@ public class Civi {
   
   public boolean canInvade(Tile til) {
     if (til.biome == homeBiome)
-      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] + 10);
+      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] + 30);
     else
-      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] - 10);
+      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] + 20);
   }
   
   
@@ -237,7 +241,7 @@ public class Civi {
   
   
   public boolean wantsWar() { // if the Civi feels like starting a war
-    return randChance((warChance>>3) - 120);
+    return randChance((warChance>>3) - 110);
   }
   
   

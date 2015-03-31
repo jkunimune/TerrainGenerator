@@ -38,6 +38,8 @@ public class Civi {
   private int deathTimer; // how soon it will die (negative means apocalype is in progress)
   public ArrayList<Civi> atWarWith;
   
+  private boolean apocalypseBefore;
+  
   
   
   public Civi(Tile start, ArrayList<Civi> existing, World wholeNewWorld) {
@@ -65,13 +67,14 @@ public class Civi {
     
     name = newName(); // picks a custom name
     capName = newCapName();
-    System.out.println(this+" has been founded in "+capName+"!"); // announces the civi's arrival
+    System.out.println(this+" ("+colorName()+") has been founded in "+capName+"!"); // announces the civi's arrival
+    
+    apocalypseBefore = false;
   }
   
   
   
   public void advance() { // naturally alters stats
-    final boolean apocalypseBefore = deathTimer <= 0;
     deathTimer --;
     warChance += (int)(Math.random()*7-3.5);
     militaryLevel += (int)(Math.random()*7-3.5);
@@ -86,8 +89,9 @@ public class Civi {
     else if (scienceLevel >= industrial && scienceLevel < industrial+scienceRate)
       capital.development = 3;
     
-    if (!apocalypseBefore && deathTimer <= 0) // announces when the apocalypse starts
-      System.out.println(this+" has begun to crumble!");
+    //if (!apocalypseBefore && deathTimer <= 0) // announces when the apocalypse starts
+    //  System.out.println(this+" has begun to crumble!");
+    //apocalypseBefore = deathTimer <= 0;
   }
   
   
@@ -184,7 +188,7 @@ public class Civi {
             loseGraspOn(til);
         }
       }
-      if (!til.isCapital && randChance(-(deathTimer>>7) - 100))
+      if (!til.isCapital && randChance(-(deathTimer>>8) - 100))
         loseGraspOn(til);
       return false; // nothing may be upgraded during the apocalypse
     }
@@ -363,6 +367,28 @@ public class Civi {
     
     else
       return -1;
+  }
+  
+  
+  public final String colorName() {
+    if (emblem.getRed() >= 128 && emblem.getBlue() < 128 && emblem.getGreen() < 64)
+      return "red";
+    else if (emblem.getRed() == 255 && emblem.getBlue() >= 128 && emblem.getGreen() < 128)
+      return "magenta";
+    else if (emblem.getRed() >= 128 && emblem.getBlue() >= 128 && emblem.getGreen() < 128)
+      return "violet";
+    else if (emblem.getRed() < 128 && emblem.getBlue() >= 128 && emblem.getGreen() < 196)
+      return "blue";
+    else if (emblem.getRed() < 128 && emblem.getBlue() >= 128 && emblem.getGreen() >= 196)
+      return "cyan";
+    else if (emblem.getRed() < 128 && emblem.getBlue() < 128 && emblem.getGreen() >= 128)
+      return "green";
+    else if (emblem.getRed() >= 128 && emblem.getBlue() < 128 && emblem.getGreen() >= 196)
+      return "yellow";
+    else if (emblem.getRed() >= 128 && emblem.getBlue() < 128 && emblem.getGreen() >= 64)
+      return "orange";
+    else
+      return "unaccounted color";
   }
   
   

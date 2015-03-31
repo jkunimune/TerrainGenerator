@@ -36,19 +36,24 @@ public final class World extends Globe { // a subclass of Globe to handle all po
         
         naturallyDisast(til);
         
-        develop(til);
-        
         spread(til);
         
+        develop(til);
+        
+        collapse(til);
+        
+        fightWar(til);
+        
         startWar(til);
+        
         startRevolution(til);
       }
     }
     
     for (Tile[] row: map) { // asssigns all new values
       for (Tile til: row) {
-        if (til.temp1 != -1 && map[til.temp1][til.temp2].owners.size() > 0)
-          map[til.temp1][til.temp2].owners.get(0).takes(til);
+        if (til.temp1 != -1)
+          civis.get(til.temp1).takes(til);
         
         else if (til.temp3 > 0 && til.owners.size() > 0)
           til.development ++;
@@ -82,15 +87,17 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void spread(Tile til) { // causes civis to spawn and claim territory
-    til.temp1 = -1; // temp1 and temp2 are the indices of til's new owner
+    til.temp1 = -1; // temp1 is the index of til's new owner
+    
+    if (til.development > 0) // only run for unclaimed tiles
+      return;
     
     final ArrayList<Tile> adjacent = adjacentTo(til);
     
     for (Tile adj: adjacent) { // for all adjacent tiles
-      if (adj.development > 0 && til.development == 0) { // if that one is settled and this is not
+      if (adj.development > 0) { // if that one is settled and this is not
         if (adj.owners.get(0).wants(til)) { // if they want this tile
-          til.temp1 = adj.lat;
-          til.temp2 = adj.lon;
+          til.temp1 = civis.indexOf(adj.owners.get(0));
           til.temp3 = 1;
         }
       }
@@ -106,6 +113,36 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     
     if (til.development > 0 && til.owners.get(0).canUpgrade(til)) // upgrades tiles
       til.temp3 = 1;
+  }
+  
+  
+  public final void collapse(Tile til) { // causes apocalypses
+  }
+  
+  
+  public final void fightWar(Tile til) { // causes wars to work out
+    if (til.development == 0 || til.owners.get(0).atWarWith.size() == 0) // only run for tiles in civis at war
+      return;
+    
+    if (til.owners.size() == 1) { // if it is not disputed
+      final ArrayList<Tile> adjacentList = adjacentTo(til);
+    
+      for (Tile adj: adjacentList) {
+        if (adj.owners.size() > 1 && adj.owners.contains(til.owners.get(0))) { // if it is adjacent to a disputed tile
+          for (Civi civ: adj.owners) {
+            if (!civ.equals(til.owners.get(0))) {
+              if (civ.canInvade(til)) {
+                til.temp1 = civis.indexOf(civ);
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    else { // if it is disputed
+    }
   }
   
   
@@ -137,7 +174,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     
     agg.takes(start);
     
-    for (int i = 0; i < 10; i ++) // calls a random region between the empires into dispute
+    for (int i = 0; i < 3; i ++) // calls a random region between the empires into dispute
       for (Tile[] row: map)
         for (Tile til: row)
           if (til.owners.size() >= 2 && til.owners.contains(agg) && til.owners.contains(vic)) // if til is disputed
@@ -159,7 +196,8 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   public final void test() {
     civis.add(new Civi(map[0][0], civis, this));
-    civis.add(new Civi(map[0][0], civis, this));
+    civis.add(new Civi(map[313][0], civis, this));
+    wageWar(civis.get(0), civis.get(1), map[159][0]);
     
     for (Tile[] row: map) {
       for (Tile til: row) {
@@ -179,8 +217,8 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     ArrayList<Tile> adjacent = adjacentTo(til);
     for (Tile adj: adjacent)
       if (adj.altitude < 0 || adj.biome == Tile.freshwater) // civis spawn a lot near rivers and oceans
-        return randChance(-120);
+        return randChance(-115);
     
-    return randChance(-150);
+    return randChance(-145);
   }
 }

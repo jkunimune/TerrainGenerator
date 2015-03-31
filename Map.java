@@ -105,6 +105,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
     setPreferredSize(new Dimension(w, h));
     JFrame frame = new JFrame();
     frame.add(this);
+    frame.setResizable(false);
     frame.pack();
     frame.setVisible(true);
   }
