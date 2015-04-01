@@ -23,6 +23,7 @@ public class Civi {
   public final int[] explorabilityOf = {0, -46, -50, -42, -46, -34, -30, -14, -34, -46, -54, -46, 0}; // how quickly civis spread over biomes
   public final int[] fertilityOf =     {0, -36, -44, -32, -36, -18, -10, -26, -06, -14, -15, -06, 0}; // how quickly civis develop them
   
+  public int serialNo; // the civi's serial number (unique per game)
   public World world; // the world it belongs to
   public ArrayList<Tile> land; // all of the tiles it owns
   public Tile capital; // its capital city
@@ -44,6 +45,11 @@ public class Civi {
   
   public Civi(Tile start, ArrayList<Civi> existing, World wholeNewWorld) {
     world = wholeNewWorld;
+    
+    if (existing.size() > 0)
+      serialNo = existing.get(existing.size()-1).serialNo + 1;
+    else
+      serialNo = 0;
     
     capital = start; // set capital and territory
     start.owners.add(this);
@@ -149,7 +155,7 @@ public class Civi {
           }
         
           for (int i = 0; i < urbanAdjacency; i ++) // urbanization is like settlement but adjacency does not matter as much
-            if (randChance(-40) || scienceLevel > space) // after the space age cities grow like crazy
+            if (randChance(-40) || (scienceLevel > space && randChance(-10))) // after the space age cities grow like crazy
               return true;
         
           if (til.development == 2 && randChance(waterAdjacency-90)) // if still unurbanized
@@ -183,7 +189,7 @@ public class Civi {
     else { // if this is the apocalypse, don't upgrade
       ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
       for (Tile adj: adjacent) {
-        if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>7) - 40)) { // causes lands to be undeveloped during apocalypse
+        if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>8) - 40)) { // causes lands to be undeveloped during apocalypse
           if (!til.isCapital || randChance(-20)) // captials are less likely to be lost
             loseGraspOn(til);
         }
@@ -197,22 +203,30 @@ public class Civi {
   
   public boolean canInvade(Tile til) {
     if (til.biome == homeBiome)
-      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] + 30);
-    else
       return randChance((militaryLevel>>3) + explorabilityOf[til.biome] + 20);
+    else
+      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] + 10);
   }
   
   
   public boolean cannotDefend(Tile til) {
     if (til.biome == homeBiome)
-      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 10);
+      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 40);
     else
-      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] - 10);
+      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 30);
   }
   
   
   public void takes(Tile t) { // add a tile to this empire
-    t.owners.add(this);
+    if (t.development == 0)
+      t.owners.add(this);
+    else {
+      int newInd = 0;
+      while (newInd < t.owners.size() && t.owners.get(newInd).serialNo < this.serialNo) // organize owners by serial number
+        newInd ++;
+      t.owners.add(newInd, this);
+    }
+    
     if (t.development == 0)
       t.development = 1;
     land.add(t);
@@ -234,9 +248,9 @@ public class Civi {
   
   public void failsToDefend(Tile t) { // lose a tile to another empire
     t.owners.remove(this);
+    land.remove(t);
     if (t.owners.size() == 0)
       t.development = 0;
-    land.remove(t);
   }
   
   
@@ -286,7 +300,7 @@ public class Civi {
       output = name+" City"; // lots of civis use their own name for their capital
     else {
       output = ""; // otherwise create a custom captial name
-      int t = (int)(Math.random()*1.5);
+      int t = (int)(Math.random()*1.7);
       if (t%2 == 1)  output += vowels[(int)(Math.random()*vowels.length)];
       else           output += consonants[(int)(Math.random()*consonants.length)];
       

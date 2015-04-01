@@ -12,17 +12,18 @@ public class Civi {
     "G", "G", "G", "Gh", "Gr", "H", "H", "H", "J", "J", "J", "K", "K", "K", "K", "K", "Kh", "Kl", "Ky", "Ks", "L", "L", "L", "L", "Ll", "Lh", "Z", "Z",
     "Z", "Z", "Zh", "X", "C", "Ch", "Cl", "Cr","Cz", "V", "V", "Vr", "B", "B", "B", "B", "Br", "Bl", "Bs", "N", "N", "N", "N", "N", "Nr", "Nt", "Nst",
     "Nstr", "Ng", "Nj", "Nh", "M", "M", "M", "M", "M", "Mr", "'"};
-  public final int classical = 8192; // science values of the different ages
-  public final int iron = 16384;
-  public final int imperialist = 24576;
-  public final int industrial = 32768;
-  public final int modern = 40960;
-  public final int space = 49152;
-  public final int prosperity = 57344;
-  public final int apocalypse = 65536;
+  public final int classical = 16384; // science values of the different ages
+  public final int iron = 32768;
+  public final int imperialist = 49152;
+  public final int industrial = 65536;
+  public final int modern = 81920;
+  public final int space = 98304;
+  public final int prosperity = 114688;
+  public final int apocalypse = 131072;
   public final int[] explorabilityOf = {0, -46, -50, -42, -46, -34, -30, -14, -34, -46, -54, -46, 0}; // how quickly civis spread over biomes
   public final int[] fertilityOf =     {0, -36, -44, -32, -36, -18, -10, -26, -06, -14, -15, -06, 0}; // how quickly civis develop them
   
+  public int serialNo; // the civi's serial number (unique per game)
   public World world; // the world it belongs to
   public ArrayList<Tile> land; // all of the tiles it owns
   public Tile capital; // its capital city
@@ -45,6 +46,11 @@ public class Civi {
   public Civi(Tile start, ArrayList<Civi> existing, World wholeNewWorld) {
     world = wholeNewWorld;
     
+    if (existing.size() > 0)
+      serialNo = existing.get(existing.size()-1).serialNo + 1;
+    else
+      serialNo = 0;
+    
     capital = start; // set capital and territory
     start.owners.add(this);
     start.development = 2;
@@ -61,7 +67,7 @@ public class Civi {
     scienceLevel = 0;
     militaryLevel = (int)(Math.random()*255);
     warChance = (int)(Math.random()*255);
-    deathTimer = 32768 + (int)(Math.random()*32768);
+    deathTimer = 65536 + (int)(Math.random()*65536);
     
     atWarWith = new ArrayList<Civi>(0);
     
@@ -197,22 +203,30 @@ public class Civi {
   
   public boolean canInvade(Tile til) {
     if (til.biome == homeBiome)
-      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] + 10);
+      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] + 20);
     else
-      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] - 10);
+      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] + 10);
   }
   
   
   public boolean cannotDefend(Tile til) {
     if (til.biome == homeBiome)
-      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 10);
+      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 40);
     else
-      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] - 10);
+      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 30);
   }
   
   
   public void takes(Tile t) { // add a tile to this empire
-    t.owners.add(this);
+    if (t.development == 0)
+      t.owners.add(this);
+    else {
+      int newInd = 0;
+      while (t.owners.get(newInd).serialNo < this.serialNo) // organize owners by serial number
+        newInd ++;
+      t.owners.add(newInd, this);
+    }
+    
     if (t.development == 0)
       t.development = 1;
     land.add(t);
@@ -234,14 +248,12 @@ public class Civi {
   
   public void failsToDefend(Tile t) { // lose a tile to another empire
     t.owners.remove(this);
-    if (t.owners.size() == 0)
-      t.development = 0;
     land.remove(t);
   }
   
   
   public boolean wantsWar() { // if the Civi feels like starting a war
-    return randChance((warChance>>3) - 120);
+    return randChance((warChance>>3) - 110);
   }
   
   
@@ -286,7 +298,7 @@ public class Civi {
       output = name+" City"; // lots of civis use their own name for their capital
     else {
       output = ""; // otherwise create a custom captial name
-      int t = (int)(Math.random()*1.5);
+      int t = (int)(Math.random()*1.7);
       if (t%2 == 1)  output += vowels[(int)(Math.random()*vowels.length)];
       else           output += consonants[(int)(Math.random()*consonants.length)];
       

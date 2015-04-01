@@ -55,7 +55,10 @@ public final class World extends Globe { // a subclass of Globe to handle all po
         if (til.temp1 != -1)
           civis.get(til.temp1).takes(til);
         
-        else if (til.temp3 > 0 && til.owners.size() > 0)
+        if (til.temp2 != -1)
+          civis.get(til.temp2).failsToDefend(til);
+        
+        if (til.temp3 > 0 && til.owners.size() == 0)
           til.development ++;
       }
     }
@@ -95,10 +98,9 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     final ArrayList<Tile> adjacent = adjacentTo(til);
     
     for (Tile adj: adjacent) { // for all adjacent tiles
-      if (adj.development > 0) { // if that one is settled and this is not
+      if (adj.owners.size() == 1) { // if that one is settled and this is not
         if (adj.owners.get(0).wants(til)) { // if they want this tile
           til.temp1 = civis.indexOf(adj.owners.get(0));
-          til.temp3 = 1;
         }
       }
     }
@@ -111,7 +113,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   public final void develop(Tile til) { // causes tiles to be developed from territory to utopias
     til.temp3 = 0; // temp3 is whether it gets upgraded this turn
     
-    if (til.development > 0 && til.owners.get(0).canUpgrade(til)) // upgrades tiles
+    if (til.owners.size() == 1 && til.owners.get(0).canUpgrade(til)) // upgrades tiles
       til.temp3 = 1;
   }
   
@@ -121,12 +123,13 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void fightWar(Tile til) { // causes wars to work out
+    til.temp2 = -1;
     if (til.development == 0 || til.owners.get(0).atWarWith.size() == 0) // only run for tiles in civis at war
       return;
     
-    if (til.owners.size() == 1) { // if it is not disputed
-      final ArrayList<Tile> adjacentList = adjacentTo(til);
+    final ArrayList<Tile> adjacentList = adjacentTo(til);
     
+    if (til.owners.size() == 1) { // if it is not disputed
       for (Tile adj: adjacentList) {
         if (adj.owners.size() > 1 && adj.owners.contains(til.owners.get(0))) { // if it is adjacent to a disputed tile
           for (Civi civ: adj.owners) {
@@ -142,6 +145,18 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     }
     
     else { // if it is disputed
+      for (Tile adj: adjacentList) {
+        if (adj.owners.size() == 1 && til.owners.contains(adj.owners.get(0))) {
+          for (Civi civ: til.owners) {
+            if (!civ.equals(adj.owners.get(0))) {
+              if (civ.cannotDefend(til)) {
+                til.temp2 = civis.indexOf(civ);
+                break;
+              }
+            }
+          }
+        }
+      }
     }
   }
   
