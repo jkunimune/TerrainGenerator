@@ -211,9 +211,9 @@ public class Civi {
   
   public boolean cannotDefend(Tile til) {
     if (til.biome == homeBiome)
-      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 40);
+      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 100);
     else
-      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 30);
+      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 90);
   }
   
   

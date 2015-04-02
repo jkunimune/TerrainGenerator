@@ -155,7 +155,7 @@ public class Civi {
           }
         
           for (int i = 0; i < urbanAdjacency; i ++) // urbanization is like settlement but adjacency does not matter as much
-            if (randChance(-40) || scienceLevel > space) // after the space age cities grow like crazy
+            if (randChance(-40) || (scienceLevel > space && randChance(-10))) // after the space age cities grow like crazy
               return true;
         
           if (til.development == 2 && randChance(waterAdjacency-90)) // if still unurbanized
@@ -189,7 +189,7 @@ public class Civi {
     else { // if this is the apocalypse, don't upgrade
       ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
       for (Tile adj: adjacent) {
-        if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>7) - 40)) { // causes lands to be undeveloped during apocalypse
+        if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>8) - 40)) { // causes lands to be undeveloped during apocalypse
           if (!til.isCapital || randChance(-20)) // captials are less likely to be lost
             loseGraspOn(til);
         }
@@ -222,7 +222,7 @@ public class Civi {
       t.owners.add(this);
     else {
       int newInd = 0;
-      while (t.owners.get(newInd).serialNo < this.serialNo) // organize owners by serial number
+      while (newInd < t.owners.size() && t.owners.get(newInd).serialNo < this.serialNo) // organize owners by serial number
         newInd ++;
       t.owners.add(newInd, this);
     }
@@ -249,6 +249,8 @@ public class Civi {
   public void failsToDefend(Tile t) { // lose a tile to another empire
     t.owners.remove(this);
     land.remove(t);
+    if (t.owners.size() == 0)
+      t.development = 0;
   }
   
   

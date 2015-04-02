@@ -52,13 +52,13 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     
     for (Tile[] row: map) { // asssigns all new values
       for (Tile til: row) {
-        if (til.temp1 != -1)
+        if (til.temp1 >= 0)
           civis.get(til.temp1).takes(til);
         
-        if (til.temp2 != -1)
+        if (til.temp2 >= 0)
           civis.get(til.temp2).failsToDefend(til);
         
-        if (til.temp3 > 0 && til.owners.size() == 0)
+        if (til.temp3 > 0 && til.owners.size() > 0)
           til.development ++;
       }
     }
@@ -130,28 +130,33 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     final ArrayList<Tile> adjacentList = adjacentTo(til);
     
     if (til.owners.size() == 1) { // if it is not disputed
-      for (Tile adj: adjacentList) {
-        if (adj.owners.size() > 1 && adj.owners.contains(til.owners.get(0))) { // if it is adjacent to a disputed tile
-          for (Civi civ: adj.owners) {
-            if (!civ.equals(til.owners.get(0))) {
-              if (civ.canInvade(til)) {
-                til.temp1 = civis.indexOf(civ);
-                break;
+      /*if (til.temp1 > -2) { // -2 means it has already resolved another tile
+        for (Tile adj: adjacentList) {
+          if (adj.owners.size() > 1 && adj.owners.contains(til.owners.get(0))) { // if it is adjacent to a disputed tile
+            for (Civi civ: adj.owners) {
+              if (!civ.equals(til.owners.get(0))) {
+                if (civ.canInvade(til)) {
+                  til.temp1 = civis.indexOf(civ);
+                  adj.temp2 = -2; // Tiles that have caused a Tile to be disputed may not be undisputed
+                  break;
+                }
               }
             }
           }
         }
-      }
+      }*/
     }
-    
     else { // if it is disputed
-      for (Tile adj: adjacentList) {
-        if (adj.owners.size() == 1 && til.owners.contains(adj.owners.get(0))) {
-          for (Civi civ: til.owners) {
-            if (!civ.equals(adj.owners.get(0))) {
-              if (civ.cannotDefend(til)) {
-                til.temp2 = civis.indexOf(civ);
-                break;
+      if (til.temp2 > -2) {
+        for (Tile adj: adjacentList) {
+          if (adj.owners.size() == 1 && til.owners.contains(adj.owners.get(0))) {
+            for (Civi civ: til.owners) {
+              if (!civ.equals(adj.owners.get(0))) {
+                if (civ.cannotDefend(til)) {
+                  til.temp2 = civis.indexOf(civ);
+                  adj.temp1 = -2; // Tiles that have caused a Tile to be resolved may not be resolved
+                  break;
+                }
               }
             }
           }
