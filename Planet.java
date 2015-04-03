@@ -66,7 +66,11 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   
   
   public final void spawnFirstContinent() { // initializes a single techtonic plate
-    this.getTile(Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI).startPlate(Math.random()<.6);
+    for (Tile[] row: map)
+      for (Tile til: row)
+        til.temp1 = 9001; // initializes temp1
+    
+    this.getTile(Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI).startPlate(Math.random()<.6); // spawns a plate
   }
   
   
@@ -88,9 +92,9 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     }
     
     for (Tile[] row: map) // copies the temporary variables to altitude
-    for (Tile tile: row)
-      if (tile.temp1 < -56 || tile.temp1 >= 56) // only copies those that have been set to something
-      tile.altitude = tile.temp1;
+      for (Tile til: row)
+        if (til.temp1 != 9001) // only copies those that have been set to something
+          til.altitude = til.temp1;
   }
   
   

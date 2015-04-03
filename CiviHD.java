@@ -14,11 +14,11 @@ public class CiviHD { // the driver for my final project
   
   public static final void main(String args[]) {
     Planet protoEarth = new Planet(100);
-    Map topographical = new OneDim(protoEarth, 800, 300);
+    Map topographical = new Sinusoidal(protoEarth, 400, 400);
     generate(protoEarth, topographical);
     
     World earth = new World(protoEarth);
-    Map political = new OneDim(earth, 800, 300);
+    Map political = new SimpleSinusoidal(earth, 400, 400);
     
     while (true) {
       setTimer(0);

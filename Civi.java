@@ -90,7 +90,7 @@ public class Civi {
     scienceLevel += scienceRate;
     
     if (scienceLevel >= apocalypse && scienceLevel < apocalypse+scienceRate) // starts apocalypse when entering apocalypse age
-      deathTimer = 0;
+      deathTimer = -1;
     
     else if (scienceLevel >= prosperity && scienceLevel < prosperity+scienceRate) { // automatically urbanizes or utopianizes capital when possible, and grants military bonuses to advanced civis
       capital.development = 4;
@@ -114,9 +114,9 @@ public class Civi {
     else if (scienceLevel >= iron && scienceLevel < iron+scienceRate)
       militaryLevel += 16;
     
-    if (!apocalypseBefore && deathTimer <= 0) // announces when the apocalypse starts
+    if (!apocalypseBefore && deathTimer < 0) // announces when the apocalypse starts
       System.out.println(this+" has begun to crumble!");
-    apocalypseBefore = deathTimer <= 0;
+    apocalypseBefore = deathTimer < 0;
   }
   
   
@@ -134,7 +134,7 @@ public class Civi {
   
   
   public boolean canUpgrade(Tile til) { // decides if a tile is ready to be upgraded
-    if (deathTimer >= 0) {
+    //if (deathTimer >= 0) {
       switch (til.development) {
         case 1: // til is territory applying for settlement
           if ((til.altitude < 0 || til.biome == Tile.freshwater) && scienceLevel < space) // water biomes may not be settled prior to the space era
@@ -204,19 +204,25 @@ public class Civi {
         default:
           return false;
       }
-    }
-    else { // if this is the apocalypse, don't upgrade
-      ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
-      for (Tile adj: adjacent) {
-        if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>8) - 40)) { // causes lands to be undeveloped during apocalypse
-          if (!til.isCapital || randChance(-20)) // captials are less likely to be lost
-            loseGraspOn(til);
-        }
+    //}
+  }
+  
+  
+  public boolean cannotSupport(Tile til) { // whether the civi will lose this tile due to the apocalypse
+    if (deathTimer >= 0)
+      return false;
+    
+    ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
+    for (Tile adj: adjacent) {
+      if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>8) - 30)) { // causes lands to be undeveloped during apocalypse
+        if (!til.isCapital || randChance(-20)) // captials are less likely to be lost
+          return true;
       }
-      if (!til.isCapital && randChance(-(deathTimer>>8) - 100))
-        loseGraspOn(til);
-      return false; // nothing may be upgraded during the apocalypse
     }
+    if (!til.isCapital && randChance(-(deathTimer>>8) - 100)) // even tiles not on the border can succumb to the apocalypse
+      return true;
+    
+    return false;
   }
   
   

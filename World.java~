@@ -130,7 +130,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     final ArrayList<Tile> adjacentList = adjacentTo(til);
     
     if (til.owners.size() == 1) { // if it is not disputed
-      /*if (til.temp1 > -2) { // -2 means it has already resolved another tile
+      if (til.temp1 > -2) { // -2 means it has already resolved another tile
         for (Tile adj: adjacentList) {
           if (adj.owners.size() > 1 && adj.owners.contains(til.owners.get(0))) { // if it is adjacent to a disputed tile
             for (Civi civ: adj.owners) {
@@ -144,7 +144,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
             }
           }
         }
-      }*/
+      }
     }
     else { // if it is disputed
       if (til.temp2 > -2) {
@@ -194,14 +194,16 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     
     agg.takes(start);
     
-    for (int i = 0; i < 3; i ++) // calls a random region between the empires into dispute
-      for (Tile[] row: map)
-        for (Tile til: row)
-          if (til.owners.size() >= 2 && til.owners.contains(agg) && til.owners.contains(vic)) // if til is disputed
-            for (Tile adj: adjacentTo(til))
-              if (adj.owners.size() == 1 && til.owners.get(0).equals(vic))
-                if (agg.canInvade(til))
-                  agg.takes(adj);
+    for (int i = 0; i < 512; i ++) { // calls a random region between the empires into dispute
+      for (int j = 0; j < agg.land.size(); j ++) {
+        final Tile til = agg.land.get(j);
+        if (til.owners.size() >= 2 && til.owners.contains(agg) && til.owners.contains(vic)) // if til is disputed
+          for (Tile adj: adjacentTo(til))
+            if (adj.owners.size() == 1 && til.owners.get(0).equals(vic))
+              if (agg.canInvade(til))
+                agg.takes(adj);
+      }
+    }
   }
   
   

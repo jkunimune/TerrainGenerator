@@ -36,11 +36,11 @@ public final class World extends Globe { // a subclass of Globe to handle all po
         
         naturallyDisast(til);
         
-        spread(til);
+        collapse(til);
         
         develop(til);
         
-        collapse(til);
+        spread(til);
         
         fightWar(til);
         
@@ -58,8 +58,11 @@ public final class World extends Globe { // a subclass of Globe to handle all po
         if (til.temp2 >= 0)
           civis.get(til.temp2).failsToDefend(til);
         
-        if (til.temp3 > 0 && til.owners.size() > 0)
+        if (til.temp3 > 0)
           til.development ++;
+        
+        else if (til.temp3 < 0)
+          til.owners.get(0).loseGraspOn(til);
       }
     }
     
@@ -111,14 +114,16 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void develop(Tile til) { // causes tiles to be developed from territory to utopias
-    til.temp3 = 0; // temp3 is whether it gets upgraded this turn
-    
-    if (til.owners.size() == 1 && til.owners.get(0).canUpgrade(til)) // upgrades tiles
-      til.temp3 = 1;
+    if (til.temp3 != -1) // tiles that have succumbed to the apocalypse shall not be upgraded
+      if (til.owners.size() == 1 && til.owners.get(0).canUpgrade(til)) // upgrades tiles
+        til.temp3 = 1;
   }
   
   
   public final void collapse(Tile til) { // causes apocalypses
+    til.temp3 = 0; // temp3 is whether it gets upgraded this turn
+    if (til.owners.size() == 1 && til.owners.get(0).cannotSupport(til))
+      til.temp3 = -1; // a temp3 of -1 means that tile decays this turn
   }
   
   
