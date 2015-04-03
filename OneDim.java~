@@ -4,6 +4,6 @@ public class OneDim extends Map { // a one dimensional map that only sees the eq
   
   
   public OneDim(Globe g, int w, int h) {
-    
+    super(g, w, h);
   }
 }

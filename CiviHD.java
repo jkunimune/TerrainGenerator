@@ -14,11 +14,11 @@ public class CiviHD { // the driver for my final project
   
   public static final void main(String args[]) {
     Planet protoEarth = new Planet(100);
-    Map topographical = new Sinusoidal(protoEarth, 400, 400);
+    Map topographical = new OneDim(protoEarth, 800, 300);
     generate(protoEarth, topographical);
     
     World earth = new World(protoEarth);
-    Map political = new SimpleSinusoidal(earth, 400, 400);
+    Map political = new OneDim(earth, 800, 300);
     
     while (true) {
       setTimer(0);
@@ -40,11 +40,11 @@ public class CiviHD { // the driver for my final project
     int t = 0;
     while (world.any(-257)) {
       world.spawnContinents();
-      if (t%10 == 0)
+      if (t%20 == 0)
         map.display(Map.altitude);
       t ++;
     }
-    if (t%10 != 1)
+    if (t%20 != 1)
       map.display(Map.altitude);
     
     System.out.println("Shifting continents...");
@@ -56,7 +56,7 @@ public class CiviHD { // the driver for my final project
       for (int j = 0; j < i; j ++)
         world.smooth(.4);
       map.display(Map.altitude);
-      world.rough(i*1.2);
+      world.rough(i*1.1);
       map.display(Map.altitude);
     }
     

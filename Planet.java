@@ -27,7 +27,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     for (int i = 64; i >= 1; i >>= 2) { // gradually randomizes and smooths out terrain
       for (int j = 0; j < i; j ++)
         this.smooth(.4);
-      this.rough(i*1.2);
+      this.rough(i*1.1);
     }
     System.out.println("Generating climate...");
     this.acclimate(.1);
@@ -76,7 +76,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
         if (tile.altitude == -257) {
           ArrayList<Tile> adjacent = adjacentTo(tile);
           for (Tile ref: adjacent) // reads all adjacent tiles to look for land or sea
-            if (ref.altitude >= -256 && randChance(-43 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
+            if (ref.altitude >= -256 && randChance(-50 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
             tile.spreadFrom(ref);
           
           if (tile.altitude == -257 && randChance(-148)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations

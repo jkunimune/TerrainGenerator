@@ -276,7 +276,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     
     for (Tile[] row: map) {
       for (Tile til: row) {
-        runoffFrom(til, til.rainfall*.0045); // fills rivers
+        runoffFrom(til, til.rainfall*.004+.02); // fills rivers
       }
     }
   }

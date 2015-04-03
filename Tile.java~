@@ -12,7 +12,7 @@ public final class Tile { // keeps track of a single point on a globe
   public int biome; // see key below
   public int development; // how settled it is
   public ArrayList<Civi> owners;
-  public boolean capital; // if it is a capital city
+  public boolean isCapital; // if it is a capital city
   public int temp1; // to store various values only necessary during generation
   public int temp2;
   public int temp3;
@@ -57,7 +57,7 @@ public final class Tile { // keeps track of a single point on a globe
     water = newWater;
     biome = newBiome;
     development = 0;
-    owners = new ArrayList<Civi>(0);
+    owners = new ArrayList<Civi>(1);
   }
   
   
@@ -101,16 +101,6 @@ public final class Tile { // keeps track of a single point on a globe
   
   public final int waterLevel() {
     return altitude+water;
-  }
-  
-  
-  public final void anarchize() { // decrease development due to apocalypse
-    if (development == 2 || development == 3)
-      development = 1;
-    else {
-      development = 0;
-      owners = new ArrayList<Civi>(1);
-    }
   }
   
   
