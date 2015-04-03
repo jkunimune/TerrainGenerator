@@ -88,16 +88,35 @@ public class Civi {
     spreadRate += (int)(Math.random()*7-3.5);
     
     scienceLevel += scienceRate;
+    
     if (scienceLevel >= apocalypse && scienceLevel < apocalypse+scienceRate) // starts apocalypse when entering apocalypse age
       deathTimer = 0;
-    else if (scienceLevel >= prosperity && scienceLevel < prosperity+scienceRate) // automatically urbanizes or utopianizes capital when possible and starts apocalypse when necessary
-      capital.development = 4;
-    else if (scienceLevel >= industrial && scienceLevel < industrial+scienceRate)
-      capital.development = 3;
     
-    //if (!apocalypseBefore && deathTimer <= 0) // announces when the apocalypse starts
-    //  System.out.println(this+" has begun to crumble!");
-    //apocalypseBefore = deathTimer <= 0;
+    else if (scienceLevel >= prosperity && scienceLevel < prosperity+scienceRate) { // automatically urbanizes or utopianizes capital when possible, and grants military bonuses to advanced civis
+      capital.development = 4;
+      militaryLevel += 16;
+    }
+    
+    else if (scienceLevel >= space && scienceLevel < space+scienceRate)
+      militaryLevel += 16;
+    
+    else if (scienceLevel >= modern && scienceLevel < modern+scienceRate)
+      militaryLevel += 16;
+    
+    else if (scienceLevel >= industrial && scienceLevel < industrial+scienceRate) {
+      capital.development = 3;
+      militaryLevel += 16;
+    }
+    
+    else if (scienceLevel >= imperialist && scienceLevel < imperialist+scienceRate)
+      militaryLevel += 16;
+    
+    else if (scienceLevel >= iron && scienceLevel < iron+scienceRate)
+      militaryLevel += 16;
+    
+    if (!apocalypseBefore && deathTimer <= 0) // announces when the apocalypse starts
+      System.out.println(this+" has begun to crumble!");
+    apocalypseBefore = deathTimer <= 0;
   }
   
   
@@ -203,17 +222,17 @@ public class Civi {
   
   public boolean canInvade(Tile til) {
     if (til.biome == homeBiome)
-      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] + 20);
+      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] - 30);
     else
-      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] + 10);
+      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] - 40);
   }
   
   
   public boolean cannotDefend(Tile til) {
     if (til.biome == homeBiome)
-      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 100);
+      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 50);
     else
-      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 90);
+      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 40);
   }
   
   
@@ -230,7 +249,7 @@ public class Civi {
     if (t.development == 0)
       t.development = 1;
     land.add(t);
-    deathTimer -= 3;
+    deathTimer -= 4;
   }
   
   
@@ -255,7 +274,7 @@ public class Civi {
   
   
   public boolean wantsWar() { // if the Civi feels like starting a war
-    return randChance((warChance>>3) - 110);
+    return randChance((warChance>>3) - 115);
   }
   
   
