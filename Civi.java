@@ -219,26 +219,26 @@ public class Civi {
           return true;
       }
     }
-    if (!til.isCapital && randChance(-(deathTimer>>8) - 100)) // even tiles not on the border can succumb to the apocalypse
+    if (!til.isCapital && randChance(-(deathTimer>>8) - 140)) // even tiles not on the border can succumb to the apocalypse
       return true;
     
     return false;
   }
   
   
-  public boolean canInvade(Tile til) {
+  public boolean canInvade(Tile til) { // decides if it can dispute atile
     if (til.biome == homeBiome)
-      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] - 30);
+      return randChance((militaryLevel>>4) + explorabilityOf[til.biome] - 10);
     else
-      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] - 40);
+      return randChance((militaryLevel>>4) + explorabilityOf[til.biome] - 20);
   }
   
   
-  public boolean cannotDefend(Tile til) {
+  public boolean cannotDefend(Tile til) { // decides if it can undispute a tile
     if (til.biome == homeBiome)
-      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 50);
+      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + 40);
     else
-      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 40);
+      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + 30);
   }
   
   
@@ -433,6 +433,11 @@ public class Civi {
   
   public Color emblem() {
     return emblem;
+  }
+  
+  
+  public String capitalName() {
+    return capName;
   }
   
   

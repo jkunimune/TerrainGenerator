@@ -77,16 +77,14 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   public final void cleanse() { // removes dead civis from the game
     for (int i = civis.size()-1; i >= 0; i --) {
-      final Civi c = civis.get(i);
-      if (c.capital.development == 0) { // if it has lost its capital
-        for (Tile t: c.land) {
-          t.owners.remove(c);
-          if (t.owners.size() == 0) // tells all owned tiles that their nation is dead
-            t.development = 0;
-        }
-        c.capital.isCapital = false;
-        System.out.println(c+" has fallen."); // announce the fall of the empire
-        civis.remove(c);
+      final Civi civ = civis.get(i);
+      if (civ.capital.development == 0) { // if is capital has been destroyed
+        System.out.println(civ+" has fallen."); // announce the fall of the empire
+        delete(civ);
+      }
+      else if (!civ.capital.owners.contains(civ)) { // if its capital has been captured
+        System.out.println(civ.capital.owners.get(0)+" has captured "+civ.capitalName()+". "+civ+" has fallen.");
+        delete(civ);
       }
     }
   }
@@ -199,16 +197,26 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     
     agg.takes(start);
     
-    for (int i = 0; i < 512; i ++) { // calls a random region between the empires into dispute
+    for (int i = 0; i < 256; i ++) { // calls a random region between the empires into dispute
       for (int j = 0; j < agg.land.size(); j ++) {
         final Tile til = agg.land.get(j);
-        if (til.owners.size() >= 2 && til.owners.contains(agg) && til.owners.contains(vic)) // if til is disputed
-          for (Tile adj: adjacentTo(til))
-            if (adj.owners.size() == 1 && til.owners.get(0).equals(vic))
-              if (agg.canInvade(til))
-                agg.takes(adj);
+        for (Tile adj: adjacentTo(til))
+          if (adj.owners.size() == 1 && til.owners.get(0).equals(vic)) // taken land can cause 
+            if (agg.canInvade(adj))
+              agg.takes(adj);
       }
     }
+  }
+  
+  
+  public final void delete(Civi civ) { // removes a civi from the game
+    for (Tile t: civ.land) {
+      t.owners.remove(civ);
+      if (t.owners.size() == 0) // tells all owned tiles that their nation is dead
+        t.development = 0;
+    }
+    civ.capital.isCapital = false;
+    civis.remove(civ);
   }
   
   
