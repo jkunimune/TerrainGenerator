@@ -13,8 +13,9 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   public static final int water = 5;
   public static final int waterLevel = 6;
   public static final int territory = 7;
+  public static final int hybrid = 8;
   final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(20, 70, 200), new Color(0,0,150),
-    new Color(255,255,255), new Color(79,191,39), new Color(200,255,25), new Color(0,150,25), new Color(200,100,50), new Color(200,100,255),
+    new Color(255,255,255), new Color(79,191,39), new Color(200,255,50), new Color(0,100,20), new Color(200,100,50), new Color(200,100,255),
     new Color(0,25,255), new Color(0,0,0)}; // colors of the biomes
   final boolean[][][] key = { // contains information for how to draw different biomes
     {
@@ -150,6 +151,8 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
         return getColorByWaterLevel(x, y);
       case territory:
         return getColorByTerritory(x, y);
+      case hybrid:
+        return getColorByHybrid(x, y);
       default:
         return new Color(255, 0, 150);
     }
@@ -260,6 +263,46 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
                       return civ.emblem();
           
           return Color.white;
+          
+        case 2: // settlement
+          return civ.emblem();
+          
+        case 3: // urban area
+          return new Color(civ.emblem().getRed()>>1,
+                           civ.emblem().getGreen()>>1,
+                           civ.emblem().getBlue()>>1); // return darkened tile
+          
+        case 4: // utopia
+          return new Color(255- ((255-civ.emblem().getRed()) >>1), 
+                           255- ((255-civ.emblem().getGreen()) >>1), 
+                           255- ((255-civ.emblem().getBlue()) >>1)); // return lightened tile
+        default:
+          return new Color(255, 127, 0);
+      }
+    }
+  }
+  
+  
+  public Color getColorByHybrid(int x, int y) {
+    final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
+    
+    if (til.development == 0) {
+      return getColorByBiome(x, y);
+    }
+    else {
+      final Civi civ = til.owners.get((x+y >>2) % til.owners.size());
+      
+      switch (til.development) {
+        case 1: // territory
+          for (int i = -3; i <= 3; i ++)
+            if (y+i >= 0 && y+i < lats.length) // if in bounds
+              for (int j = -3; j <= 3; j ++)
+                if (i*i + j*j <= 9) // if in circle
+                  if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
+                    if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners)) // if it is near a tile owned by someone else
+                      return civ.emblem();
+          
+          return getColorByBiome(x,y);
           
         case 2: // settlement
           return civ.emblem();

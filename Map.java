@@ -15,7 +15,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   public static final int territory = 7;
   public static final int hybrid = 8;
   final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(20, 70, 200), new Color(0,0,150),
-    new Color(255,255,255), new Color(79,191,39), new Color(200,255,50), new Color(0,100,20), new Color(200,100,50), new Color(200,100,255),
+    new Color(255,255,255), new Color(79,191,39), new Color(200,255,50), new Color(0,130,20), new Color(200,100,50), new Color(200,100,255),
     new Color(0,25,255), new Color(0,0,0)}; // colors of the biomes
   final boolean[][][] key = { // contains information for how to draw different biomes
     {

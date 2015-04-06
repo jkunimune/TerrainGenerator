@@ -77,16 +77,14 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   public final void cleanse() { // removes dead civis from the game
     for (int i = civis.size()-1; i >= 0; i --) {
-      final Civi c = civis.get(i);
-      if (c.capital.development == 0) { // if it has lost its capital
-        for (Tile t: c.land) {
-          t.owners.remove(c);
-          if (t.owners.size() == 0) // tells all owned tiles that their nation is dead
-            t.development = 0;
-        }
-        c.capital.isCapital = false;
-        System.out.println(c+" has fallen."); // announce the fall of the empire
-        civis.remove(c);
+      final Civi civ = civis.get(i);
+      if (civ.capital.development == 0) { // if is capital has been destroyed
+        System.out.println(civ+" has fallen."); // announce the fall of the empire
+        delete(civ);
+      }
+      else if (!civ.capital.owners.contains(civ)) { // if its capital has been captured
+        System.out.println(civ.capital.owners.get(0)+" has captured "+civ.capitalName()+". "+civ+" has fallen.");
+        delete(civ);
       }
     }
   }
@@ -101,7 +99,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     final ArrayList<Tile> adjacent = adjacentTo(til);
     
     for (Tile adj: adjacent) { // for all adjacent tiles
-      if (adj.owners.size() == 1) { // if that one is settled and this is not
+      if (adj.owners.size() == 1 && adj.temp3 != -1) { // if that one is settled and this is not and that one is not succumbing to the apocalypse
         if (adj.owners.get(0).wants(til)) { // if they want this tile
           til.temp1 = civis.indexOf(adj.owners.get(0));
         }
@@ -171,10 +169,10 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   }
   
   
-  public final void startWar(Tile til) { // causes Civis to wage war on others
+  public final void startWar(Tile til) { // causes Civis to wage war on others from tiles occasionally
     if (til.owners.size() == 1 && til.owners.get(0).wantsWar()) { // Tiles occasionally decide to wage war on neighbors
       final Tile adj = landBorderAt(til);
-      if (adj.lat != -1 && adj.altitude >= 0) // if there is a border
+      if (adj.lat != -1) // if there is a border and these civis are not already at war
         wageWar(til.owners.get(0), adj.owners.get(0), adj);
     }
   }
@@ -185,6 +183,11 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void endWar() { // causes peace treaties
+    for (Civi civ: civis) {
+      if (civ.atWarWith.size() > 0) { // if a civi is at war
+        if (civ.isAtPeace())
+          civ.makePeace();
+        
   }
   
   
@@ -193,13 +196,16 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void wageWar(Civi agg, Civi vic, Tile start) { // starts a war between two civis at a Tile
+    if (agg.atWarWith.contains(vic)) // if they are already at war
+      return;
+    
     System.out.println(agg+" has invaded "+vic+"!");
     agg.atWarWith.add(vic); // civis know with whom they are at war
     vic.atWarWith.add(agg);
     
     agg.takes(start);
     
-    for (int i = 0; i < 256; i ++) { // calls a random region between the empires into dispute
+    for (int i = 0; i < 128; i ++) { // calls a random region between the empires into dispute
       for (int j = 0; j < agg.land.size(); j ++) {
         final Tile til = agg.land.get(j);
         for (Tile adj: adjacentTo(til))
@@ -208,6 +214,17 @@ public final class World extends Globe { // a subclass of Globe to handle all po
               agg.takes(adj);
       }
     }
+  }
+  
+  
+  public final void delete(Civi civ) { // removes a civi from the game
+    for (Tile t: civ.land) {
+      t.owners.remove(civ);
+      if (t.owners.size() == 0) // tells all owned tiles that their nation is dead
+        t.development = 0;
+    }
+    civ.capital.isCapital = false;
+    civis.remove(civ);
   }
   
   

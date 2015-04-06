@@ -219,26 +219,26 @@ public class Civi {
           return true;
       }
     }
-    if (!til.isCapital && randChance(-(deathTimer>>8) - 100)) // even tiles not on the border can succumb to the apocalypse
+    if (!til.isCapital && randChance(-(deathTimer>>8) - 140)) // even tiles not on the border can succumb to the apocalypse
       return true;
     
     return false;
   }
   
   
-  public boolean canInvade(Tile til) {
+  public boolean canInvade(Tile til) { // decides if it can dispute atile
     if (til.biome == homeBiome)
-      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] - 30);
+      return randChance((militaryLevel>>4) + explorabilityOf[til.biome]);
     else
-      return randChance((militaryLevel>>3) + explorabilityOf[til.biome] - 40);
+      return randChance((militaryLevel>>4) + explorabilityOf[til.biome] - 10);
   }
   
   
-  public boolean cannotDefend(Tile til) {
+  public boolean cannotDefend(Tile til) { // decides if it can undispute a tile
     if (til.biome == homeBiome)
-      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 50);
+      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + 30);
     else
-      return randChance(-(militaryLevel>>3) + explorabilityOf[til.biome] + 40);
+      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + 20);
   }
   
   
@@ -281,6 +281,26 @@ public class Civi {
   
   public boolean wantsWar() { // if the Civi feels like starting a war
     return randChance((warChance>>3) - 115);
+  }
+  
+  
+  public boolean wantsSurrender() { // if the Civi feels like surrendering
+    return randChance(-(militaryLevel>>4) - 80);
+  }
+  
+  
+  public boolean isAtPeace() {
+    for (Tile til: civ.land)
+      if (til.owners.size() <= 1) // if there is any disputed territory
+        return false;
+    return true;
+  }
+  
+  
+  public void makePeace() {
+    for (Civi civ: atWarWith)
+      civ.atWarWith.remove(this);
+    atWarWith = new ArrayList<Civi>();
   }
   
   
@@ -433,6 +453,11 @@ public class Civi {
   
   public Color emblem() {
     return emblem;
+  }
+  
+  
+  public String capitalName() {
+    return capName;
   }
   
   

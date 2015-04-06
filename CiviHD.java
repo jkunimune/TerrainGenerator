@@ -23,7 +23,7 @@ public class CiviHD { // the driver for my final project
     while (true) {
       setTimer(0);
       earth.update();
-      political.display(Map.hybrid);
+      political.display(Map.territory);
       waitFor(100);
     }
   }

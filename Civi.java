@@ -37,7 +37,7 @@ public class Civi {
   private int militaryLevel; // how much military it has
   private int warChance; // how likely it is to wage war
   private int deathTimer; // how soon it will die (negative means apocalype is in progress)
-  public ArrayList<Civi> atWarWith;
+  public ArrayList<Civi> adversaries;
   
   private boolean apocalypseBefore;
   
@@ -65,11 +65,11 @@ public class Civi {
     spreadRate = (int)(Math.random()*255); // randomize stats
     scienceRate = (int)(Math.random()*255);
     scienceLevel = 0;
-    militaryLevel = (int)(Math.random()*255);
+    militaryLevel = (int)(Math.random()*255-32);
     warChance = (int)(Math.random()*255);
     deathTimer = 65536 + (int)(Math.random()*65536);
     
-    atWarWith = new ArrayList<Civi>(0);
+    adversaries = new ArrayList<Civi>(0);
     
     name = newName(); // picks a custom name
     capName = newCapName();
@@ -94,28 +94,29 @@ public class Civi {
     
     else if (scienceLevel >= prosperity && scienceLevel < prosperity+scienceRate) { // automatically urbanizes or utopianizes capital when possible, and grants military bonuses to advanced civis
       capital.development = 4;
-      militaryLevel += 16;
+      militaryLevel += 32;
     }
     
     else if (scienceLevel >= space && scienceLevel < space+scienceRate)
-      militaryLevel += 16;
+      militaryLevel += 32;
     
     else if (scienceLevel >= modern && scienceLevel < modern+scienceRate)
-      militaryLevel += 16;
+      militaryLevel += 32;
     
     else if (scienceLevel >= industrial && scienceLevel < industrial+scienceRate) {
       capital.development = 3;
-      militaryLevel += 16;
+      militaryLevel += 32;
     }
     
     else if (scienceLevel >= imperialist && scienceLevel < imperialist+scienceRate)
-      militaryLevel += 16;
+      militaryLevel += 32;
     
     else if (scienceLevel >= iron && scienceLevel < iron+scienceRate)
-      militaryLevel += 16;
+      militaryLevel += 32;
     
-    if (!apocalypseBefore && deathTimer < 0) // announces when the apocalypse starts
-      System.out.println(this+" has begun to crumble!");
+    if (!apocalypseBefore && deathTimer < 0) { // weakens the military during the apocalypse
+      militaryLevel -= 128;
+    }
     apocalypseBefore = deathTimer < 0;
   }
   
@@ -174,7 +175,7 @@ public class Civi {
           }
         
           for (int i = 0; i < urbanAdjacency; i ++) // urbanization is like settlement but adjacency does not matter as much
-            if (randChance(-40) || (scienceLevel > space && randChance(-10))) // after the space age cities grow like crazy
+            if (randChance(-50) || (scienceLevel > space && randChance(-10))) // after the space age cities grow like crazy
               return true;
         
           if (til.development == 2 && randChance(waterAdjacency-90)) // if still unurbanized
@@ -226,19 +227,19 @@ public class Civi {
   }
   
   
-  public boolean canInvade(Tile til) { // decides if it can dispute atile
+  public boolean canInvade(Tile til) { // decides if it can dispute a tile
     if (til.biome == homeBiome)
       return randChance((militaryLevel>>4) + explorabilityOf[til.biome] - 10);
     else
-      return randChance((militaryLevel>>4) + explorabilityOf[til.biome] - 20);
+      return randChance((militaryLevel>>4) + explorabilityOf[til.biome] - 30);
   }
   
   
-  public boolean cannotDefend(Tile til) { // decides if it can undispute a tile
+  public boolean cannotDefend(Tile til) { // decides if it can undispute a tile in the opponent's favor
     if (til.biome == homeBiome)
-      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + 40);
+      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + (adversaries.size()>>3) + 20);
     else
-      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + 30);
+      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + (adversaries.size()>>3));
   }
   
   
@@ -280,7 +281,27 @@ public class Civi {
   
   
   public boolean wantsWar() { // if the Civi feels like starting a war
-    return randChance((warChance>>3) - 115);
+    return randChance((warChance>>3) - 120);
+  }
+  
+  
+  public boolean wantsSurrender() { // if the Civi feels like surrendering
+    return randChance(-(militaryLevel>>4) - 50);
+  }
+  
+  
+  public boolean isAtPeaceWith(Civi civ) { // if it is at peace with a civ
+    for (Tile til: land)
+      if (til.altitude >= 0 && til.owners.contains(civ)) // if there is any disputed land territory
+        return false;
+    return true;
+  }
+  
+  
+  public void makePeaceWith(Civi civ) { // ends war with a civ
+    System.out.println(this+" and "+civ+" have made peace!");
+    this.adversaries.remove(civ);
+    civ.adversaries.remove(this);
   }
   
   
