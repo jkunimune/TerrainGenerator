@@ -14,11 +14,11 @@ public class CiviHD { // the driver for my final project
   
   public static final void main(String args[]) {
     Planet protoEarth = new Planet(100);
-    Map topographical = new Sinusoidal(protoEarth, 400, 400);
+    Map topographical = new Sinusoidal(protoEarth, 600, 600);
     generate(protoEarth, topographical);
     
     World earth = new World(protoEarth);
-    Map political = new SimpleSinusoidal(earth, 400, 400);
+    Map political = new SimpleSinusoidal(earth, 600, 600);
     
     while (true) {
       setTimer(0);
@@ -67,7 +67,6 @@ public class CiviHD { // the driver for my final project
     System.out.println("Raining...");
     world.rain();
     world.runoff();
-    map.display(Map.water);
     
     System.out.println("Setting up biomes...");
     world.biomeAssign();

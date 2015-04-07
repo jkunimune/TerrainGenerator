@@ -21,7 +21,7 @@ public class Civi {
   public final int prosperity = 114688;
   public final int apocalypse = 131072;
   public final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -24, -40, -52, -60, -52, 0}; // how quickly civis spread over biomes
-  public final int[] fertilityOf =     {0, -56, -64, -52, -60, -36, -32, -44, -28, -40, -36, -28, 0}; // how quickly civis develop them
+  public final int[] fertilityOf =     {0, -56, -64, -52, -60, -40, -32, -44, -28, -40, -36, -28, 0}; // how quickly civis develop them
                                    // mag, ocn, ice, ref, tre, tun, pln, dst, jng, mtn, cap, wtr, SPAAAACE
   
   public int serialNo; // the civi's serial number (unique per game)
@@ -129,38 +129,25 @@ public class Civi {
     else if (scienceLevel >= prosperity && scienceLevel < prosperity+scienceRate) { // automatically urbanizes or utopianizes capital when possible, and grants military bonuses to advanced civis
       capital.development = 4;
       militaryLevel += 64;
-      System.out.println(this+" has entered the Prosperity Age!");
-    }
-    
+    } 
     else if (scienceLevel >= space && scienceLevel < space+scienceRate) {
       militaryLevel += 64;
-      System.out.println(this+" has entered the Space Age!");
     }
-    
     else if (scienceLevel >= modern && scienceLevel < modern+scienceRate) {
       militaryLevel += 64;
-      System.out.println(this+" has entered the Modern Age!");
     }
-    
     else if (scienceLevel >= industrial && scienceLevel < industrial+scienceRate) {
       capital.development = 3;
       militaryLevel += 64;
-      System.out.println(this+" has entered the Industrial Age!");
     }
-    
     else if (scienceLevel >= imperialist && scienceLevel < imperialist+scienceRate) {
       militaryLevel += 64;
-      System.out.println(this+" has entered the Imperialist Age!");
     }
-    
     else if (scienceLevel >= iron && scienceLevel < iron+scienceRate) {
       militaryLevel += 64;
-      System.out.println(this+" has entered the Iron Age!");
     }
-    
     if (!apocalypseBefore && deathTimer < 0) { // weakens the military during the apocalypse
       militaryLevel -= 128;
-      System.out.println(this+" has begun to crumble!");
     }
     apocalypseBefore = deathTimer < 0;
   }
@@ -299,7 +286,7 @@ public class Civi {
     if (t.development == 0)
       t.development = 1;
     land.add(t);
-    deathTimer -= 5;
+    deathTimer -= 6;
   }
   
   
@@ -344,7 +331,7 @@ public class Civi {
   
   
   public void makePeaceWith(Civi civ) { // ends war with a civ
-    System.out.println(this+" and "+civ+" have made peace!");
+    //System.out.println(this+" and "+civ+" have made peace!");
     this.adversaries.remove(civ);
     civ.adversaries.remove(this);
   }
