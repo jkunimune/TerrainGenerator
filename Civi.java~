@@ -20,7 +20,7 @@ public class Civi {
   public final int space = 98304;
   public final int prosperity = 114688;
   public final int apocalypse = 131072;
-  public final int[] explorabilityOf = {0, -46, -50, -42, -46, -34, -30, -14, -34, -46, -54, -46, 0}; // how quickly civis spread over biomes
+  public final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -20, -40, -52, -60, -52, 0}; // how quickly civis spread over biomes
   public final int[] fertilityOf =     {0, -36, -44, -32, -36, -18, -10, -26, -06, -14, -15, -06, 0}; // how quickly civis develop them
   
   public int serialNo; // the civi's serial number (unique per game)
@@ -37,13 +37,13 @@ public class Civi {
   private int militaryLevel; // how much military it has
   private int warChance; // how likely it is to wage war
   private int deathTimer; // how soon it will die (negative means apocalype is in progress)
-  public ArrayList<Civi> atWarWith;
+  public ArrayList<Civi> adversaries;
   
   private boolean apocalypseBefore;
   
   
   
-  public Civi(Tile start, ArrayList<Civi> existing, World wholeNewWorld) {
+  public Civi(Tile start, ArrayList<Civi> existing, World wholeNewWorld) { // starts a civi in the World wholeNewWorld, where there are already existing, from the Tile start
     world = wholeNewWorld;
     
     if (existing.size() > 0)
@@ -65,15 +65,48 @@ public class Civi {
     spreadRate = (int)(Math.random()*255); // randomize stats
     scienceRate = (int)(Math.random()*255);
     scienceLevel = 0;
-    militaryLevel = (int)(Math.random()*255);
+    militaryLevel = (int)(Math.random()*255-64);
     warChance = (int)(Math.random()*255);
     deathTimer = 65536 + (int)(Math.random()*65536);
     
-    atWarWith = new ArrayList<Civi>(0);
+    adversaries = new ArrayList<Civi>(0);
     
     name = newName(); // picks a custom name
     capName = newCapName();
     System.out.println(this+" ("+colorName()+") has been founded in "+capName+"!"); // announces the civi's arrival
+    
+    apocalypseBefore = false;
+  }
+  
+  
+  public Civi (Tile start, ArrayList<Civi> existing, World wholeNewWorld, Civi motherland) { // starts a civi as a rebellion in motherland
+    world = wholeNewWorld;
+    
+    serialNo = existing.get(existing.size()-1).serialNo + 1;
+    
+    capital = start; // set capital and territory
+    start.owners.add(this);
+    start.isCapital = true;
+    start.development = motherland.capital.development;
+    land = new ArrayList<Tile>(1);
+    land.add(start);
+    homeBiome = start.biome;
+    
+    int hueNo = chooseColor(256, existing, motherland); // pick color
+    emblem = intToColor(hueNo);
+    
+    spreadRate = (int)(Math.random()*255); // randomize stats
+    scienceRate = (int)(Math.random()*255);
+    scienceLevel = motherland.scienceLevel;
+    militaryLevel = (int)(Math.random()*255-64);
+    warChance = (int)(Math.random()*255);
+    deathTimer = 65536 + (int)(Math.random()*65536);
+    
+    adversaries = new ArrayList<Civi>(1);
+    
+    name = newName(); // picks a custom name
+    capName = newCapName();
+    System.out.println("Rebels have risen up in "+motherland+" and declared "+this+" in "+capName+"!"); // announces the civi's arrival
     
     apocalypseBefore = false;
   }
@@ -94,28 +127,29 @@ public class Civi {
     
     else if (scienceLevel >= prosperity && scienceLevel < prosperity+scienceRate) { // automatically urbanizes or utopianizes capital when possible, and grants military bonuses to advanced civis
       capital.development = 4;
-      militaryLevel += 16;
+      militaryLevel += 64;
     }
     
     else if (scienceLevel >= space && scienceLevel < space+scienceRate)
-      militaryLevel += 16;
+      militaryLevel += 64;
     
     else if (scienceLevel >= modern && scienceLevel < modern+scienceRate)
-      militaryLevel += 16;
+      militaryLevel += 64;
     
     else if (scienceLevel >= industrial && scienceLevel < industrial+scienceRate) {
       capital.development = 3;
-      militaryLevel += 16;
+      militaryLevel += 64;
     }
     
     else if (scienceLevel >= imperialist && scienceLevel < imperialist+scienceRate)
-      militaryLevel += 16;
+      militaryLevel += 64;
     
     else if (scienceLevel >= iron && scienceLevel < iron+scienceRate)
-      militaryLevel += 16;
+      militaryLevel += 64;
     
-    if (!apocalypseBefore && deathTimer < 0) // announces when the apocalypse starts
-      System.out.println(this+" has begun to crumble!");
+    if (!apocalypseBefore && deathTimer < 0) { // weakens the military during the apocalypse
+      militaryLevel -= 128;
+    }
     apocalypseBefore = deathTimer < 0;
   }
   
@@ -174,7 +208,7 @@ public class Civi {
           }
         
           for (int i = 0; i < urbanAdjacency; i ++) // urbanization is like settlement but adjacency does not matter as much
-            if (randChance(-40) || (scienceLevel > space && randChance(-10))) // after the space age cities grow like crazy
+            if (randChance(-50) || (scienceLevel > space && randChance(-10))) // after the space age cities grow like crazy
               return true;
         
           if (til.development == 2 && randChance(waterAdjacency-90)) // if still unurbanized
@@ -226,19 +260,19 @@ public class Civi {
   }
   
   
-  public boolean canInvade(Tile til) { // decides if it can dispute atile
+  public boolean canInvade(Tile til) { // decides if it can dispute a tile
     if (til.biome == homeBiome)
-      return randChance((militaryLevel>>4) + explorabilityOf[til.biome]);
-    else
       return randChance((militaryLevel>>4) + explorabilityOf[til.biome] - 10);
+    else
+      return randChance((militaryLevel>>4) + explorabilityOf[til.biome] - 30);
   }
   
   
-  public boolean cannotDefend(Tile til) { // decides if it can undispute a tile
+  public boolean cannotDefend(Tile til) { // decides if it can undispute a tile in the opponent's favor
     if (til.biome == homeBiome)
-      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + 30);
+      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + (adversaries.size()>>3) + 20);
     else
-      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + 20);
+      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + (adversaries.size()>>3));
   }
   
   
@@ -280,27 +314,35 @@ public class Civi {
   
   
   public boolean wantsWar() { // if the Civi feels like starting a war
-    return randChance((warChance>>3) - 115);
+    return randChance((warChance>>3) - 120);
   }
   
   
   public boolean wantsSurrender() { // if the Civi feels like surrendering
-    return randChance(-(militaryLevel>>4) - 80);
+    return randChance(-(militaryLevel>>4) - 50);
   }
   
   
-  public boolean isAtPeace() {
-    for (Tile til: civ.land)
-      if (til.owners.size() <= 1) // if there is any disputed territory
+  public boolean isAtPeaceWith(Civi civ) { // if it is at peace with a civ
+    for (Tile til: land)
+      if (til.altitude >= 0 && til.owners.contains(civ)) // if there is any disputed land territory
         return false;
     return true;
   }
   
   
-  public void makePeace() {
-    for (Civi civ: atWarWith)
-      civ.atWarWith.remove(this);
-    atWarWith = new ArrayList<Civi>();
+  public void makePeaceWith(Civi civ) { // ends war with a civ
+    System.out.println(this+" and "+civ+" have made peace!");
+    this.adversaries.remove(civ);
+    civ.adversaries.remove(this);
+  }
+  
+  
+  public boolean hasDiscontent(boolean urban) { // if a rebellion shall start here
+    if (scienceLevel < classical || deathTimer < 0) // the ancient age is too early to start a revolution, and the apocalypse is too late
+      return false;
+    if (urban)  return randChance((warChance<<7) - (militaryLevel<<9) - (deathTimer<<14) + 100); // old weak warmongers are more likely to have revolutions
+    else        return randChance((warChance<<7) - (militaryLevel<<9) - (deathTimer<<14) + 100); // urban areas are more likely to seed revolutions
   }
   
   
@@ -375,12 +417,28 @@ public class Civi {
   }
   
   
-  public int chooseColor(int intolerance, ArrayList<Civi> existing) {
+  public int chooseColor(int intolerance, ArrayList<Civi> existing) { // chooses a new color for the Civi, but not too similar to any existing colorsddddddddd
     int hue = (int)(Math.random()*1530+1);
     
     for (Civi c: existing) {
       if (Math.abs(hue-c.hueNumber()) < intolerance) {
         hue = chooseColor(intolerance-1, existing); // makes sure the color is not too close to any existing ones
+        break;
+      }
+    }
+    
+    return hue;
+  }
+  
+  
+  public int chooseColor(int intolerance, ArrayList<Civi> existing, Civi enemy) { // like the one above, but the color may not be close to enemy's color
+    int hue = (int)(Math.random()*1530+1);
+    
+    if (Math.abs(hue-enemy.hueNumber()) < 256)
+        hue = chooseColor(intolerance-1, existing, enemy); // makes sure the color is not too close to enemy
+    for (Civi c: existing) {
+      if (Math.abs(hue-c.hueNumber()) < intolerance) {
+        hue = chooseColor(intolerance-1, existing, enemy); // makes sure the color is not too close to any existing ones
         break;
       }
     }

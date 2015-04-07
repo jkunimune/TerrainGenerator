@@ -27,7 +27,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     for (int i = 64; i >= 1; i >>= 2) { // gradually randomizes and smooths out terrain
       for (int j = 0; j < i; j ++)
         this.smooth(.4);
-      this.rough(i*1.2);
+      this.rough(i*1.1);
     }
     System.out.println("Generating climate...");
     this.acclimate(.1);
@@ -66,7 +66,11 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   
   
   public final void spawnFirstContinent() { // initializes a single techtonic plate
-    this.getTile(Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI).startPlate(Math.random()<.6);
+    for (Tile[] row: map)
+      for (Tile til: row)
+        til.temp1 = 9001; // initializes temp1
+    
+    this.getTile(Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI).startPlate(Math.random()<.6); // spawns a plate
   }
   
   
@@ -76,7 +80,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
         if (tile.altitude == -257) {
           ArrayList<Tile> adjacent = adjacentTo(tile);
           for (Tile ref: adjacent) // reads all adjacent tiles to look for land or sea
-            if (ref.altitude >= -256 && randChance(-43 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
+            if (ref.altitude >= -256 && randChance(-50 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
             tile.spreadFrom(ref);
           
           if (tile.altitude == -257 && randChance(-148)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
@@ -88,9 +92,9 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     }
     
     for (Tile[] row: map) // copies the temporary variables to altitude
-    for (Tile tile: row)
-      if (tile.temp1 < -56 || tile.temp1 >= 56) // only copies those that have been set to something
-      tile.altitude = tile.temp1;
+      for (Tile til: row)
+        if (til.temp1 != 9001) // only copies those that have been set to something
+          til.altitude = til.temp1;
   }
   
   

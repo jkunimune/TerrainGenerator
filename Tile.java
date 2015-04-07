@@ -92,7 +92,7 @@ public final class Tile { // keeps track of a single point on a globe
   
   
   public final void startPlate(boolean wet) { // becomes the seed for a continental plate
-    if (wet)  temp1 = (int)(Math.random()*16-72); // randomizes altitude from -72 to -56
+    if (wet)  temp1 = (int)(Math.random()*16-80); // randomizes altitude from -80 to -64
     else      temp1 = (int)(Math.random()*16+56); // randomizes altitude from 56 to 72
     temp2 = (int)(Math.random()*Math.PI*128); // randomizes drift velocity
     temp3 = (int)(Math.random()*2*Math.PI*128); // these numbers represent a vector, so they are coordinates representing a point on the axis of the plate's rotation, which also goes through the center of the sphere
