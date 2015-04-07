@@ -86,7 +86,6 @@ public final class World extends Globe { // a subclass of Globe to handle all po
       
       else if (!civ.capital.owners.contains(civ)) { // if its capital has been captured
         final Civi winner = civ.capital.owners.get(0);
-        System.out.println(civ.capital.owners.get(0)+" has captured "+civ.capitalName()+". "+civ+" has fallen.");
         give(civ, winner);
         delete(civ);
       }
@@ -190,7 +189,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
       final Civi empire = start.owners.get(0);
       Civi rebels = new Civi(start, civis, this, empire);
       
-      for (int i = 0; i < 128; i ++) { // gives rebels a head start
+      for (int i = 0; i < 64; i ++) { // gives rebels a head start
         for (int j = 0; j < rebels.land.size(); j ++) {
           final Tile til = rebels.land.get(j);
           for (Tile adj: adjacentTo(til))
@@ -204,8 +203,6 @@ public final class World extends Globe { // a subclass of Globe to handle all po
       }
       if (rebels.land.contains(empire.capital)) { // if the rebels have already taken the capital
         System.out.println(rebels+" have toppled "+empire+" in a coup d'Žtat!");
-        give(empire, rebels);
-        delete(empire);
       }
       else {
         for (int i = 0; i < 128; i ++) { // give rebels more disputed territory if they have not won yet
@@ -213,14 +210,13 @@ public final class World extends Globe { // a subclass of Globe to handle all po
             final Tile til = rebels.land.get(j);
             for (Tile adj: adjacentTo(til))
               if (adj.owners.size() == 1 && adj.owners.get(0).equals(empire)) // imperial land can be invaded by rebel land
-              if (rebels.canInvade(adj))
-              rebels.takes(adj);
+                if (rebels.canInvade(adj))
+                  rebels.takes(adj);
           }
         }
+        rebels.adversaries.add(empire); // civis know with whom they are at war
+        empire.adversaries.add(rebels);
       }
-      
-      rebels.adversaries.add(empire); // civis know with whom they are at war
-      empire.adversaries.add(rebels);
     }
   }
   
@@ -321,9 +317,9 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     ArrayList<Tile> adjacent = adjacentTo(til);
     for (Tile adj: adjacent)
       if (adj.altitude < 0 || adj.biome == Tile.freshwater) // civis spawn a lot near rivers and oceans
-        return randChance(-118);
+        return randChance(-115);
     
-    return randChance(-148);
+    return randChance(-145);
   }
   
   

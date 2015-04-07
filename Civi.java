@@ -20,8 +20,9 @@ public class Civi {
   public final int space = 98304;
   public final int prosperity = 114688;
   public final int apocalypse = 131072;
-  public final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -20, -40, -52, -60, -52, 0}; // how quickly civis spread over biomes
-  public final int[] fertilityOf =     {0, -48, -72, -60, -64, -48, -40, -56, -36, -44, -48, -36, 0}; // how quickly civis develop them
+  public final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -24, -40, -52, -60, -52, 0}; // how quickly civis spread over biomes
+  public final int[] fertilityOf =     {0, -56, -64, -52, -60, -36, -32, -44, -28, -40, -36, -28, 0}; // how quickly civis develop them
+                                   // mag, ocn, ice, ref, tre, tun, pln, dst, jng, mtn, cap, wtr, SPAAAACE
   
   public int serialNo; // the civi's serial number (unique per game)
   public World world; // the world it belongs to
@@ -308,6 +309,8 @@ public class Civi {
     land.remove(t);
     if (t.owners.size() == 0)
       t.development = 0;
+    else if (t.equals(capital)) // announce when it loses its capital
+      System.out.println(t.owners.get(0)+" has captured "+capitalName()+". "+this+" has fallen.");
   }
   
   
@@ -339,8 +342,8 @@ public class Civi {
   public boolean hasDiscontent(boolean urban) { // if a rebellion shall start here
     if (scienceLevel < classical || deathTimer < 0) // the ancient age is too early to start a revolution, and the apocalypse is too late
       return false;
-    if (urban)  return randChance((warChance>>3) - (militaryLevel>>4) - (deathTimer>>12) - 125); // old weak warmongers are more likely to have revolutions
-    else        return randChance((warChance>>3) - (militaryLevel>>4) - (deathTimer>>12) - 155); // urban areas are more likely to seed revolutions
+    if (urban)  return randChance((warChance>>3) - (militaryLevel>>4) + (land.size()>>11) - (deathTimer>>12) - 110); // big old weak warmongers are more likely to have revolutions
+    else        return randChance((warChance>>3) - (militaryLevel>>4) + (land.size()>>11) - (deathTimer>>12) - 140); // urban areas are more likely to seed revolutions
   }
   
   
