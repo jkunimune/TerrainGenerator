@@ -29,5 +29,7 @@ public class Hemispherical extends Map { // a realistic globe projection that sh
         }
       }
     }
+    
+    initialPaint();
   }
 }

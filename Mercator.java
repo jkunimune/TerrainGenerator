@@ -14,5 +14,7 @@ public class Mercator extends Map { // a sphere projection designed to preserve 
         }
       }
     }
+    
+    initialPaint();
   }
 }

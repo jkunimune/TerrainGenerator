@@ -129,27 +129,38 @@ public class Civi {
     else if (scienceLevel >= prosperity && scienceLevel < prosperity+scienceRate) { // automatically urbanizes or utopianizes capital when possible, and grants military bonuses to advanced civis
       capital.development = 4;
       militaryLevel += 64;
+      System.out.println(this+" has entered the Prosperity Age!");
     }
     
-    else if (scienceLevel >= space && scienceLevel < space+scienceRate)
+    else if (scienceLevel >= space && scienceLevel < space+scienceRate) {
       militaryLevel += 64;
+      System.out.println(this+" has entered the Space Age!");
+    }
     
-    else if (scienceLevel >= modern && scienceLevel < modern+scienceRate)
+    else if (scienceLevel >= modern && scienceLevel < modern+scienceRate) {
       militaryLevel += 64;
+      System.out.println(this+" has entered the Modern Age!");
+    }
     
     else if (scienceLevel >= industrial && scienceLevel < industrial+scienceRate) {
       capital.development = 3;
       militaryLevel += 64;
+      System.out.println(this+" has entered the Industrial Age!");
     }
     
-    else if (scienceLevel >= imperialist && scienceLevel < imperialist+scienceRate)
+    else if (scienceLevel >= imperialist && scienceLevel < imperialist+scienceRate) {
       militaryLevel += 64;
+      System.out.println(this+" has entered the Imperialist Age!");
+    }
     
-    else if (scienceLevel >= iron && scienceLevel < iron+scienceRate)
+    else if (scienceLevel >= iron && scienceLevel < iron+scienceRate) {
       militaryLevel += 64;
+      System.out.println(this+" has entered the Iron Age!");
+    }
     
     if (!apocalypseBefore && deathTimer < 0) { // weakens the military during the apocalypse
       militaryLevel -= 128;
+      System.out.println(this+" has begun to crumble!");
     }
     apocalypseBefore = deathTimer < 0;
   }
@@ -342,8 +353,8 @@ public class Civi {
   public boolean hasDiscontent(boolean urban) { // if a rebellion shall start here
     if (scienceLevel < classical || deathTimer < 0) // the ancient age is too early to start a revolution, and the apocalypse is too late
       return false;
-    if (urban)  return randChance((warChance>>3) - (militaryLevel>>4) + (land.size()>>12) - (deathTimer>>12) - 110); // big old weak warmongers are more likely to have revolutions
-    else        return randChance((warChance>>3) - (militaryLevel>>4) + (land.size()>>12) - (deathTimer>>12) - 140); // urban areas are more likely to seed revolutions
+    if (urban)  return randChance((warChance>>3) - (militaryLevel>>4) + (land.size()>>12) - (deathTimer>>12) - 120); // big old weak warmongers are more likely to have revolutions
+    else        return randChance((warChance>>3) - (militaryLevel>>4) + (land.size()>>12) - (deathTimer>>12) - 150); // urban areas are more likely to seed revolutions
   }
   
   

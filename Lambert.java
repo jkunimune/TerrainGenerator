@@ -18,5 +18,7 @@ public class Lambert extends Map { // an equal area globe projection that distor
         }
       }
     }
+    
+    initialPaint();
   }
 }

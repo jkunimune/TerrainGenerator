@@ -122,18 +122,25 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
+  public final void initialPaint() {
+    for (int x = 0; x < width(); x ++) // draws background colors
+      for (int y = 0; y < height(); y ++)
+        if (lats[y][x] == -1)
+          drawPx(x, y, new Color(lons[y][x]>>16, lons[y][x]%65536>>8, lons[y][x]%256)); // draw the color found in the rgb value
+    show();
+  }
+  
+  
   public void display(int colorScheme) { // displays the map
     for (int x = 0; x < width(); x ++)
       for (int y = 0; y < height(); y ++)
-        drawPx(x, y, getColorBy(colorScheme, x, y));
+        if (lats[y][x] != -1)
+          drawPx(x, y, getColorBy(colorScheme, x, y));
     show();
   }
   
   
   public Color getColorBy(int type, int x, int y) { // gets the color at a point on the screen
-    if (lats[y][x] < 0) // if it is a color, not a tile
-      return new Color(lons[y][x]>>16, lons[y][x]%65536>>8, lons[y][x]%256); // return a color with the rgb value found
-    
     switch (type) {
       case biome: // otherwise calculate the color from that tile
         return getColorByBiome(x, y);

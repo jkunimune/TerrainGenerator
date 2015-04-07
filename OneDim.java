@@ -48,5 +48,7 @@ public class OneDim extends Map { // a one dimensional map that only sees the pr
         }
       }
     }
+    
+    initialPaint();
   }
 }

@@ -1,5 +1,5 @@
 public final class SimpleSinusoidal extends Map { // a projection that mimics sinusoidal but is simpler and cleaner
-  public Sinusoidal(Globe g, int w, int h) {
+  public SimpleSinusoidal(Globe g, int w, int h) {
     super(g, w, h);
     
     for (int x = 0; x < w; x ++) {

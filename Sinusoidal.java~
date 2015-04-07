@@ -1,4 +1,4 @@
-public class Sinusoidal extends Map { // an equal-area projection that is shaped like a sine curve
+public final class Sinusoidal extends Map { // an equal-area projection that is shaped like a sine curve
   public Sinusoidal(Globe g, int w, int h) {
     super(g, w, h);
     

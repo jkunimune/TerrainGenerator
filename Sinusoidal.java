@@ -20,5 +20,7 @@ public final class Sinusoidal extends Map { // an equal-area projection that is 
         }
       }
     }
+    
+    initialPaint();
   }
 }

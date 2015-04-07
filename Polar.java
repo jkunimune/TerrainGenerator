@@ -32,5 +32,7 @@ public class Polar extends Map { // an equal-distant map centered on the north p
         }
       }
     }
+    
+    initialPaint();
   }
 }
