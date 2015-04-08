@@ -7,21 +7,29 @@ import java.util.*;
 
 
 
-public class CiviHD { // the driver for my final project
-  static long startTime = 0; // the time it was when we last checked
+public final class CiviHD { // the driver for my final project
+  static java.applet.AudioClip intro;
   static java.applet.AudioClip music;
+  static java.applet.AudioClip boom;
+  
+  static long startTime = 0; // the time it was when we last checked
   
   
   
   public static final void main(String args[]) {
+    loadSound();
+    
     Planet protoEarth = new Planet(100);
     Map topographical = new Sinusoidal(protoEarth, 600, 600);
+    
+    intro.loop();
     generate(protoEarth, topographical);
+    intro.stop();
     
     World earth = new World(protoEarth);
     Map political = new SimpleSinusoidal(earth, 600, 600);
     
-    startMusic();
+    music.loop();
     
     while (true) {
       setTimer(0);
@@ -33,10 +41,11 @@ public class CiviHD { // the driver for my final project
   
   
   
-  public static final void startMusic() {
+  public static final void loadSound() { // loads all sound files
     try {
-      music = java.applet.Applet.newAudioClip(new java.net.URL("file:Sound/soundtrack.wav"));
-      music.play();
+      intro = java.applet.Applet.newAudioClip(new java.net.URL("file:Sound/babaYetu.wav"));
+      music = java.applet.Applet.newAudioClip(new java.net.URL("file:Sound/terraNova.wav"));
+      boom = java.applet.Applet.newAudioClip(new java.net.URL("file:Sound/explosion.wav"));
     }
     catch (java.net.MalformedURLException error) {
       System.out.println(error);

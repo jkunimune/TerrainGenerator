@@ -142,7 +142,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
             for (Civi civ: adj.owners) {
               if (!civ.equals(til.owners.get(0))) {
                 if (civ.canInvade(til)) {
-                  til.temp1 = civis.indexOf(civ);
+                  til.temp1 = civis.indexOf(civ); // tell it to get taken by the civi
                   adj.temp2 = -2; // Tiles that have caused a Tile to be disputed may not be undisputed
                   break;
                 }
@@ -159,7 +159,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
             for (Civi civ: til.owners) {
               if (!civ.equals(adj.owners.get(0))) {
                 if (civ.cannotDefend(til)) {
-                  til.temp2 = civis.indexOf(civ);
+                  til.temp2 = civis.indexOf(civ); // tell it to get undisputed from the civi
                   adj.temp1 = -2; // Tiles that have caused a Tile to be resolved may not be resolved
                   break;
                 }
@@ -199,6 +199,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
         }
       }
       for (Tile t: rebels.land) { // some land is completely given to the rebels
+        if (t.owners.contains(empire))
         empire.failsToDefend(t);
       }
       if (rebels.land.contains(empire.capital)) { // if the rebels have already taken the capital
@@ -214,9 +215,9 @@ public final class World extends Globe { // a subclass of Globe to handle all po
                   rebels.takes(adj);
           }
         }
-        rebels.adversaries.add(empire); // civis know with whom they are at war
-        empire.adversaries.add(rebels);
       }
+      rebels.adversaries.add(empire); // civis know with whom they are at war
+      empire.adversaries.add(rebels);
     }
   }
   
@@ -246,7 +247,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
       for (int j = 0; j < agg.land.size(); j ++) {
         final Tile til = agg.land.get(j);
         for (Tile adj: adjacentTo(til))
-          if (adj.owners.size() == 1 && adj.owners.get(0).equals(vic)) // taken land can cause 
+          if (adj.owners.size() == 1 && adj.owners.get(0).equals(vic)) // land owned only by the victim can be disputed by the aggressor
             if (agg.canInvade(adj))
               agg.takes(adj);
       }

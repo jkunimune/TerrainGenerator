@@ -340,8 +340,13 @@ public class Civi {
   public boolean hasDiscontent(boolean urban) { // if a rebellion shall start here
     if (scienceLevel < classical || deathTimer < 0) // the ancient age is too early to start a revolution, and the apocalypse is too late
       return false;
-    if (urban)  return randChance((warChance>>4) - (militaryLevel>>5) + (land.size()>>13) - (deathTimer>>13) - 120); // big old weak warmongers are more likely to have revolutions
-    else        return randChance((warChance>>4) - (militaryLevel>>5) + (land.size()>>13) - (deathTimer>>13) - 150); // urban areas are more likely to seed revolutions
+    if (urban)  return randChance((warChance>>4) - (militaryLevel>>5) + (land.size()>>13) - (deathTimer>>13) - 140); // big old weak warmongers are more likely to have revolutions
+    else        return randChance((warChance>>4) - (militaryLevel>>5) + (land.size()>>13) - (deathTimer>>13) - 170); // urban areas are more likely to seed revolutions
+  }
+  
+  
+  public boolean canNuke(Tile til) {
+    return scienceLevel >= modern && randChance((militaryLevel>>4) + (til.development>>3) - 100);
   }
   
   

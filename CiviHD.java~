@@ -9,6 +9,7 @@ import java.util.*;
 
 public class CiviHD { // the driver for my final project
   static long startTime = 0; // the time it was when we last checked
+  static java.applet.AudioClip music;
   
   
   
@@ -20,6 +21,8 @@ public class CiviHD { // the driver for my final project
     World earth = new World(protoEarth);
     Map political = new SimpleSinusoidal(earth, 600, 600);
     
+    startMusic();
+    
     while (true) {
       setTimer(0);
       earth.update();
@@ -28,6 +31,17 @@ public class CiviHD { // the driver for my final project
     }
   }
   
+  
+  
+  public static final void startMusic() {
+    try {
+      music = java.applet.Applet.newAudioClip(new java.net.URL("file:Sound/soundtrack.wav"));
+      music.play();
+    }
+    catch (java.net.MalformedURLException error) {
+      System.out.println(error);
+    }
+  }
   
   
   /* PRECONDITION: map's Globe is world */
