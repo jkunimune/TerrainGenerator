@@ -255,7 +255,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     if (agg.isAtPeaceWith(vic)) // if no land was disputed, nothing happens
       return;
     
-    System.out.println(agg+" has invaded "+vic+"!");
+    //System.out.println(agg+" has invaded "+vic+"!");
     agg.adversaries.add(vic); // civis know with whom they are at war
     vic.adversaries.add(agg);
   }
@@ -281,7 +281,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     
     victor.adversaries.remove(loser);
     loser.adversaries.remove(victor);
-    System.out.println(loser+" has surrendered to "+victor+"!");
+    //System.out.println(loser+" has surrendered to "+victor+"!");
   }
   
   
