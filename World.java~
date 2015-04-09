@@ -4,11 +4,13 @@ import java.util.*;
 
 public final class World extends Globe { // a subclass of Globe to handle all political elements
   public ArrayList<Civi> civis;
+  public java.applet.AudioClip boom;
   
   
   
   public World(int r) {
     super(r);
+    loadSound();
     civis = new ArrayList<Civi>();
     
     while (civis.size() == 0) // skips ahead to the founding of the first civi
@@ -20,6 +22,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   public World(Globe g) {
     super(g);
+    loadSound();
     civis = new ArrayList<Civi>();
     
     while (civis.size() == 0) // skips ahead to the founding of the first civi
@@ -136,6 +139,12 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     final ArrayList<Tile> adjacentList = adjacentTo(til);
     
     if (til.owners.size() == 1) { // if it is not disputed
+      for (Civi enemy: til.owners.get(0).adversaries)
+        if (enemy.canNuke(til)) { // it might get nuked
+          nuke(til);
+          return;
+        }
+      
       if (til.temp1 > -2) { // -2 means it has already resolved another tile
         for (Tile adj: adjacentList) {
           if (adj.owners.size() > 1 && adj.owners.contains(til.owners.get(0))) { // if it is adjacent to a disputed tile
@@ -329,6 +338,25 @@ public final class World extends Globe { // a subclass of Globe to handle all po
       t.owners.remove(civ);
       if (!t.owners.contains(winner))
         t.owners.add(winner);
+    }
+  }
+  
+  
+  public final void nuke(Tile t) { // shoots a nuclear warhead at the specified Tile
+    boom.play(); // BOOM
+    t.radioactive = true;
+    final ArrayList<Tile> adjacentList = adjacentTo(t);
+    for (Tile adj: adjacentList) // spews radiation onto this and all surrounding tiles
+      adj.radioactive = true;
+  }
+  
+  
+  public void loadSound() {
+    try {
+      boom = java.applet.Applet.newAudioClip(new java.net.URL("file:Sound/explosion.wav"));
+    }
+    catch (java.net.MalformedURLException error) {
+      System.out.println(error);
     }
   }
 }

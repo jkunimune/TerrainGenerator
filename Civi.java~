@@ -345,6 +345,11 @@ public class Civi {
   }
   
   
+  public boolean canNuke(Tile til) {
+    return scienceLevel >= modern && randChance((militaryLevel>>4) + (til.development>>3) - 100);
+  }
+  
+  
   public String newName() {
     String output = ""; // create a name
     

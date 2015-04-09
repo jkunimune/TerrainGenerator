@@ -157,6 +157,9 @@ public class Civi {
     if (til.altitude < 0 && scienceLevel < iron) // civis may not claim ocean prior to the iron age
       return false;
     
+    if (til.radioactive)
+      return false;
+    
     int chance = explorabilityOf[til.biome] + (spreadRate>>3);
     
     if (homeBiome == til.biome) // civis spread fastest in their home biome
@@ -307,8 +310,6 @@ public class Civi {
     land.remove(t);
     if (t.owners.size() == 0)
       t.development = 0;
-    else if (t.equals(capital)) // announce when it loses its capital
-      System.out.println(t.owners.get(0)+" has captured "+capitalName()+". "+this+" has fallen.");
   }
   
   
@@ -340,13 +341,13 @@ public class Civi {
   public boolean hasDiscontent(boolean urban) { // if a rebellion shall start here
     if (scienceLevel < classical || deathTimer < 0) // the ancient age is too early to start a revolution, and the apocalypse is too late
       return false;
-    if (urban)  return randChance((warChance>>4) - (militaryLevel>>5) + (land.size()>>13) - (deathTimer>>13) - 140); // big old weak warmongers are more likely to have revolutions
-    else        return randChance((warChance>>4) - (militaryLevel>>5) + (land.size()>>13) - (deathTimer>>13) - 170); // urban areas are more likely to seed revolutions
+    if (urban)  return randChance((warChance>>4) - (militaryLevel>>5) + (land.size()>>13) - (deathTimer>>13) - 130); // big old weak warmongers are more likely to have revolutions
+    else        return randChance((warChance>>4) - (militaryLevel>>5) + (land.size()>>13) - (deathTimer>>13) - 160); // urban areas are more likely to seed revolutions
   }
   
   
   public boolean canNuke(Tile til) {
-    return scienceLevel >= modern && randChance((militaryLevel>>4) + (til.development>>3) - 100);
+    return scienceLevel >= modern && randChance((militaryLevel>>4) + (til.development>>3) - 140);
   }
   
   

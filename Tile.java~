@@ -13,6 +13,7 @@ public final class Tile { // keeps track of a single point on a globe
   public int development; // how settled it is
   public ArrayList<Civi> owners;
   public boolean isCapital; // if it is a capital city
+  public boolean radioactive;
   public int temp1; // to store various values only necessary during generation
   public int temp2;
   public int temp3;
@@ -101,6 +102,15 @@ public final class Tile { // keeps track of a single point on a globe
   
   public final int waterLevel() {
     return altitude+water;
+  }
+  
+  
+  public final void getNuked() { // causes this tile to be radiated and killed
+    radioactive = true;
+    development = 0;
+    for (Civi civ: owners)
+      civ.land.remove(this);
+    owners.clear();
   }
   
   

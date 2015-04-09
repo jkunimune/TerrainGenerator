@@ -105,7 +105,7 @@ public final class Tile { // keeps track of a single point on a globe
   }
   
   
-  public final void getNuked() { // causes this tile to be radiated and killed
+  public final void getsNuked() { // causes this tile to be radiated and killed
     radioactive = true;
     development = 0;
     for (Civi civ: owners)

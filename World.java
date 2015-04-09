@@ -89,6 +89,8 @@ public final class World extends Globe { // a subclass of Globe to handle all po
       
       else if (!civ.capital.owners.contains(civ)) { // if its capital has been captured
         final Civi winner = civ.capital.owners.get(0);
+        if (civ.adversaries.size() > 0) // if it has no adversaries, it was a coup d'etat
+          System.out.println(winner+" has captured "+civ.capitalName()+". "+civ+" has fallen.");
         give(civ, winner);
         delete(civ);
       }
@@ -344,10 +346,10 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   public final void nuke(Tile t) { // shoots a nuclear warhead at the specified Tile
     boom.play(); // BOOM
-    t.radioactive = true;
+    t.getsNuked();
     final ArrayList<Tile> adjacentList = adjacentTo(t);
     for (Tile adj: adjacentList) // spews radiation onto this and all surrounding tiles
-      adj.radioactive = true;
+      adj.getsNuked();
   }
   
   
