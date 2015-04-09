@@ -105,7 +105,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
     img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
     setPreferredSize(new Dimension(w, h));
     JFrame frame = new JFrame();
-    frame.addMouseListener(new GodInterface());
+    frame.addMouseListener(new GodInterface(this, glb));
     frame.add(this);
     frame.setResizable(false);
     frame.pack();
@@ -120,6 +120,28 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
     g.drawLine(x, y, x, y);
     g.dispose();
     //repaint();
+  }
+  
+  
+  public final String getTileTip(int x, int y) { // gets the "Tile Tip" for a given point on screen
+    if (lats[y][x] == -1)
+      return "Pretty Colors!";
+    
+    final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
+    String output = Tile.developmentNames[til.development]; // starts with the development level
+    
+    if (til.development == 0)
+      return output + Tile.biomeNames[til.biome]; // unclaimed land prints out the biome
+    
+    else if (til.owners.size() == 1) // owned land prints out the owner on a new line
+      return output + " owned by\n" + til.owners.get(0);
+    
+    else { // disputed land prints out all owners
+      output += " disputed by\n";
+      for (Civi owner: til.owners)
+        output += owner + ", ";
+      return output.substring(0, output.length()-2);
+    }
   }
   
   
