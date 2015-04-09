@@ -8,7 +8,7 @@ import java.util.*;
 
 
 public final class CiviHD { // the driver for my final project
-  static java.applet.AudioClip intro;
+  static java.applet.AudioClip intro; // songs for generation and CiviHD
   static java.applet.AudioClip music;
   
   static long startTime = 0; // the time it was when we last checked

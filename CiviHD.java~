@@ -10,7 +10,6 @@ import java.util.*;
 public final class CiviHD { // the driver for my final project
   static java.applet.AudioClip intro;
   static java.applet.AudioClip music;
-  static java.applet.AudioClip boom;
   
   static long startTime = 0; // the time it was when we last checked
   
@@ -22,9 +21,9 @@ public final class CiviHD { // the driver for my final project
     Planet protoEarth = new Planet(100);
     Map topographical = new Sinusoidal(protoEarth, 600, 600);
     
-    intro.loop();
-    generate(protoEarth, topographical);
-    intro.stop();
+    intro.play();
+    protoEarth.generate(topographical);
+    delay(3000);
     
     World earth = new World(protoEarth);
     Map political = new SimpleSinusoidal(earth, 600, 600);
@@ -45,58 +44,10 @@ public final class CiviHD { // the driver for my final project
     try {
       intro = java.applet.Applet.newAudioClip(new java.net.URL("file:Sound/babaYetu.wav"));
       music = java.applet.Applet.newAudioClip(new java.net.URL("file:Sound/terraNova.wav"));
-      boom = java.applet.Applet.newAudioClip(new java.net.URL("file:Sound/explosion.wav"));
     }
     catch (java.net.MalformedURLException error) {
       System.out.println(error);
     }
-  }
-  
-  
-  /* PRECONDITION: map's Globe is world */
-  public static final void generate(Planet world, Map map) { // randomly generates a map and simultaneously displays it
-    map.display(Map.altitude);
-    System.out.println("Generating landmasses...");
-      
-    world.spawnFirstContinent();
-    
-    int t = 0;
-    while (world.any(-257)) {
-      world.spawnContinents();
-      if (t%20 == 0)
-        map.display(Map.altitude);
-      t ++;
-    }
-    if (t%20 != 1)
-      map.display(Map.altitude);
-    
-    System.out.println("Shifting continents...");
-    world.plateTechtonics();
-    map.display(Map.altitude);
-    
-    System.out.println("Roughing up and smoothing down terrain...");
-    for (int i = 64; i >= 1; i >>= 2) { // gradually randomizes and smooths out terrain
-      for (int j = 0; j < i; j ++)
-        world.smooth(.4);
-      map.display(Map.altitude);
-      world.rough(i*1.1);
-      map.display(Map.altitude);
-    }
-    
-    System.out.println("Generating climate...");
-    world.acclimate(.1);
-    world.climateEnhance();
-    
-    System.out.println("Raining...");
-    world.rain();
-    world.runoff();
-    
-    System.out.println("Setting up biomes...");
-    world.biomeAssign();
-    map.display(Map.biome);
-    
-    System.out.println("Done!\n");
-    delay(3000);
   }
   
   
