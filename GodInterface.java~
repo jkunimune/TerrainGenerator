@@ -1,0 +1,3 @@
+public class GodInterface implements mouseListener {
+  public void mouseClicked(MouseEvent e) {
+}

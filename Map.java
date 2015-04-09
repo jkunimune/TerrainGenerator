@@ -105,6 +105,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
     img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
     setPreferredSize(new Dimension(w, h));
     JFrame frame = new JFrame();
+    frame.addMouseListener(new GodInterface());
     frame.add(this);
     frame.setResizable(false);
     frame.pack();
