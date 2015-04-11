@@ -1,0 +1,36 @@
+import java.awt.*;
+import java.awt.image.*;
+import javax.swing.*;
+
+
+
+public final class TileTip extends JPanel { // just writes words to the screen
+  private BufferedImage img;
+  
+  
+  
+  public TileTip(JFrame frame) {
+    img = new BufferedImage(500, 300, BufferedImage.TYPE_INT_ARGB_PRE);
+    img.getGraphics().setColor(Color.black);
+    frame.add(this);
+  }
+  
+  
+  
+  public final void drawTileTip(String tip, int x, int y) {
+    final Graphics g = img.getGraphics();
+    g.drawString(tip, x, y);
+    g.dispose();
+  }
+  
+  
+  @Override
+  public void paintComponent(Graphics g) {
+    g.drawImage(img, 0, 0, null);
+  }
+  
+  
+  public void show() {
+    repaint();
+  }
+}

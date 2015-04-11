@@ -5,6 +5,7 @@ import javax.swing.*;
 
 
 public class Map extends JPanel { // a class to manage the graphic elements of terrain generation
+  public Font monaco;
   public static final int biome = 0; // colorscheme codes
   public static final int altitude = 1;
   public static final int temperature = 2;
@@ -14,10 +15,10 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   public static final int waterLevel = 6;
   public static final int territory = 7;
   public static final int hybrid = 8;
-  final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(20, 70, 200), new Color(0,0,150),
+  public static final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(20, 70, 200), new Color(0,0,150),
     new Color(255,255,255), new Color(79,191,39), new Color(200,255,50), new Color(0,130,20), new Color(200,100,50), new Color(200,100,255),
     new Color(0,25,255), new Color(0,0,0)}; // colors of the biomes
-  final boolean[][][] key = { // contains information for how to draw different biomes
+  public static final boolean[][][] key = { // contains information for how to draw different biomes
     {
       {false, false, false, false, false},
       {false,  true, false,  true, false},
@@ -99,14 +100,16 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   
   public Map(Globe newWorld, int w, int h) {
+    monaco = new Font("Monaco", 0, 12);
     glb = newWorld;
     lats = new int[h][w];
     lons = new int[h][w];
-    img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
-    setPreferredSize(new Dimension(w, h));
     JFrame frame = new JFrame();
-    frame.addMouseListener(new GodInterface(this, glb));
+    img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
+    img.getGraphics().setFont(monaco);
+    setPreferredSize(new Dimension(w, h));
     frame.add(this);
+    frame.addMouseListener(new GodInterface(this, glb));
     frame.setResizable(false);
     frame.pack();
     frame.setVisible(true);
@@ -115,33 +118,38 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   
   public final void drawPx(int x, int y, Color z) { // draws a pixel to the buffered image
-    Graphics g = img.getGraphics();
+    final Graphics g = img.getGraphics();
     g.setColor(z);
     g.drawLine(x, y, x, y);
     g.dispose();
-    //repaint();
   }
   
   
-  public final String getTileTip(int x, int y) { // gets the "Tile Tip" for a given point on screen
-    if (lats[y][x] == -1)
-      return "Pretty Colors!";
+  public final void showTileTip(int x, int y) { // displays the "TileTip" for a point on the screen
+    if (lats[y][x] == -1) // if no tile here
+      return; // do nothing
     
-    final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
-    String output = Tile.developmentNames[til.development]; // starts with the development level
+    final String[] tip = glb.getTileByIndex(lats[y][x], lons[y][x]).getTip();
+    int left;
+    if (x < width()/2)  left = x; // left is the left side of the tip, which changes based on what side of the screen you are on
+    else                left = x - tip[0].length()*7;
     
-    if (til.development == 0)
-      return output + Tile.biomeNames[til.biome]; // unclaimed land prints out the biome
-    
-    else if (til.owners.size() == 1) // owned land prints out the owner on a new line
-      return output + " owned by\n" + til.owners.get(0);
-    
-    else { // disputed land prints out all owners
-      output += " disputed by\n";
-      for (Civi owner: til.owners)
-        output += owner + ", ";
-      return output.substring(0, output.length()-2);
+    for (int i = -3; i < tip[0].length()*7 + 3 && left+i < width(); i ++) { // draw a black rectangle around the wrods
+      for (int j = -3; j < tip.length*12 + 3 && y-j >= 0; j ++) {
+        drawPx(left+i, y-j, Color.black);
+        lats[y-j][left+i] = -1;
+      }
     }
+    
+    final Graphics g = img.getGraphics(); // draws the words in white 12 pt. Monaco
+    g.setColor(Color.white);
+    g.setFont(monaco);
+    for (int i = 0; i < tip.length; i ++)
+      g.drawString(tip[i], left, y+12*(i-tip.length+1));
+  }
+  
+  
+  public final void hideTileTip() {
   }
   
   

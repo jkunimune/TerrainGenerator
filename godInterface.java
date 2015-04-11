@@ -33,6 +33,6 @@ public final class GodInterface implements MouseListener {
   
   
   public final void mousePressed(MouseEvent e) {
-    System.out.println(display.getTileTip(e.getX(), e.getY()-23));
+    display.showTileTip(e.getX(), e.getY()-23); // clicking shows the a TileTip
   }
 }

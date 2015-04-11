@@ -31,8 +31,9 @@ public final class Tile { // keeps track of a single point on a globe
   public static final int snowcap = 10;
   public static final int freshwater = 11;
   public static final int space = 12;
-  public static final String[] biomeNames = {"magma","ocean","ice","reef","trench","tundra","plains",
-    "desert","jungle","mountain","snowcap","freshwater","space"};
+  public static final String[] biomeNames = {"magma","ocean","ice","coral reef","trench","tundra","plains","desert","jungle","mountains","snowy mountains",
+    "freshwater","space"};
+  public static final String[] developmentNames = {"Some unclaimed ", "Some untamed frontier", "Some settled regions", "A city", "A utopia", "An error"};
   
   
   
@@ -110,7 +111,7 @@ public final class Tile { // keeps track of a single point on a globe
     development = 0;
     for (Civi civ: owners)
       civ.land.remove(this);
-    owners.clear();
+    owners = new ArrayList<Civi>();
   }
   
   
