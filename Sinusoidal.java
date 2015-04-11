@@ -23,4 +23,19 @@ public final class Sinusoidal extends Map { // an equal-area projection that is 
     
     initialPaint();
   }
+  
+  
+  public final void replaceLat(int x, int y) {
+    if (Math.abs(x-width()/2.0) < Math.sin(Math.PI*y/height())*width()/2.0) { // if it is inside the sin curve
+      lats[y][x] = glb.latIndex(y*Math.PI/height());
+    }
+    
+    else if (Math.abs(x-width()/2.0) - 3 < Math.sin(Math.PI*(y+2)/(height()+4))*width()/2.0) { // if it is on the edge
+      return;
+    }
+    
+    else { // if it is outside the sine curve
+      lats[y][x] = glb.latIndex(y*Math.PI/height());
+    }
+  }
 }

@@ -20,5 +20,7 @@ public final class SimpleSinusoidal extends Map { // a projection that mimics si
         }
       }
     }
+    
+    initialPaint();
   }
 }

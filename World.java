@@ -193,7 +193,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void startRevolution(Tile start) { // causes Civis to simultaneously spawn inside an existing one and wage war on the parent Civi
-    if (start.owners.size() != 1 || start.isCapital) // revolutions cannot happen in unclaimed, disputed, or capital territory
+    if (start.owners.size() != 1 || start.isCapital || start.altitude < 0) // revolutions cannot happen in unclaimed, disputed, ocean, or capital territory
       return;
     
     if (start.owners.get(0).hasDiscontent(start.development >= 3)) { // if a rebellion is going to happen

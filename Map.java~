@@ -5,7 +5,6 @@ import javax.swing.*;
 
 
 public class Map extends JPanel { // a class to manage the graphic elements of terrain generation
-  //public static final Font monaco = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts()[465];
   public Font monaco;
   public static final int biome = 0; // colorscheme codes
   public static final int altitude = 1;
