@@ -14,5 +14,7 @@ public class Equirectangular extends Map { // a simple globe projection that is 
         }
       }
     }
+    
+    initialPaint();
   }
 }

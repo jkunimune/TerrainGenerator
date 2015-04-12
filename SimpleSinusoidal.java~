@@ -23,4 +23,11 @@ public final class SimpleSinusoidal extends Map { // a projection that mimics si
     
     initialPaint();
   }
+  
+  
+  public final void replaceLat(int x, int y) {
+    if (Math.abs(x-width()/2.0) < Math.sin(Math.PI*y/height())*width()/2.0) { // if it is inside the sin curve
+          lats[y][x] = glb.latIndex(y*Math.PI/height());
+    }
+  }
 }

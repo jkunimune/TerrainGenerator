@@ -17,4 +17,10 @@ public class Mercator extends Map { // a sphere projection designed to preserve 
     
     initialPaint();
   }
+  
+  
+  public final void replaceLat(int x, int y) {
+    if (!((x>>1<<1 == width()/10>>1<<1 || x>>1<<1 == width()*9/10>>1<<1) && y/7%2 == 0))
+      lats[y][x] = glb.latIndex(Math.PI/2 + Math.atan(((double)y-height()*5/8) / (width()/2/Math.PI)));
+  }
 }

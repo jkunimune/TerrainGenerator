@@ -17,4 +17,10 @@ public class Equirectangular extends Map { // a simple globe projection that is 
     
     initialPaint();
   }
+  
+  
+  public final void replaceLat(int x, int y) {
+    if (!((x>>1<<1 == width()/10>>1<<1 || x>>1<<1 == width()*9/10>>1<<1) && y/7%2 == 0))
+      lats[y][x] = glb.latIndex(x*height()/Math.PI);
+  }
 }

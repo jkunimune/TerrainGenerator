@@ -32,4 +32,12 @@ public class Hemispherical extends Map { // a realistic globe projection that sh
     
     initialPaint();
   }
+  
+  
+  public final void replaceLat(int x, int y) {
+    if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius)
+      lats[y][x] = glb.latIndex(Math.acos(1-(double)y/radius));
+    else if ((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < radius*radius)
+      lats[y][x] = glb.latIndex(Math.acos(1-(double)y/radius));
+  }
 }

@@ -92,15 +92,19 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
       {false, false, false, false, false},
       {false, false, false, false, false},},};
       
+  private int tipX, tipY, tipW, tipH; // TileTip coordinates and dimensions
   private BufferedImage img;
-  public int[][] lats; // remembers which tile goes to which pixels (remembr to initialize in subclass constructor)
-  public int[][] lons; // if a lat is -1, the lon is the rgb value of the color to put there
-  public Globe glb;
+  public int[][] lats, lons; // remembers which tile goes to which pixels (remembr to initialize in subclass constructor)
+  public Globe glb;          // if a lat is -1, the lon is the rgb value of the color to put there
   
   
   
   public Map(Globe newWorld, int w, int h) {
     monaco = new Font("Monaco", 0, 12);
+    tipX = -1;
+    tipY = -1;
+    tipW = -1;
+    tipH = -1;
     glb = newWorld;
     lats = new int[h][w];
     lons = new int[h][w];
@@ -130,26 +134,37 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
       return; // do nothing
     
     final String[] tip = glb.getTileByIndex(lats[y][x], lons[y][x]).getTip();
-    int left;
-    if (x < width()/2)  left = x; // left is the left side of the tip, which changes based on what side of the screen you are on
-    else                left = x - tip[0].length()*7;
     
-    for (int i = -3; i < tip[0].length()*7 + 3 && left+i < width(); i ++) { // draw a black rectangle around the wrods
-      for (int j = -3; j < tip.length*12 + 3 && y-j >= 0; j ++) {
-        drawPx(left+i, y-j, Color.black);
-        lats[y-j][left+i] = -1;
+    if (x < width()/2)  tipX = x; // left is the left side of the tip, which changes based on what side of the screen you are on
+    else                   tipX = x - tip[0].length()*7;
+    tipY = y;
+    tipW = tip[0].length()*7;
+    tipH = tip.length*12;
+    
+    for (int i = -3; i < tipW + 3 && tipX+i < width(); i ++) { // draw a black rectangle around the words
+      for (int j = -3; j < tipH + 3 && tipY-j >= 0; j ++) {
+        drawPx(tipX+i, tipY-j, Color.black);
+        lats[tipY-j][tipX+i] = -1;
       }
     }
     
     final Graphics g = img.getGraphics(); // draws the words in white 12 pt. Monaco
     g.setColor(Color.white);
     g.setFont(monaco);
-    for (int i = 0; i < tip.length; i ++)
-      g.drawString(tip[i], left, y+12*(i-tip.length+1));
+    for (int i = 0; i < tip.length; i ++) // writes each line
+      g.drawString(tip[i], tipX, tipY+12*(i-tip.length+1));
   }
   
   
   public final void hideTileTip() {
+    if (tipX == -1) // if there is no tile tip
+      return;
+    
+    for (int i = -3; i < tipW + 3 && tipX+i < width(); i ++) // draw a black rectangle around the words
+      for (int j = -3; j < tipH + 3 && tipY-j >= 0; j ++)
+        replaceLat(tipX+i, tipY-j);
+    
+    tipX = -1;
   }
   
   
@@ -168,6 +183,11 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
         if (lats[y][x] != -1)
           drawPx(x, y, getColorBy(colorScheme, x, y));
     show();
+  }
+  
+  
+  public void replaceLat(int x, int y) {
+    lats[y][x] = glb.latIndex(y*Math.PI/height());
   }
   
   

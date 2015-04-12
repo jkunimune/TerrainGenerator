@@ -86,7 +86,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
       for (Tile til: row)
         til.temp1 = 9001; // initializes temp1
     
-    this.getTile(Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI).startPlate(Math.random()<.6); // spawns a plate
+    this.getTile(Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI).startPlate(randChance(0)); // spawns a plate
   }
   
   
@@ -141,7 +141,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
                 totalChange += rise; // it forms a sea trench
               }
               else if (thisTil.altitude > thatTil.altitude) { // if this is above that one
-                totalChange -= rise*.77; // it forms an island chain
+                totalChange -= rise*.78; // it forms an island chain
               }
               else { // if they are going at the same speed
                 if (Math.random() < .5)  totalChange += rise/4.0; // it forms a random type thing
@@ -296,7 +296,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     
     for (Tile[] row: map) {
       for (Tile til: row) {
-        runoffFrom(til, til.rainfall*.004+.02); // fills rivers
+        runoffFrom(til, til.rainfall*.004+.05); // fills rivers
       }
     }
   }

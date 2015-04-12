@@ -14,31 +14,47 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   
   
   
-  public final void generate() {
+  /* PRECONDITION: map's Globe is world */
+  public final void generate(Map map) { // randomly generates a map and simultaneously displays it
+    map.display(Map.altitude);
     System.out.println("Generating landmasses...");
-    this.spawnFirstContinent();
-    while (this.any(-257))
-      this.spawnContinents();
+      
+    spawnFirstContinent();
+    
+    int t = 0;
+    while (any(-257)) {
+      spawnContinents();
+      if (t%20 == 0)
+        map.display(Map.altitude);
+      t ++;
+    }
+    if (t%20 != 1)
+      map.display(Map.altitude);
     
     System.out.println("Shifting continents...");
-    this.plateTechtonics();
+    plateTechtonics();
+    map.display(Map.altitude);
     
     System.out.println("Roughing up and smoothing down terrain...");
     for (int i = 64; i >= 1; i >>= 2) { // gradually randomizes and smooths out terrain
       for (int j = 0; j < i; j ++)
-        this.smooth(.4);
-      this.rough(i*1.1);
+        smooth(.4);
+      map.display(Map.altitude);
+      rough(i*1.1);
+      map.display(Map.altitude);
     }
+    
     System.out.println("Generating climate...");
-    this.acclimate(.1);
-    this.climateEnhance();
+    acclimate(.1);
+    climateEnhance();
     
     System.out.println("Raining...");
-    this.rain();
-    this.runoff();
+    rain();
+    runoff();
     
     System.out.println("Setting up biomes...");
-    this.biomeAssign();
+    biomeAssign();
+    map.display(Map.biome);
     
     System.out.println("Done!\n");
   }
