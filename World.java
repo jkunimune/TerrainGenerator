@@ -61,10 +61,10 @@ public final class World extends Globe { // a subclass of Globe to handle all po
         if (til.temp2 >= 0)
           civis.get(til.temp2).failsToDefend(til);
         
-        if (til.temp3 > 0)
+        if (til.temp3 > 0 && til.owners.size() == 1)
           til.development ++;
         
-        else if (til.temp3 < 0)
+        else if (til.temp3 < 0 && til.owners.size() == 1)
           til.owners.get(0).loseGraspOn(til);
       }
     }
@@ -199,6 +199,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     if (start.owners.get(0).hasDiscontent(start.development >= 3)) { // if a rebellion is going to happen
       final Civi empire = start.owners.get(0);
       Civi rebels = new Civi(start, civis, this, empire);
+      civis.add(rebels);
       
       for (int i = 0; i < 64; i ++) { // gives rebels a head start
         for (int j = 0; j < rebels.land.size(); j ++) {
@@ -338,8 +339,10 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   public final void give(Civi civ, Civi winner) {
     for (Tile t: civ.land) { // give all of its land to the victor
       t.owners.remove(civ);
-      if (!t.owners.contains(winner))
+      if (!t.owners.contains(winner)) {
+        winner.land.add(t);
         t.owners.add(winner);
+      }
     }
   }
   

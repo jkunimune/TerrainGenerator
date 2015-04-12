@@ -159,6 +159,7 @@ public class Civi {
     
     if (til.radioactive && (scienceLevel < space || randChance((scienceLevel>>11) - 100))) // radioactive tiles must be cleared by an advanced Civi
       return false;
+    til.radioactive = false;
     
     int chance = explorabilityOf[til.biome] + (spreadRate>>3);
     
@@ -402,7 +403,7 @@ public class Civi {
         t++;
       } while (Math.random() < .2);
       
-      switch ((int)(Math.pow(Math.random(),1.4)*4)) { // puts an ending onto it
+      switch ((int)(Math.pow(Math.random(),2.0)*4)) { // puts an ending onto it
         case 1:
           output += " City";
           break;
