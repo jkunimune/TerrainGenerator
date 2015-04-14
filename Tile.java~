@@ -33,7 +33,7 @@ public final class Tile { // keeps track of a single point on a globe
   public static final int space = 12;
   public static final String[] biomeNames = {"magma","ocean","ice","coral reef","trench","tundra","plains","desert","jungle","mountains","snowy mountains",
     "freshwater","space"};
-  public static final String[] developmentNames = {"Some unclaimed ", "Some untamed frontier", "Some settled regions", "A city", "A utopia", "An error"};
+  public static final String[] developmentNames = {"Some unclaimed ", "Some frontier", "Some settlement", "A city", "A utopia", "An error"};
   
   
   
@@ -112,6 +112,36 @@ public final class Tile { // keeps track of a single point on a globe
     for (Civi civ: owners)
       civ.land.remove(this);
     owners = new ArrayList<Civi>();
+  }
+  
+  
+  public final String[] getTip() { // returns the TileTip
+    String[] output = new String[owners.size() + 1];
+    output[0] = developmentNames[development]; // starts with the development level
+    
+    if (development == 0)
+      output[0] += biomeNames[biome]; // unclaimed land prints out the biome
+    
+    else if (owners.size() == 1) { // owned land prints out the owner on a new line
+      output[0] += " owned by";
+      output[1] = owners.get(0).toString();
+    }
+    
+    else { // disputed land prints out all owners
+      output[0] += " disputed by";
+      for (int i = 0; i < owners.size(); i ++)
+        output[i+1] = owners.get(i).toString();
+    }
+    
+    int maxLen = 0;
+    for (String line: output)
+      if (line.length() > maxLen) // figures out how long the longest line is
+        maxLen = line.length();
+    
+    while (output[0].length() < maxLen) // stacks spaces on the end of the first line to make it the longest
+      output[0] += " ";
+    
+    return output;
   }
   
   

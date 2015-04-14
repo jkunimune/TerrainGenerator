@@ -113,7 +113,8 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
     img.getGraphics().setFont(monaco);
     setPreferredSize(new Dimension(w, h));
     frame.add(this);
-    frame.addMouseListener(new GodInterface(this, glb));
+    if (newWorld.getClass().getName().equals("World"))
+      frame.addMouseListener(new GodInterface(this, (World)glb)); // only Worlds get interfaces
     frame.setResizable(false);
     frame.pack();
     frame.setVisible(true);
@@ -189,6 +190,11 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   
   public void replaceLat(int x, int y) {
     lats[y][x] = glb.latIndex(y*Math.PI/height());
+  }
+  
+  
+  public final Tile getTile(int x, int y) {
+    return glb.getTileByIndex(lats[y][x], lons[y][x]);
   }
   
   

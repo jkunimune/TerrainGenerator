@@ -5,11 +5,11 @@ import java.awt.event.MouseListener;
 
 public final class GodInterface implements MouseListener {
   Map display;
-  Globe world;
+  World world;
   
   
   
-  public GodInterface(Map newMap, Globe newGlobe) {
+  public GodInterface(Map newMap, World newGlobe) {
     display = newMap;
     world = newGlobe;
   }
@@ -17,6 +17,8 @@ public final class GodInterface implements MouseListener {
   
   
   public final void mouseClicked(MouseEvent e) {
+    if (e.getButton() == e.BUTTON3)
+      world.meteor(display.getTile(e.getX(), e.getY()-23));
   }
   
   
@@ -29,11 +31,13 @@ public final class GodInterface implements MouseListener {
   
   
   public final void mouseReleased(MouseEvent e) {
-    display.hideTileTip();
+    if (e.getButton() == e.BUTTON1)
+      display.hideTileTip();
   }
   
   
   public final void mousePressed(MouseEvent e) {
-    display.showTileTip(e.getX(), e.getY()-23); // clicking shows the a TileTip
+    if (e.getButton() == e.BUTTON1)
+      display.showTileTip(e.getX(), e.getY()-23); // left clicking shows the a TileTip
   }
 }

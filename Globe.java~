@@ -135,6 +135,11 @@ public class Globe { // a spherical surface
   }
   
   
+  public final int distance(Tile from, Tile to) { // calculates the distance between two tiles
+    return (new Vector(radius
+  }
+  
+  
   public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
     return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
   }

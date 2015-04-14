@@ -129,7 +129,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public final void showTileTip(int x, int y) { // displays the "TileTip" for a point on the screen
+  public void showTileTip(int x, int y) { // displays the "TileTip" for a point on the screen
     if (lats[y][x] == -1) // if no tile here
       return; // do nothing
     
@@ -163,6 +163,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
     for (int i = -3; i < tipW + 3 && tipX+i < width(); i ++) // draw a black rectangle around the words
       for (int j = -3; j < tipH + 3 && tipY-j >= 0; j ++)
         replaceLat(tipX+i, tipY-j);
+    initialPaint();
     
     tipX = -1;
   }

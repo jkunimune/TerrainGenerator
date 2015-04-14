@@ -29,6 +29,7 @@ public final class GodInterface implements MouseListener {
   
   
   public final void mouseReleased(MouseEvent e) {
+    display.hideTileTip();
   }
   
   
