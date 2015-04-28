@@ -4,7 +4,7 @@ import javax.swing.*;
 
 
 
-public class Map extends JPanel { // a class to manage the graphic elements of terrain generation
+public abstract class Map extends JPanel { // a class to manage the graphic elements of terrain generation
   public Font monaco;
   public static final int biome = 0; // colorscheme codes
   public static final int altitude = 1;
@@ -115,9 +115,7 @@ public class Map extends JPanel { // a class to manage the graphic elements of t
   }
   
   
-  public void replaceLat(int x, int y) {
-    lats[y][x] = glb.latIndex(y*Math.PI/height());
-  }
+  public abstract void replaceLat(int x, int y);
   
   
   public final Tile getTile(int x, int y) {
