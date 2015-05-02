@@ -20,8 +20,8 @@ public class Civi {
   public final int space = 98304;
   public final int prosperity = 114688;
   public final int apocalypse = 131072;
-  public final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -24, -40, -52, -60, -52, 0}; // how quickly civis spread over biomes
-  public final int[] fertilityOf =     {0, -56, -64, -52, -60, -40, -32, -44, -28, -40, -36, -28, 0}; // how quickly civis develop them
+  public final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -24, -40, -52, -60, -56, 0}; // how quickly civis spread over biomes
+  public final int[] fertilityOf =     {0, -60, -68, -56, -64, -44, -36, -48, -32, -44, -40, -36, 0}; // how quickly civis develop them
                                    // mag, ocn, ice, ref, tre, tun, pln, dst, jng, mtn, cap, wtr, SPAAAACE
   
   public int serialNo; // the civi's serial number (unique per game)
@@ -423,40 +423,65 @@ public class Civi {
   }
   
   
-  public int chooseColor(int intolerance, ArrayList<Civi> existing) { // chooses a new color for the Civi, but not too similar to any existing colorsddddddddd
-    int hue = (int)(Math.random()*1530+1);
+  public int chooseColor(int intolerance, ArrayList<Civi> existing) { // chooses a new color for the Civi, but not too similar to any existing colors
+    if (existing.isEmpty())  return (int)(Math.random()*1530+1);
     
-    for (Civi c: existing) {
-      if (Math.abs(hue-c.hueNumber()) < intolerance) {
-        hue = chooseColor(intolerance-1, existing); // makes sure the color is not too close to any existing ones
-        break;
+    int idealCo = -1; // idealCo is the hue that is farthest away from all existing ones
+    int maxDist = -1; // minDist is the distance from idealCo to the next color
+    
+    for (int hue = 1; hue <= 1530; hue ++) { // for every hue
+      int locDist = 1531; // locDist is the distance from this hue to the next color
+      
+      for (Civi civ: existing) { // calculates how close it is to the nearest color
+        if (hueDist(civ.hueNumber(), hue) < locDist)
+          locDist = hueDist(civ.hueNumber(), hue);
+      }
+      
+      if (locDist > maxDist) {
+        idealCo = hue;
+        maxDist = locDist;
       }
     }
     
-    return hue;
+    return idealCo;
   }
   
   
   public int chooseColor(int intolerance, ArrayList<Civi> existing, Civi enemy) { // like the one above, but the color may not be close to enemy's color
-    int hue = (int)(Math.random()*1530+1);
+    int idealCo = -1; // idealCo is the hue that is farthest away from all existing ones
+    int maxDist = -1; // minDist is the distance from idealCo to the next color
     
-    if (Math.abs(hue-enemy.hueNumber()) < 256)
-      hue = chooseColor(intolerance-1, existing, enemy); // makes sure the color is not too close to enemy
-    else {
-      for (Civi c: existing) {
-        if (Math.abs(hue-c.hueNumber()) < intolerance) {
-          hue = chooseColor(intolerance-1, existing, enemy); // makes sure the color is not too close to any existing ones
-          break;
-        }
+    for (int hue = 1; hue <= 1530; hue ++) { // for every hue
+      if (hueDist(enemy.hueNumber(), hue) < 256)  continue;
+      
+      int locDist = 1531; // locDist is the distance from this hue to the next color
+      
+      for (Civi civ: existing) { // calculates how close it is to the nearest color
+        if (hueDist(civ.hueNumber(), hue) < locDist)
+          locDist = hueDist(civ.hueNumber(), hue);
+      }
+      
+      if (locDist > maxDist) {
+        idealCo = hue;
+        maxDist = locDist;
       }
     }
     
-    return hue;
+    return idealCo;
+  }
+  
+  
+  public int hueDist(int one, int two) {
+    int dist = Math.abs(one-two);
+    if (dist <= 765)  return dist;
+    else              return 1530-dist;
   }
   
   
   public Color intToColor(int hue) { // converts hue to color
-    if (hue <= 255 && hue > 0)
+    if (hue <= 0)
+      System.out.println("Illegal hue number: "+hue);
+    else if (hue <= 255)
       return new Color(255, hue, 0); // orange
     else if (hue <= 510)
       return new Color(510-hue, 255, 0); // chartreuse
@@ -466,8 +491,11 @@ public class Civi {
       return new Color(0, 1020-hue, 255); // aquamarine
     else if (hue <= 1275)
       return new Color(hue-1020, 0, 255); // purple
-    else
+    else if (hue <= 1530)
       return new Color(255, 0, 1530-hue); // maroon
+    else
+      System.out.println("Illegal hue number: "+hue);
+    return Color.black;
   }
   
   
@@ -533,12 +561,10 @@ public class Civi {
   
   
   public String toString() { // names empire based on characteristics
-    if (spreadRate > scienceRate && spreadRate > militaryLevel && spreadRate > warChance) // if this Civi is known for is massive territory
+    if (spreadRate > scienceRate && spreadRate > warChance) // if this Civi is known for is massive territory
       return "The Great Empire of "+name;
-    else if (scienceRate > militaryLevel && scienceRate > warChance) // if this Civi is known for its technological prowess
+    else if (scienceRate > warChance) // if this Civi is known for its technological prowess
       return "The Glorious Empire of "+name;
-    else if (militaryLevel > warChance) // if this Civi is known for its powerful military
-      return "The Powerful Empire of "+name;
     else // if this Civi is a warmonger
       return "The Mighty Empire of "+name;
   }

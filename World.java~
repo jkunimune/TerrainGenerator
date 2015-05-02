@@ -5,6 +5,7 @@ import java.util.*;
 public final class World extends Globe { // a subclass of Globe to handle all political elements
   public ArrayList<Civi> civis;
   public java.applet.AudioClip boom;
+  public java.applet.AudioClip blast;
   
   
   
@@ -357,17 +358,21 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void meteor(Tile t) { // shoots a meteor of random size at the specified Tile
-    int size = 5 + Math.random()*45;
+    blast.play();
+    System.out.println("A meteor has struck!");
     
+    int size = 50 + (int)(Math.random()*50);
     for (Tile[] row: map)
       for (Tile til: row)
-        if (dist
+        if (distance(t, til) < size)
+          til.getsHitByMeteor();
   }
   
   
   public void loadSound() {
     try {
       boom = java.applet.Applet.newAudioClip(new java.net.URL("file:Sound/explosion.wav"));
+      blast = java.applet.Applet.newAudioClip(new java.net.URL("file:Sound/impact.wav"));
     }
     catch (java.net.MalformedURLException error) {
       System.out.println(error);

@@ -256,7 +256,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     if (agg.adversaries.contains(vic)) // if they are already at war
       return;
     
-    for (int i = 0; i < 64; i ++) { // calls a random region between the empires into dispute
+    for (int i = 0; i < 50; i ++) { // calls a random region between the empires into dispute
       for (int j = 0; j < agg.land.size(); j ++) {
         final Tile til = agg.land.get(j);
         for (Tile adj: adjacentTo(til))

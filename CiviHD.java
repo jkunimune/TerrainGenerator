@@ -26,7 +26,7 @@ public final class CiviHD { // the driver for my final project
     delay(3000);
     
     World earth = new World(protoEarth);
-    Map political = new SimpleSinusoidal(earth, 600, 600);
+    Map political = new Hemispherical(earth, 600, 600);
     
     music.loop();
     
