@@ -20,7 +20,7 @@ public class Civi {
   public final int space = 98304;
   public final int prosperity = 114688;
   public final int apocalypse = 131072;
-  public final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -28, -40, -52, -60, -56, 0}; // how quickly civis spread over biomes
+  public final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -28, -40, -52, -60, -76, 0}; // how quickly civis spread over biomes
   public final int[] fertilityOf =     {0, -60, -68, -56, -64, -44, -36, -48, -32, -44, -40, -36, 0}; // how quickly civis develop them
                                    // mag, ocn, ice, ref, tre, tun, pln, des, jng, mtn, cap, wtr, SPAAAACE
   

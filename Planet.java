@@ -99,9 +99,9 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
             if (ref.altitude >= -256 && randChance(-50 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
             tile.spreadFrom(ref);
           
-          if (tile.altitude == -257 && randChance(-144)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
+          if (tile.altitude == -257 && randChance(-146)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
             tile.startPlate(false); // seeds new plates occasionally
-          else if (tile.altitude == -257 && randChance(-135))
+          else if (tile.altitude == -257 && randChance(-133))
             tile.startPlate(true);
         }
       }
@@ -128,9 +128,6 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
           
           final Vector r1 = new Vector(1, thisTil.lat*Math.PI/map.length, thisTil.lon*2*Math.PI/map[thisTil.lat].length);
           final Vector r2 = new Vector(1, thatTil.lat*Math.PI/map.length, thatTil.lon*2*Math.PI/map[thatTil.lat].length);
-          /*final double arcLength = r1.angleTo(r2)*getRadius(); // the distance between them
-          if (arcLength > 1)
-            continue;*/
           
           Vector delTheta = r1.cross(r2);
           delTheta.setR(1.0);
@@ -139,7 +136,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
           Vector omega2 = new Vector(1, thatTil.temp2/128.0, thatTil.temp3/128.0);
           Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
           
-          double rise = 40.0*delOmega.dot(delTheta)/*/Math.pow(delTheta.getR(),3)*/;
+          double rise = 40.0*delOmega.dot(delTheta);
           
           if (thisTil.altitude < 0) { // if this is ocean
             if (rise < 0) { // if they are going towards each other
@@ -164,7 +161,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
               totalChange -= rise; // it forms a mountain range
             }
             else { // if they are going away from each other
-              totalChange -= rise/4; // it forms a valley
+              totalChange -= rise/2; // it forms a valley
             }
           }
         }
@@ -294,15 +291,16 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   
   
   public void runoff() {
-    for (Tile[] row: map)
-    for (Tile til: row)
-      til.temp3 = 0;
-    
     for (Tile[] row: map) {
       for (Tile til: row) {
-        runoffFrom(til, til.rainfall*.004+.05); // fills rivers
+        til.temp3 = 0;
+        til.water <<= 5;
       }
     }
+    
+    for (Tile[] row: map)
+      for (Tile til: row)
+        runoffFrom(til, 1); // fills rivers
   }
   
   
@@ -316,10 +314,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   
   /* PRECONDITION: all Tiles in lake are at the same height (altitude+water) */
   public void fillLake(ArrayList<Tile> lake) {
-    //System.out.println("\nFilling a lake which starts at "+lake);
     int height = lake.get(0).waterLevel();
-    //System.out.println("The height is "+height);
-    //System.out.println("To be sure, the height of the next one is "+lake.get((int)(Math.random()*lake.size())).waterLevel());
     ArrayList<Tile> shore = new ArrayList<Tile>();
     for (Tile til: lake) // defines the shore as all tiles adjacent to and not in the lake
     for (Tile adj: adjacentTo(til))
@@ -349,6 +344,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
         for (Tile til: lake) { // for every tile in the lake
           if (til.temp1 == -1) { // if it does not have its runoff point set
             tilesNeedRouting = true;
+            if (randChance(20))  continue; // this line makes the rivers more random
             final List<Tile> adjacentList = adjacentTo(til);
             for (Tile adj: adjacentList) { // look at all the adjacent tiles IN THE LAKE
               if (lake.contains(adj)) {
@@ -382,7 +378,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   }
   
   
-  public void runoffFrom(Tile start, double amount) {
+  public void runoffFrom(Tile start, int amount) {
     if (start.altitude < 0) // do not bother with ocean
       return;
     
@@ -437,7 +433,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
           if (til.temperature + 8*Math.sin(til.rainfall) < 100) { // if cold
             til.biome = Tile.ice;
           }
-          else if (til.altitude < -64) { // if super deep
+          else if (til.altitude < -100) { // if super deep
             til.biome = Tile.trench;
           }
           else if (til.temperature < 235) { // if warm
@@ -447,7 +443,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
             til.biome = Tile.reef;
           }
         }
-        else if (til.water > 16) { // if has freshwater on it
+        else if (til.water > 470) { // if has freshwater on it
           til.biome = Tile.freshwater;
         }
         else if (til.altitude < 64) { // if low altitude

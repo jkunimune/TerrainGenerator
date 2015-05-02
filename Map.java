@@ -17,7 +17,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   public static final int hybrid = 8;
   public static final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(20, 70, 200), new Color(0,0,150),
     new Color(255,255,255), new Color(79,191,39), new Color(200,255,50), new Color(0,130,20), new Color(200,100,50), new Color(200,100,255),
-    new Color(0,25,255), new Color(0,0,0)}; // colors of the biomes
+    new Color(10,33,255), new Color(0,0,0)}; // colors of the biomes
       
   private int tipX, tipY, tipW, tipH; // TileTip coordinates and dimensions
   private BufferedImage img;
@@ -230,7 +230,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
     
     if (til.development == 0) {
-      if (til.altitude < 0) // unsettled ocean is black
+      if (til.isWet()) // unsettled water is black
         return Color.black;
       else
         return Color.white; // unclaimed land is white
@@ -240,7 +240,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
       
       switch (til.development) {
         case 1: // territory
-          if (til.altitude < 0)
+          if (til.isWet())
           return Color.black;
           
           for (int i = -3; i <= 3; i ++)
@@ -249,7 +249,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
                 if (i*i + j*j <= 9) // if in circle
                   if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
                     if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) ||
-                        glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) // if it is near a tile owned by someone else or near ocean
+                        glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).isWet()) // if it is near a tile owned by someone else or near ocean
                       return civ.emblem();
           
           return Color.white;

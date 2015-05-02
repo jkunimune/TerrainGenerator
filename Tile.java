@@ -125,6 +125,11 @@ public final class Tile { // keeps track of a single point on a globe
   }
   
   
+  public final boolean isWet() { // is it a water biome?
+    return biome==ocean || biome==ice || biome==trench || biome==reef || biome==freshwater;
+  }
+  
+  
   public final String[] getTip() { // returns the TileTip
     String[] output = new String[owners.size() + 1];
     output[0] = developmentNames[development]; // starts with the development level
