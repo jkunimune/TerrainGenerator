@@ -86,7 +86,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
       for (Tile til: row)
         til.temp1 = 9001; // initializes temp1
     
-    this.getTile(Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI).startPlate(randChance(0)); // spawns a plate
+    this.getTile(Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI).startPlate(randChance(10)); // spawns a plate
   }
   
   
@@ -99,9 +99,9 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
             if (ref.altitude >= -256 && randChance(-50 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
             tile.spreadFrom(ref);
           
-          if (tile.altitude == -257 && randChance(-139)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
+          if (tile.altitude == -257 && randChance(-144)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
             tile.startPlate(false); // seeds new plates occasionally
-          else if (tile.altitude == -257 && randChance(-139))
+          else if (tile.altitude == -257 && randChance(-135))
             tile.startPlate(true);
         }
       }
@@ -119,21 +119,27 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
       for (Tile thisTil: row) {
         thisTil.temp1 = thisTil.altitude;
         double totalChange = 0; // keeps track of how much to change the altitude
-        ArrayList<Tile> adj = adjacentTo(thisTil);
-        for (Tile thatTil: adj) {
+        final List<Tile> adjacentList = adjacentTo(thisTil);
+        for (Tile adj: adjacentList) {
+        final List<Tile> nearbyList = adjacentTo(adj);
+        for (Tile thatTil: nearbyList) {
           if (thisTil.temp2 == thatTil.temp2 && thisTil.temp3 == thatTil.temp3) // if they are on the same plate
             continue; // skip this pair
           
           final Vector r1 = new Vector(1, thisTil.lat*Math.PI/map.length, thisTil.lon*2*Math.PI/map[thisTil.lat].length);
           final Vector r2 = new Vector(1, thatTil.lat*Math.PI/map.length, thatTil.lon*2*Math.PI/map[thatTil.lat].length);
+          /*final double arcLength = r1.angleTo(r2)*getRadius(); // the distance between them
+          if (arcLength > 1)
+            continue;*/
+          
           Vector delTheta = r1.cross(r2);
-          delTheta.setR(r1.angleTo(r2)*getRadius()); // the distance between them
+          delTheta.setR(1.0);
           
           Vector omega1 = new Vector(1, thisTil.temp2/128.0, thisTil.temp3/128.0);
           Vector omega2 = new Vector(1, thatTil.temp2/128.0, thatTil.temp3/128.0);
           Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
           
-          double rise = 2000.0*delOmega.dot(delTheta)/Math.pow(delTheta.getR(),3);
+          double rise = 40.0*delOmega.dot(delTheta)/*/Math.pow(delTheta.getR(),3)*/;
           
           if (thisTil.altitude < 0) { // if this is ocean
             if (rise < 0) { // if they are going towards each other
@@ -141,11 +147,11 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
                 totalChange += rise; // it forms a sea trench
               }
               else if (thisTil.altitude > thatTil.altitude) { // if this is above that one
-                totalChange -= rise*.78; // it forms an island chain
+                totalChange -= rise*.74; // it forms an island chain
               }
-              else { // if they are going at the same speed
-                if (Math.random() < .5)  totalChange += rise/4.0; // it forms a random type thing
-                else                     totalChange -= rise/4.0;
+              else { // if they are going at the same altitude
+                if (Math.random() < .5)  totalChange += rise/2.0; // it forms a random type thing
+                else                     totalChange -= rise/2.0;
                 
               }
             }
@@ -163,6 +169,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
           }
         }
         thisTil.temp1 += totalChange;
+      }
       }
     }
     
@@ -410,7 +417,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
           if (til.temperature + 8*Math.sin(til.rainfall) < 100) { // if cold
             til.biome = Tile.ice;
           }
-          else if (til.altitude < -100) { // if super deep
+          else if (til.altitude < -64) { // if super deep
             til.biome = Tile.trench;
           }
           else if (til.temperature < 234) { // if warm

@@ -147,7 +147,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
                 totalChange += rise; // it forms a sea trench
               }
               else if (thisTil.altitude > thatTil.altitude) { // if this is above that one
-                totalChange -= rise*.74; // it forms an island chain
+                totalChange -= rise*.73; // it forms an island chain
               }
               else { // if they are going at the same altitude
                 if (Math.random() < .5)  totalChange += rise/2.0; // it forms a random type thing
@@ -420,7 +420,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
           else if (til.altitude < -64) { // if super deep
             til.biome = Tile.trench;
           }
-          else if (til.temperature < 234) { // if warm
+          else if (til.temperature < 235) { // if warm
             til.biome = Tile.ocean;
           }
           else { // if hot
