@@ -59,9 +59,7 @@ public class Civi {
     land = new ArrayList<Tile>(1);
     land.add(start);
     homeBiome = start.biome;
-    
-    int hueNo = chooseColor(256, existing); // pick color
-    emblem = intToColor(hueNo);
+    emblem = chooseColor(256, existing);// pick color
     
     spreadRate = (int)(Math.random()*256); // randomize stats
     scienceRate = (int)(Math.random()*256);
@@ -92,9 +90,7 @@ public class Civi {
     land = new ArrayList<Tile>(1);
     land.add(start);
     homeBiome = start.biome;
-    
-    int hueNo = chooseColor(256, existing, motherland); // pick color
-    emblem = intToColor(hueNo);
+    emblem = chooseColor(256, existing, motherland); // pick color
     
     spreadRate = (int)(Math.random()*256); // randomize stats
     scienceRate = (int)(Math.random()*256);
@@ -423,75 +419,67 @@ public class Civi {
   }
   
   
-  public int chooseColor(int intolerance, ArrayList<Civi> existing) { // chooses a new color for the Civi, but not too similar to any existing colorsddddddddd
-    int hue = (int)(Math.random()*1530+1);
+  public Color chooseColor(int intolerance, ArrayList<Civi> existing) { // chooses a new color for the Civi, but not too similar to any existing colorsddddddddd
+    Color col = randColor();
     
     for (Civi c: existing) {
-      if (Math.abs(hue-c.hueNumber()) < intolerance) {
-        hue = chooseColor(intolerance-1, existing); // makes sure the color is not too close to any existing ones
+      if (colorDist(col, c.emblem()) < intolerance) {
+        col = chooseColor(intolerance-1, existing); // makes sure the color is not too close to any existing ones
         break;
       }
     }
     
-    return hue;
+    return col;
   }
   
   
-  public int chooseColor(int intolerance, ArrayList<Civi> existing, Civi enemy) { // like the one above, but the color may not be close to enemy's color
-    int hue = (int)(Math.random()*1530+1);
+  public Color chooseColor(int intolerance, ArrayList<Civi> existing, Civi enemy) { // like the one above, but the color may not be close to enemy's color
+    Color col = randColor();
     
-    if (Math.abs(hue-enemy.hueNumber()) < 256)
-      hue = chooseColor(intolerance-1, existing, enemy); // makes sure the color is not too close to enemy
+    if (colorDist(col, enemy.emblem()) < 256)
+      col = chooseColor(intolerance-1, existing, enemy); // makes sure the color is not too close to enemy
     else {
       for (Civi c: existing) {
-        if (Math.abs(hue-c.hueNumber()) < intolerance) {
-          hue = chooseColor(intolerance-1, existing, enemy); // makes sure the color is not too close to any existing ones
+        if (colorDist(col, c.emblem()) < intolerance) {
+          col = chooseColor(intolerance-1, existing, enemy); // makes sure the color is not too close to any existing ones
           break;
         }
       }
     }
     
-    return hue;
+    return col;
   }
   
   
-  public Color intToColor(int hue) { // converts hue to color
-    if (hue <= 255 && hue > 0)
-      return new Color(255, hue, 0); // orange
+  private static final Color randColor() { // converts hue to color
+    final double brightness = 1-Math.random()/5;
+    final double saturation = 1-Math.random()/3;
+    final int hue = (int)(Math.random()*1530+1);
+    Color output;
+    
+    if (hue <= 255)
+      output = new Color(255, hue, 0); // orange
     else if (hue <= 510)
-      return new Color(510-hue, 255, 0); // chartreuse
+      output = new Color(510-hue, 255, 0); // chartreuse
     else if (hue <= 765)
-      return new Color(0, 255, hue-510); // teal
+      output = new Color(0, 255, hue-510); // teal
     else if (hue <= 1020)
-      return new Color(0, 1020-hue, 255); // aquamarine
+      output = new Color(0, 1020-hue, 255); // aquamarine
     else if (hue <= 1275)
-      return new Color(hue-1020, 0, 255); // purple
+      output = new Color(hue-1020, 0, 255); // purple
     else
-      return new Color(255, 0, 1530-hue); // maroon
+      output = new Color(255, 0, 1530-hue); // maroon
+    
+    return new Color((int)(brightness*(255 - saturation*(255 - output.getRed()))),
+                     (int)(brightness*(255 - saturation*(255 - output.getGreen()))),
+                     (int)(brightness*(255 - saturation*(255 - output.getBlue()))));
   }
   
   
-  public int hueNumber() {
-    if (emblem.getRed() == 255 && emblem.getGreen() <= 255 && emblem.getGreen() > 0) // orange
-      return emblem.getGreen();
-    
-    else if (emblem.getRed() < 255 && emblem.getGreen() == 255) // chartreuse
-      return 510-emblem.getRed();
-    
-    else if (emblem.getGreen() == 255 && emblem.getBlue() <= 255) // teal
-      return 510+emblem.getBlue();
-    
-    else if (emblem.getGreen() < 255 && emblem.getBlue() == 255) // aquamarine
-      return 1020-emblem.getGreen();
-    
-    else if (emblem.getBlue() == 255 && emblem.getRed() <= 255) // purple
-      return 1020+emblem.getRed();
-    
-    else if (emblem.getBlue() < 255 && emblem.getRed() == 255) // maroon
-      return 1530-emblem.getBlue();
-    
-    else
-      return -1;
+  private static final int colorDist(Color one, Color two) {
+    return (int)Math.sqrt(Math.pow((one.getRed() - two.getRed()), 2) + 
+                          Math.pow((one.getGreen() - two.getGreen()), 2) + 
+                          Math.pow((one.getBlue() - two.getBlue()), 2));
   }
   
   

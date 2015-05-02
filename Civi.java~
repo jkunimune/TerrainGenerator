@@ -157,7 +157,7 @@ public class Civi {
     if (til.altitude < 0 && scienceLevel < iron) // civis may not claim ocean prior to the iron age
       return false;
     
-    if (til.radioactive && (scienceLevel < space || randChance((scienceLevel>>11) - 100))) // radioactive tiles must be cleared by an advanced Civi
+    if (til.radioactive && (scienceLevel < space || randChance((scienceLevel>>11) - 70))) // radioactive tiles must be cleared by an advanced Civi
       return false;
     til.radioactive = false;
     
