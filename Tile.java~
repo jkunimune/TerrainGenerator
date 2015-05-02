@@ -111,7 +111,17 @@ public final class Tile { // keeps track of a single point on a globe
     development = 0;
     for (Civi civ: owners)
       civ.land.remove(this);
-    owners = new ArrayList<Civi>();
+    owners.clear();
+  }
+  
+  
+  public final void getsHitByMeteor() { // causes this tile to be partially destroyed
+    if (development < 4) {
+      development = 0;
+      owners.clear();
+      for (Civi civ: owners)
+        civ.land.remove(this);
+    }
   }
   
   
