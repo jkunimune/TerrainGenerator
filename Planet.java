@@ -265,12 +265,9 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
           Tile lowest = destinations.get(0); // lowest tile to which water can flow
           
           for (Tile adj: destinations) {
-            if (adj.altitude < 0 || adj.altitude+adj.water < lowest.altitude+lowest.water) { // if this is the new lowest
+            if (adj.altitude < 0 || adj.waterLevel() < lowest.waterLevel()) { // if this is the new lowest
               lowest = adj;
             }
-//            else if (adj.altitude+adj.water == lowest.altitude+lowest.water && randChance(0)) { // if it is equal to the lowest
-//              lowest = adj; // throw in a random element
-//            }
           }
           
           if (lowest.waterLevel() < til.waterLevel()) { // if water can flow
@@ -285,7 +282,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
             }
           }
           else { // if water can't flow
-            til.water = lowest.altitude+lowest.water - til.altitude;
+            til.water = lowest.waterLevel() - til.altitude;
             fillLake(til, lowest); // fill in the area so it can
             r = 0; // start over
             c = 0;
@@ -327,23 +324,46 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     for (Tile til: lake) // defines the shore as all tiles adjacent to and not in the lake
     for (Tile adj: adjacentTo(til))
       if (!lake.contains(adj) && !shore.contains(adj))
-      shore.add(adj);
-    //System.out.println("The shore is "+shore);
+        shore.add(adj);
     
     Tile low = shore.get(0);
     for (Tile til: shore)
-      if (til.altitude+til.water < low.altitude+low.water) // cycles through shore to find lowest point
-      low = til;
+      if (til.waterLevel() < low.waterLevel()) // cycles through shore to find lowest point
+        low = til;
     
-    //System.out.println("The lowest point on the shore is at "+low.waterLevel());
     if (low.waterLevel() < height || low.altitude < 0) { // if it is an outlet or the ocean
-      for (Tile til: lake) {
-        til.temp1 = low.lat; // sets path from lake to outlet
-        til.temp2 = low.lon;
-        map[til.lat][til.lon].temp1 = low.lat; // accounts for some bug in my OO skills
-        map[til.lat][til.lon].temp2 = low.lon;
+      for (Tile til: lake)
+        til.temp1 = -1;
+      
+      final List<Tile> drainage = adjacentTo(low);
+      for (Tile til: drainage) {
+        if (lake.contains(til)) { // set all the paths in the lake to lead back to low
+          til.temp1 = low.lat;
+          til.temp2 = low.lon;
+        }
       }
-      return;
+      
+      boolean tilesNeedRouting;
+      do {
+        tilesNeedRouting = false;
+        for (Tile til: lake) { // for every tile in the lake
+          if (til.temp1 == -1) { // if it does not have its runoff point set
+            tilesNeedRouting = true;
+            final List<Tile> adjacentList = adjacentTo(til);
+            for (Tile adj: adjacentList) { // look at all the adjacent tiles IN THE LAKE
+              if (lake.contains(adj)) {
+                if (adj.temp1 != -1) { // if any of them do have their runoff point set
+                  til.temp1 = adj.lat; // this point runs off to that adjacent tile
+                  til.temp2 = adj.lon;
+                  break;
+                }
+              }
+            }
+          }
+        }
+      } while (tilesNeedRouting); // repeat until all the tiles in the lake have their runoff points set
+      
+      return; // this lake is done
     }
     if (low.altitude+low.water > height) { // if the lowest is above this lake
       //System.out.println("Raising the lake level to "+low.waterLevel()+" to match "+low);
