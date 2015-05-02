@@ -521,12 +521,10 @@ public class Civi {
   
   
   public String toString() { // names empire based on characteristics
-    if (spreadRate > scienceRate && spreadRate > militaryLevel && spreadRate > warChance) // if this Civi is known for is massive territory
+    if (spreadRate > scienceRate && spreadRate > warChance) // if this Civi is known for is massive territory
       return "The Great Empire of "+name;
-    else if (scienceRate > militaryLevel && scienceRate > warChance) // if this Civi is known for its technological prowess
+    else if (scienceRate > warChance) // if this Civi is known for its technological prowess
       return "The Glorious Empire of "+name;
-    else if (militaryLevel > warChance) // if this Civi is known for its powerful military
-      return "The Powerful Empire of "+name;
     else // if this Civi is a warmonger
       return "The Mighty Empire of "+name;
   }

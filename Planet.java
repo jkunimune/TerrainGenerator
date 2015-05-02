@@ -44,13 +44,15 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
       map.display(Map.altitude);
     }
     
-    System.out.println("Generating climate...");
-    acclimate(.1);
-    climateEnhance();
-    
     System.out.println("Raining...");
     rain();
     runoff();
+    for (int i = 0; i < 50; i ++)
+    map.display(Map.altitude);
+    
+    System.out.println("Generating climate...");
+    acclimate(.1);
+    climateEnhance();
     
     System.out.println("Setting up biomes...");
     biomeAssign();
@@ -99,7 +101,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
             if (ref.altitude >= -256 && randChance(-50 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
             tile.spreadFrom(ref);
           
-          if (tile.altitude == -257 && randChance(-146)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
+          if (tile.altitude == -257 && randChance(-145)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
             tile.startPlate(false); // seeds new plates occasionally
           else if (tile.altitude == -257 && randChance(-133))
             tile.startPlate(true);
@@ -233,8 +235,9 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
       return 0;
     
     int here;
-    if (til.altitude < 0)  here = (int)Math.sqrt(dist)>>1; // if this is an ocean, draw moisture from it
-    else if (til.altitude < 64) here = (int)Math.sqrt(dist)>>3; // if not, draw a little bit of moisture from it
+    if (til.altitude < 0)        here = (int)Math.sqrt(dist)>>1; // if this is an ocean, draw moisture from it
+    else if (til.water > 450)    here = (int)Math.sqrt(dist)>>1; // if this is a river, draw less moisture from it
+    else if (til.altitude < 64)  here = (int)Math.sqrt(dist)>>3; // if low altitude, draw a little bit of moisture from it
     else here = 0; // if it is a mountain, no moisture
     
     final Tile next = map[til.lat][(til.lon+dir+map[til.lat].length)%map[til.lat].length];
@@ -295,16 +298,21 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
       for (Tile til: row) {
         til.temp3 = 0;
         til.water <<= 5;
+        til.altitude += til.water>>7; // accounts for erosion later on
       }
     }
     
     for (Tile[] row: map)
       for (Tile til: row)
-        runoffFrom(til, 1); // fills rivers
+        runoffFrom(til); // fills rivers
+    
+    for (Tile[] row: map)
+      for (Tile til: row)
+        til.altitude -= til.water>>7; // erodes
   }
   
   
-  public void fillLake(Tile seed, Tile adj) {
+  private void fillLake(Tile seed, Tile adj) {
     ArrayList<Tile> lake = new ArrayList<Tile>();
     lake.add(seed);
     lake.add(adj);
@@ -313,7 +321,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   
   
   /* PRECONDITION: all Tiles in lake are at the same height (altitude+water) */
-  public void fillLake(ArrayList<Tile> lake) {
+  private void fillLake(ArrayList<Tile> lake) {
     int height = lake.get(0).waterLevel();
     ArrayList<Tile> shore = new ArrayList<Tile>();
     for (Tile til: lake) // defines the shore as all tiles adjacent to and not in the lake
@@ -378,17 +386,17 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   }
   
   
-  public void runoffFrom(Tile start, int amount) {
+  private void runoffFrom(Tile start) {
     if (start.altitude < 0) // do not bother with ocean
       return;
     
-    start.water += amount;
+    start.water += 1;
     start.temp3 = 1; // indicate start is checked
     
     if (start.temp1 < 0) // if temp1 is not set
       System.out.println("Warning: a river flowed into the void"); // throw error message
     else if (map[start.temp1][start.temp2].temp3 == 0) // if the next one is not checked
-      runoffFrom(map[start.temp1][start.temp2], amount);
+      runoffFrom(map[start.temp1][start.temp2]);
     else  System.out.println("JOOWEE! JOOWEE! Rivers are flowing into themselves! FillLake() is not doing its job!");
     
     start.temp3 = 0;
@@ -443,7 +451,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
             til.biome = Tile.reef;
           }
         }
-        else if (til.water > 470) { // if has freshwater on it
+        else if (til.water > 480) { // if has freshwater on it
           til.biome = Tile.freshwater;
         }
         else if (til.altitude < 64) { // if low altitude
