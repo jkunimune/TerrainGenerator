@@ -116,7 +116,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     }
     
     if (til.development == 0 && settlersLike(til)) // spawns new civis
-      civis.add(new Civi(til, civis, this));
+      spawnCivi(til);
   }
   
   
@@ -199,7 +199,13 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     
     if (start.owners.get(0).hasDiscontent(start.development >= 3)) { // if a rebellion is going to happen
       final Civi empire = start.owners.get(0);
-      Civi rebels = new Civi(start, civis, this, empire);
+      Civi rebels;
+      
+      if (empire.sciLevel() >= Civi.space && !empire.getClass().getName().equals("Robots") && randChance(0)) // advanced human Civilizations sometimes have robot rebellions
+        rebels = new Robots(start, civis, this, empire);
+      else
+        rebels = new Civi(start, civis, this, empire); // but revolutions are usually normal
+      
       civis.add(rebels);
       
       for (int i = 0; i < 64; i ++) { // gives rebels a head start
@@ -249,6 +255,11 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void naturallyDisast(Tile til) { // causes natural disasters
+  }
+  
+  
+  public final void spawnCivi(Tile til) {
+    civis.add(new Civi(til, civis, this));
   }
   
   

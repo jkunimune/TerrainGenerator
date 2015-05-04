@@ -1,0 +1,24 @@
+public class Robots extends Civi {
+  private String name; // it must have control over all private Civi variables
+  private String capName;
+  private Color emblem;
+  private int homeBiome;
+  private int spreadRate;
+  private int scienceRate;
+  private int scienceLevel;
+  private int militaryLevel;
+  private int warChance;
+  private int deathTimer;
+  private boolean apocalypseBefore;
+  
+  
+  
+  public Robots(Tile start, ArrayList<Civi> existing, World wholeNewWorld) {
+    super(Tile start, ArrayList<Civi> existing, World wholeNewWorld);
+  }
+  
+  
+  public Robots(Tile start, ArrayList<Civi> existing, World wholeNewWorld, Civi motherland) {
+    super(Tile start, ArrayList<Civi> existing, World wholeNewWorld, Civi motherland);
+  }
+}

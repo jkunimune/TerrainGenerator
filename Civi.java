@@ -12,17 +12,17 @@ public class Civi {
     "G", "G", "G", "Gh", "Gr", "H", "H", "H", "J", "J", "J", "K", "K", "K", "K", "K", "Kh", "Kl", "Ky", "Ks", "L", "L", "L", "L", "Ll", "Lh", "Z", "Z",
     "Z", "Z", "Zh", "X", "C", "Ch", "Cl", "Cr","Cz", "V", "V", "Vr", "B", "B", "B", "B", "Br", "Bl", "Bs", "N", "N", "N", "N", "N", "Nr", "Nt", "Nst",
     "Nstr", "Ng", "Nj", "Nh", "M", "M", "M", "M", "M", "Mr", "'"};
-  public final int classical = 16384; // science values of the different ages
-  public final int iron = 32768;
-  public final int imperialist = 49152;
-  public final int industrial = 65536;
-  public final int modern = 81920;
-  public final int space = 98304;
-  public final int prosperity = 114688;
-  public final int apocalypse = 131072;
-  public final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -28, -40, -52, -60, -76, 0}; // how quickly civis spread over biomes
-  public final int[] fertilityOf =     {0, -60, -68, -56, -64, -44, -36, -48, -32, -44, -40, -36, 0}; // how quickly civis develop them
-                                   // mag, ocn, ice, ref, tre, tun, pln, des, jng, mtn, cap, wtr, SPAAAACE
+  public static final int classical = 16384; // science values of the different ages
+  public static final int iron = 32768;
+  public static final int imperialist = 49152;
+  public static final int industrial = 65536;
+  public static final int modern = 81920;
+  public static final int space = 98304;
+  public static final int prosperity = 114688;
+  public static final int apocalypse = 131072;
+  public static final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -32, -40, -52, -60, -76, 0}; // how quickly civis spread over biomes
+  public static final int[] fertilityOf =     {0, -60, -68, -56, -64, -44, -36, -48, -36, -44, -40, -36, 0}; // how quickly civis develop them
+                                          // mag, ocn, ice, ref, tre, tun, pln, des, jng, mtn, cap, wtr, SPAAAACE
   
   public int serialNo; // the civi's serial number (unique per game)
   public World world; // the world it belongs to
@@ -510,12 +510,37 @@ public class Civi {
   }
   
   
-  public String capitalName() {
+  public final String name() {
+    return name;
+  }
+  
+  
+  public final String capitalName() {
     return capName;
   }
   
   
-  public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
+  public final int sciLevel() {
+    return scienceLevel;
+  }
+  
+  
+  public final int milLevel() {
+    return militaryLevel;
+  }
+  
+  
+  public final int warChance() {
+    return warChance;
+  }
+  
+  
+  public final int dthTimer() {
+    return deathTimer;
+  }
+  
+  
+  public boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
     return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
   }
   
