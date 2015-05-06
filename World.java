@@ -33,6 +33,11 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   }
   
   
+  public World() { // FOR TESTING PURPOSES ONLY: DO NOT CALL
+    super(1);
+  }
+  
+  
   
   public final void update() { // updates the world a frame
     for (Tile[] row: map) { // for each tile in map

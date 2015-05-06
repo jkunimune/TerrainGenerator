@@ -5,28 +5,36 @@ import java.util.ArrayList;
 
 
 public class Civi {
-  public final String[] vowels = {"A", "A", "A", "E", "A", "E", "I", "A", "E", "I", "O", "U", "A", "E", "I", "O", "U", "A", "E", "I", "O", "U", "Y",
-    "Ae", "Ai", "Ao", "Aw", "Ar", "Ay", "Ea", "Ee", "Er", "Ey", "Ia", "Ie", "Io", "Ir", "Oa", "Oe", "Oi", "Ou", "Oo", "Oo", "Or", "Ol", "Ow"}; // vowels and consonants for name generation
-  public final String[] consonants = {"Qu", "W", "R", "R", "RR", "Ry", "T", "T", "T", "T", "T", "Th", "Th", "Tr", "Y", "P", "P", "P", "P", "Ph", "Pl",
-    "Pr", "Pp", "Py", "Ps", "S", "S", "S", "S", "S", "Sh", "Sh", "Sh", "Shr", "St", "Str", "D", "D", "D", "D", "Dr", "F", "F", "F", "F", "Fl", "Fr", "G",
-    "G", "G", "G", "Gh", "Gr", "H", "H", "H", "J", "J", "J", "K", "K", "K", "K", "K", "Kh", "Kl", "Ky", "Ks", "L", "L", "L", "L", "Ll", "Lh", "Z", "Z",
-    "Z", "Z", "Zh", "X", "C", "Ch", "Cl", "Cr","Cz", "V", "V", "Vr", "B", "B", "B", "B", "Br", "Bl", "Bs", "N", "N", "N", "N", "N", "Nr", "Nt", "Nst",
-    "Nstr", "Ng", "Nj", "Nh", "M", "M", "M", "M", "M", "Mr", "'"};
-  public final int classical = 16384; // science values of the different ages
-  public final int iron = 32768;
-  public final int imperialist = 49152;
-  public final int industrial = 65536;
-  public final int modern = 81920;
-  public final int space = 98304;
-  public final int prosperity = 114688;
-  public final int apocalypse = 131072;
-  public final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -28, -40, -52, -60, -76, 0}; // how quickly civis spread over biomes
-  public final int[] fertilityOf =     {0, -60, -68, -56, -64, -44, -36, -48, -32, -44, -40, -36, 0}; // how quickly civis develop them
-                                   // mag, ocn, ice, ref, tre, tun, pln, des, jng, mtn, cap, wtr, SPAAAACE
+  public final String[][] alphabet = { { "w", "r", "r",  "r", "t", "t", "t", "t", "t", "t", "th", "th", "y", "p", "p", "p", "p", "p", "ph", "pp", "s", "s", "s", "s", "s",
+    "s", "sh", "sh", "sh", "st", "d", "d", "d", "d", "f", "f", "f", "f", "g", "g", "g", "g", "h", "h", "h", "j", "j", "j", "k", "k", "k", "k", "k",
+    "l", "l", "l", "l", "l", "z", "z", "z", "z", "z", "zh", "x", "c", "v", "v", "vr", "b", "b", "b", "b","b", "n", "n", "n", "n", "n", "n", "nt", "ng", "ng", "ng", "m",
+    "m", "m", "m", "m", "m", "", "", "" }, // syllable-ending consonants,
+    { "a", "a", "a", "e", "a", "e", "i", "a", "e", "i", "o", "u", "a", "e", "i", "o", "u", "a", "e", "i", "o", "u", "y", "ae", "ai", "ao", "aw", "ar",
+      "ay", "ea", "ee", "er", "ey", "ia", "ie", "io", "ir", "oa", "oe", "oi", "ou", "oo", "oo", "or", "ol", "ow" }, // vowels,
+    { "qu", "w", "r", "r", "r", "r", "r", "r", "r", "ry", "t", "t", "t", "th", "th", "tr", "y", "p", "p", "ph", "pl", "pr", "py", "s", "s", "s", "s", "s", "sh", "sh", "shr",
+      "st", "str", "d", "d", "dr", "f", "f", "fl", "fr", "g", "g", "gh", "gr", "h", "h", "h", "h", "h", "h", "j", "k", "k", "k", "kh", "kl", "ky", "l",
+      "l", "l", "l", "l", "l", "l", "ll", "lh", "z", "z", "zh", "c", "ch", "cl", "cr","cz", "v", "vr", "b", "b", "br", "bl", "n", "n", "n", "ng", "m", "m", "m",
+      "mr", "'", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" , "", "", "", "", "", "", "", "" , "", "",
+      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" , "", "", "", "", "", "", "", "" , "", "" }, // syllable-starting consonants,
+    { "", "", "", "", "", "", "", "", "", "", " ", "-" } }; // and connectors for name generation
+  
+  public static final int ancient = 0;
+  public static final int classical = 16384; // science values of the different ages
+  public static final int iron = 32768;
+  public static final int industrial = 49152;
+  public static final int modern = 65536;
+  public static final int space = 81920;
+  public static final int prosperity = 98304;
+  public static final int apocalypse = 114688;
+  public static final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -32, -40, -52, -60, -76, 0}; // how quickly civis spread over biomes
+  public static final int[] fertilityOf =     {0, -60, -68, -56, -64, -44, -36, -48, -36, -44, -40, -36, 0}; // how quickly civis develop them
+                                          // mag, ocn, ice, ref, tre, tun, pln, des, jng, mtn, cap, wtr, SPAAAACE
   
   public int serialNo; // the civi's serial number (unique per game)
   public World world; // the world it belongs to
-  public ArrayList<Tile> land; // all of the tiles it owns
+  public ArrayList<Tile> land; // all of the Tiles it owns
   public Tile capital; // its capital city
   private String name; // its name
   private String capName; // its captial's name
@@ -136,9 +144,6 @@ public class Civi {
       capital.development = 3;
       militaryLevel += 64;
     }
-    else if (scienceLevel >= imperialist && scienceLevel < imperialist+scienceRate) {
-      militaryLevel += 64;
-    }
     else if (scienceLevel >= iron && scienceLevel < iron+scienceRate) {
       militaryLevel += 64;
     }
@@ -186,7 +191,7 @@ public class Civi {
           if (randChance(fertilityOf[til.biome] + (spreadRate>>3) + waterAdjacency))
             return true;
       
-        if (til.development == 1 && scienceLevel >= imperialist && randChance(fertilityOf[til.biome]+waterAdjacency+(spreadRate>>3)-130)) // if still unsettled and civi is in imperialist age
+        if (til.development == 1 && randChance(fertilityOf[til.biome]+waterAdjacency+(spreadRate>>3)-130)) // if still unsettled and civi is in imperialist age
           return true; // it might get settled
         return false;
       
@@ -286,7 +291,7 @@ public class Civi {
     if (t.development == 0)
       t.development = 1;
     land.add(t);
-    deathTimer -= 6;
+    deathTimer -= 7;
   }
   
   
@@ -338,8 +343,8 @@ public class Civi {
   public boolean hasDiscontent(boolean urban) { // if a rebellion shall start here
     if (scienceLevel < classical || deathTimer < 0) // the ancient age is too early to start a revolution, and the apocalypse is too late
       return false;
-    if (urban)  return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>14) - 130); // big old weak warmongers are more likely to have revolutions
-    else        return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>14) - 160); // urban areas are more likely to seed revolutions
+    if (urban)  return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>14) - 120); // big old weak warmongers are more likely to have revolutions
+    else        return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>14) - 150); // urban areas are more likely to seed revolutions
   }
   
   
@@ -351,22 +356,18 @@ public class Civi {
   public String newName() {
     String output = ""; // create a name
     
-    int t = (int)(Math.random()*1.5);
-    if (t%2 == 1)  output += vowels[(int)(Math.random()*vowels.length)];
-    else           output += consonants[(int)(Math.random()*consonants.length)];
-    
-    do {
-      if (t%2 == 0)  output += vowels[(int)(Math.random()*vowels.length)].toLowerCase();
-      else           output += consonants[(int)(Math.random()*consonants.length)].toLowerCase();
-      t++;
-    } while (t%2 != 0 || Math.random() < .3);
+    for (int i = (int)(Math.random()*3)*4+2; i >= 0; i --) // i decrements from a random number whose %4 is 2
+      output += alphabet[i%4][(int)(Math.random()*alphabet[i%4].length)]; // strings together a bunch of random syllables
+      for (int j = 0; j < output.length()-1; j ++) // capitalizes all words
+        if (j == 0 || output.charAt(j-1) == ' ' || output.charAt(j-1) == '-' || output.charAt(j-1) == '\'')
+          output = output.substring(0,j) + output.substring(j, j+1).toUpperCase() + output.substring(j+1);
     
     switch ((int)(Math.pow(Math.random(),2)*5)) { // puts an ending onto it
       case 1:
         output += "an";
         break;
       case 2:
-        output += vowels[(int)(Math.random()*vowels.length)].toLowerCase();
+        output += alphabet[2][(int)(Math.random()*alphabet[2].length)];
         break;
       case 3:
         break;
@@ -389,15 +390,12 @@ public class Civi {
       output = name+" City"; // lots of civis use their own name for their capital
     else {
       output = ""; // otherwise create a custom captial name
-      int t = (int)(Math.random()*1.7);
-      if (t%2 == 1)  output += vowels[(int)(Math.random()*vowels.length)];
-      else           output += consonants[(int)(Math.random()*consonants.length)];
       
-      do {
-        if (t%2 == 0)  output += vowels[(int)(Math.random()*vowels.length)].toLowerCase();
-        else           output += consonants[(int)(Math.random()*consonants.length)].toLowerCase();
-        t++;
-      } while (Math.random() < .2);
+      for (int i = (int)(Math.random()*2)*4+2; i >= 0; i --)
+        output += alphabet[i%4][(int)(Math.random()*alphabet[i%4].length)]; // strings together a bunch of random syllables
+      for (int j = 0; j < output.length()-1; j ++) // capitalizes all words
+        if (j == 0 || output.charAt(j-1) == ' ' || output.charAt(j-1) == '-' || output.charAt(j-1) == '\'')
+          output = output.substring(0,j) + output.substring(j, j+1).toUpperCase() + output.substring(j+1);
       
       switch ((int)(Math.pow(Math.random(),2.0)*4)) { // puts an ending onto it
         case 1:
@@ -510,12 +508,37 @@ public class Civi {
   }
   
   
-  public String capitalName() {
+  public final String name() {
+    return name;
+  }
+  
+  
+  public final String capitalName() {
     return capName;
   }
   
   
-  public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
+  public final int sciLevel() {
+    return scienceLevel;
+  }
+  
+  
+  public final int milLevel() {
+    return militaryLevel;
+  }
+  
+  
+  public final int warChance() {
+    return warChance;
+  }
+  
+  
+  public final int dthTimer() {
+    return deathTimer;
+  }
+  
+  
+  public boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
     return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
   }
   

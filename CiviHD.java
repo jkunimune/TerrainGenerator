@@ -19,14 +19,14 @@ public final class CiviHD { // the driver for my final project
     loadSound();
     
     Planet protoEarth = new Planet(100);
-    Map topographical = new OneDim(protoEarth, 600, 600);
+    Map topographical = new Lambert(protoEarth, 700, 500);
     
     intro.play();
     protoEarth.generate(topographical);
     delay(3000);
     
     World earth = new World(protoEarth);
-    Map political = new Polar(earth, 600, 600);
+    Map political = new Lambert(earth, 700, 500);
     
     music.loop();
     
@@ -34,7 +34,7 @@ public final class CiviHD { // the driver for my final project
       setTimer(0);
       earth.update();
       political.display(Map.territory);
-      waitFor(100);
+      waitFor(10);
     }
   }
   
