@@ -21,4 +21,10 @@ public class Lambert extends Map { // an equal area globe projection that distor
     
     initialPaint();
   }
+  
+  
+  public final void replaceLat(int x, int y) {
+    if (!((x>>1<<1 == width()/10>>1<<1 || x>>1<<1 == width()*9/10>>1<<1) && y/7%2 == 0))
+      lats[y][x] = glb.latIndex(Math.PI/2 + Math.asin((y-height()/2.0) / (height()/2.0)));
+  }
 }

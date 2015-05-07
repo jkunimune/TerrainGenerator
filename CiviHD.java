@@ -19,14 +19,14 @@ public final class CiviHD { // the driver for my final project
     loadSound();
     
     Planet protoEarth = new Planet(100);
-    Map topographical = new Lambert(protoEarth, 700, 500);
+    Map topographical = new Equirectangular(protoEarth, 700, 500);
     
     intro.play();
     protoEarth.generate(topographical);
     delay(3000);
     
     World earth = new World(protoEarth);
-    Map political = new Lambert(earth, 700, 500);
+    Map political = new Equirectangular(earth, 700, 500);
     
     music.loop();
     
@@ -36,6 +36,11 @@ public final class CiviHD { // the driver for my final project
       political.display(Map.territory);
       waitFor(10);
     }
+    
+    /*World world = new World();
+    while (true) {
+      world.spawnCivi(new Tile(0,0));
+    }*/
   }
   
   

@@ -249,7 +249,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
                 if (i*i + j*j <= 9) // if in circle
                   if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
                     if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) ||
-                        glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).isWet()) // if it is near a tile owned by someone else or near ocean
+                        glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) // if it is near a tile owned by someone else or near ocean
                       return civ.emblem();
           
           return Color.white;

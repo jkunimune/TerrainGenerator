@@ -1,6 +1,5 @@
 import java.util.*;
 import java.awt.*;
-import java.util.ArrayList;
 import org.apache.commons.lang3.RandomStringUtils;
 
 
@@ -30,6 +29,7 @@ public class Robots extends Civi {
   }
   
   
+  @Override
   public boolean hasDiscontent(boolean urban) { // human rebellions are the only random fator for robots
     if (sciLevel() < classical || dthTimer() < 0) // the ancient age is too early to start a revolution, and the apocalypse is too late
       return false;
@@ -38,18 +38,21 @@ public class Robots extends Civi {
   }
   
   
+  @Override
   public String newName() {
     return "" + RandomStringUtils.randomAlphanumeric(5); // robot names are random strings
   }
   
   
+  @Override
   public String newCapName() {
     return "The City "+ RandomStringUtils.randomAlphanumeric(5);
   }
   
   
+  @Override
   public final boolean randChance(int p) { // like randChance, but less random
-    return year % (1+Math.pow(Math.E, -.1*p)) == 0;
+    return year % (int)(1+Math.pow(Math.E, -.1*p)) == 0;
   }
   
   

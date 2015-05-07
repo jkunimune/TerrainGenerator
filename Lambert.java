@@ -1,7 +1,3 @@
-import java.awt.*;
-
-
-
 public class Lambert extends Map { // an equal area globe projection that distorts shape severely near poles, which are lines
   public Lambert(Globe g, int w, int h) {
     super(g, w, h);

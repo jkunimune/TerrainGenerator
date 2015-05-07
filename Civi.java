@@ -1,24 +1,24 @@
 import java.util.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 
 
 public class Civi {
-  public final String[][] alphabet = { { "w", "r", "r",  "r", "t", "t", "t", "t", "t", "t", "th", "th", "y", "p", "p", "p", "p", "p", "ph", "pp", "s", "s", "s", "s", "s",
-    "s", "sh", "sh", "sh", "st", "d", "d", "d", "d", "f", "f", "f", "f", "g", "g", "g", "g", "h", "h", "h", "j", "j", "j", "k", "k", "k", "k", "k",
-    "l", "l", "l", "l", "l", "z", "z", "z", "z", "z", "zh", "x", "c", "v", "v", "vr", "b", "b", "b", "b","b", "n", "n", "n", "n", "n", "n", "nt", "ng", "ng", "ng", "m",
-    "m", "m", "m", "m", "m", "", "", "" }, // syllable-ending consonants,
+  public final String[][] alphabet = { { "w", "r", "r", "r", "t", "t", "t", "t", "t", "t", "th", "th", "y", "p", "p", "p", "p", "p", "ph", "pp", "s",
+    "s", "s", "s", "s", "s", "sh", "sh", "sh", "st", "d", "d", "d", "d", "f", "f", "f", "f", "g", "g", "g", "g", "h", "h", "h", "j", "j", "j", "k",
+    "k", "k", "k", "k", "l", "l", "l", "l", "l", "z", "z", "z", "zh", "x", "c", "v", "v", "vr", "b", "b", "b", "b","b", "n", "n", "n", "n",
+    "n", "n", "nt", "ng", "ng", "ng", "m", "m", "m", "m", "m", "m", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "" , "", "", "", "", "", "", "", "", "", "" , "", "" }, // syllable-ending consonants,
     { "a", "a", "a", "e", "a", "e", "i", "a", "e", "i", "o", "u", "a", "e", "i", "o", "u", "a", "e", "i", "o", "u", "y", "ae", "ai", "ao", "aw", "ar",
       "ay", "ea", "ee", "er", "ey", "ia", "ie", "io", "ir", "oa", "oe", "oi", "ou", "oo", "oo", "or", "ol", "ow" }, // vowels,
-    { "qu", "w", "r", "r", "r", "r", "r", "r", "r", "ry", "t", "t", "t", "th", "th", "tr", "y", "p", "p", "ph", "pl", "pr", "py", "s", "s", "s", "s", "s", "sh", "sh", "shr",
-      "st", "str", "d", "d", "dr", "f", "f", "fl", "fr", "g", "g", "gh", "gr", "h", "h", "h", "h", "h", "h", "j", "k", "k", "k", "kh", "kl", "ky", "l",
-      "l", "l", "l", "l", "l", "l", "ll", "lh", "z", "z", "zh", "c", "ch", "cl", "cr","cz", "v", "vr", "b", "b", "br", "bl", "n", "n", "n", "ng", "m", "m", "m",
-      "mr", "'", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" , "", "", "", "", "", "", "", "" , "", "",
-      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" , "", "", "", "", "", "", "", "" , "", "" }, // syllable-starting consonants,
-    { "", "", "", "", "", "", "", "", "", "", " ", "-" } }; // and connectors for name generation
+    { "qu", "w", "r", "r", "r", "r", "r", "r", "r", "ry", "t", "t", "t", "th", "th", "tr", "y", "y", "y", "p", "p", "ph", "pl", "pr", "py", "s", "s",
+      "s", "s", "sh", "sh", "shr", "st", "str", "d", "d", "dr", "f", "f", "fl", "fr", "g", "g", "gh", "gr", "h", "h", "h", "h", "h", "h", "h", "j", "k",
+      "k", "k", "kh", "kl", "ky", "l", "l", "l", "l", "l", "l", "l", "ll", "lh", "z", "z", "zh", "c", "ch", "cl", "cr","cz", "v", "vr", "b", "b", "br",
+      "bl", "n", "n", "n", "ng", "m", "m", "m", "mr", "'", "", "", "" }, // syllable-starting consonants,
+    { "", "", "", "", "", "", "", "", "", "", "", "", " ", "-" } }; // and connectors for name generation
   
   public static final int ancient = 0;
   public static final int classical = 16384; // science values of the different ages
@@ -28,7 +28,7 @@ public class Civi {
   public static final int space = 81920;
   public static final int prosperity = 98304;
   public static final int apocalypse = 114688;
-  public static final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -32, -40, -52, -60, -76, 0}; // how quickly civis spread over biomes
+  public static final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -32, -40, -52, -60, -72, 0}; // how quickly civis spread over biomes
   public static final int[] fertilityOf =     {0, -60, -68, -56, -64, -44, -36, -48, -36, -44, -40, -36, 0}; // how quickly civis develop them
                                           // mag, ocn, ice, ref, tre, tun, pln, des, jng, mtn, cap, wtr, SPAAAACE
   
@@ -362,9 +362,9 @@ public class Civi {
         if (j == 0 || output.charAt(j-1) == ' ' || output.charAt(j-1) == '-' || output.charAt(j-1) == '\'')
           output = output.substring(0,j) + output.substring(j, j+1).toUpperCase() + output.substring(j+1);
     
-    switch ((int)(Math.pow(Math.random(),2)*5)) { // puts an ending onto it
+    switch ((int)(Math.pow(Math.random(),1.8)*5)) { // puts an ending onto it
       case 1:
-        output += "an";
+        output += alphabet[3][(int)(Math.random()*alphabet[3].length)] + "an";
         break;
       case 2:
         output += alphabet[2][(int)(Math.random()*alphabet[2].length)];
@@ -375,7 +375,7 @@ public class Civi {
         output += "land";
         break;
       default:
-        output += "ia";
+        output += alphabet[3][(int)(Math.random()*alphabet[3].length)] + "ia";
         break;
     }
     
@@ -397,7 +397,7 @@ public class Civi {
         if (j == 0 || output.charAt(j-1) == ' ' || output.charAt(j-1) == '-' || output.charAt(j-1) == '\'')
           output = output.substring(0,j) + output.substring(j, j+1).toUpperCase() + output.substring(j+1);
       
-      switch ((int)(Math.pow(Math.random(),2.0)*4)) { // puts an ending onto it
+      switch ((int)(Math.pow(Math.random(),2.2)*4)) { // puts an ending onto it
         case 1:
           output += " City";
           break;
@@ -515,6 +515,16 @@ public class Civi {
   
   public final String capitalName() {
     return capName;
+  }
+  
+  
+  public final int home() {
+    return homeBiome;
+  }
+  
+  
+  public final int spdRate() {
+    return spreadRate;
   }
   
   

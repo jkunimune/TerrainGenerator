@@ -209,7 +209,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
       if (empire.sciLevel() >= Civi.space && !empire.getClass().getName().equals("Robots") && randChance(0)) // advanced human Civilizations sometimes have robot rebellions
         rebels = new Robots(start, civis, this, empire);
       else
-        rebels = new Civi(start, civis, this, empire); // but revolutions are usually normal
+        rebels = new Civi(start, civis, this, empire); // but revolutions are usually human
       
       civis.add(rebels);
       
@@ -264,7 +264,8 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void spawnCivi(Tile til) {
-    civis.add(new Civi(til, civis, this));
+    if (randChance(-30))  civis.add(new CityState(til, civis, this)); // occasionally City-States spawn
+    else                 civis.add(new Civi(til, civis, this)); // but usually, they are empires
   }
   
   
