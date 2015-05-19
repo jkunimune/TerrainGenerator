@@ -74,7 +74,7 @@ public class Civi {
     scienceLevel = 0;
     militaryLevel = (int)(Math.random()*256-64);
     warChance = (int)(Math.random()*256);
-    deathTimer = 32768 + (int)(Math.random()*32768);
+    deathTimer = 16384 + (int)(Math.random()*16384);
     
     adversaries = new ArrayList<Civi>(0);
     
@@ -337,7 +337,7 @@ public class Civi {
   
   
   public void makePeaceWith(Civi civ) { // ends war with a civ
-    System.out.println(this+" and "+civ+" have made peace!");
+    //System.out.println(this+" and "+civ+" have made peace!");
     this.adversaries.remove(civ);
     civ.adversaries.remove(this);
   }
