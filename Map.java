@@ -33,8 +33,10 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     tipW = -1;
     tipH = -1;
     glb = newWorld;
+    
     lats = new int[h][w];
     lons = new int[h][w];
+    
     JFrame frame = new JFrame();
     img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
     img.getGraphics().setFont(monaco);
@@ -48,6 +50,24 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   }
   
   
+  
+  public abstract int getLat(int x, int y);
+  
+  
+  public abstract int getLon(int x, int y);
+  
+  
+  public final void finishSuper() { // a method stupid Java forces me to put in because super must be the first thing in the constructor because the stupid constructor says so and I can't just put this dang thing in the constructor.
+    for (int x = 0; x < width(); x ++) { // and i cant use w or h or g because, again, stupid Java
+      for (int y = 0; y < height(); y ++) {
+        lats[y][x] = getLat(x,y);
+        lons[y][x] = getLon(x,y);
+      }
+    }
+    
+    initialPaint();
+  }
+    
   
   public final void drawPx(int x, int y, Color z) { // draws a pixel to the buffered image
     final Graphics g = img.getGraphics();
@@ -88,10 +108,15 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     if (tipX == -1) // if there is no tile tip
       return;
     
-    for (int i = -3; i < tipW + 3 && tipX+i < width(); i ++) // draw a black rectangle around the words
-      for (int j = -3; j < tipH + 3 && tipY-j >= 0; j ++)
-        replaceLat(tipX+i, tipY-j);
-    initialPaint();
+    for (int i = -3; i < tipW + 3 && tipX+i < width(); i ++) { // draw a colorful rectangle around the words
+      for (int j = -3; j < tipH + 3 && tipY-j >= 0; j ++) {
+        final int lat = getLat(tipX+i, tipY-j);
+        if (lat != -1)
+          lats[tipY-j][tipX+i] = lat;
+        else
+          drawPx(tipX+i, tipY-j, new Color(lons[tipY-j][tipX+i]>>16, lons[tipY-j][tipX+i]%65536>>8, lons[tipY-j][tipX+i]%256));
+      }
+    }
     
     tipX = -1;
   }
@@ -113,9 +138,6 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
           drawPx(x, y, getColorBy(colorScheme, x, y));
     show();
   }
-  
-  
-  public abstract void replaceLat(int x, int y);
   
   
   public final Tile getTile(int x, int y) {

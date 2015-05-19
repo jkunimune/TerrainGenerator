@@ -74,7 +74,7 @@ public class Civi {
     scienceLevel = 0;
     militaryLevel = (int)(Math.random()*256-64);
     warChance = (int)(Math.random()*256);
-    deathTimer = 65536 + (int)(Math.random()*65536);
+    deathTimer = 16384 + (int)(Math.random()*16384);
     
     adversaries = new ArrayList<Civi>(0);
     
@@ -105,7 +105,7 @@ public class Civi {
     scienceLevel = motherland.scienceLevel;
     militaryLevel = motherland.militaryLevel + (int)(Math.random()*256-128);
     warChance = (int)(Math.random()*256);
-    deathTimer = 65536 + (int)(Math.random()*65536);
+    deathTimer = 32768 + (int)(Math.random()*32768);
     
     adversaries = new ArrayList<Civi>(1);
     
@@ -135,6 +135,7 @@ public class Civi {
       militaryLevel += 64;
     } 
     else if (scienceLevel >= space && scienceLevel < space+scienceRate) {
+      System.out.println(this+"has mastered space-travel!");
       militaryLevel += 64;
     }
     else if (scienceLevel >= modern && scienceLevel < modern+scienceRate) {
@@ -145,9 +146,11 @@ public class Civi {
       militaryLevel += 64;
     }
     else if (scienceLevel >= iron && scienceLevel < iron+scienceRate) {
+      System.out.println(this+" has discovered iron-working!");
       militaryLevel += 64;
     }
     if (!apocalypseBefore && deathTimer < 0) { // weakens the military during the apocalypse
+      System.out.println(this+" has begun to crumble!");
       militaryLevel -= 128;
     }
     apocalypseBefore = deathTimer < 0;
@@ -207,14 +210,14 @@ public class Civi {
           if (adj.development > 2) // cities can spread from civi to civi
             urbanAdjacency ++;
           if (adj.altitude < 0 || adj.biome == Tile.freshwater)
-            waterAdjacency = 5;
+            waterAdjacency = 10;
         }
       
         for (int i = 0; i < urbanAdjacency; i ++) // urbanization is like settlement but adjacency does not matter as much
           if (randChance((spreadRate>>3)-70) || (scienceLevel >= space && randChance((spreadRate>>3)-30))) // after the space age cities grow like crazy
             return true;
       
-        if (til.development == 2 && randChance(waterAdjacency + (spreadRate>>3) - 110)) // if still unurbanized
+        if (til.development == 2 && randChance(waterAdjacency + (spreadRate>>3) - 115)) // if still unurbanized
           return true; // it might seed a city
         return false;
       
@@ -250,12 +253,12 @@ public class Civi {
     
     ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
     for (Tile adj: adjacent) {
-      if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>8) - 30)) { // causes lands to be undeveloped during apocalypse
+      if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>7) - 30)) { // causes lands to be undeveloped during apocalypse
         if (!til.isCapital || randChance(-20)) // captials are less likely to be lost
           return true;
       }
     }
-    if (!til.isCapital && randChance(-(deathTimer>>8) - 140)) // even tiles not on the border can succumb to the apocalypse
+    if (!til.isCapital && randChance(-(deathTimer>>7) - 140)) // even tiles not on the border can succumb to the apocalypse
       return true;
     
     return false;
@@ -291,7 +294,7 @@ public class Civi {
     if (t.development == 0)
       t.development = 1;
     land.add(t);
-    deathTimer -= 7;
+    deathTimer -= 4;
   }
   
   
@@ -343,8 +346,8 @@ public class Civi {
   public boolean hasDiscontent(boolean urban) { // if a rebellion shall start here
     if (scienceLevel < classical || deathTimer < 0) // the ancient age is too early to start a revolution, and the apocalypse is too late
       return false;
-    if (urban)  return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>14) - 120); // big old weak warmongers are more likely to have revolutions
-    else        return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>14) - 150); // urban areas are more likely to seed revolutions
+    if (urban)  return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>13) - 120); // big old weak warmongers are more likely to have revolutions
+    else        return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>13) - 150); // urban areas are more likely to seed revolutions
   }
   
   

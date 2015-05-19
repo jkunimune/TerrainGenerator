@@ -33,8 +33,10 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     tipW = -1;
     tipH = -1;
     glb = newWorld;
+    
     lats = new int[h][w];
     lons = new int[h][w];
+    
     JFrame frame = new JFrame();
     img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
     img.getGraphics().setFont(monaco);
@@ -47,6 +49,12 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     frame.setVisible(true);
   }
   
+  
+  
+  public abstract int getLat(int x, int y);
+  
+  
+  public abstract int getLon(int x, int y);
   
   
   public final void drawPx(int x, int y, Color z) { // draws a pixel to the buffered image
@@ -88,10 +96,15 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     if (tipX == -1) // if there is no tile tip
       return;
     
-    for (int i = -3; i < tipW + 3 && tipX+i < width(); i ++) // draw a black rectangle around the words
-      for (int j = -3; j < tipH + 3 && tipY-j >= 0; j ++)
-        replaceLat(tipX+i, tipY-j);
-    initialPaint();
+    for (int i = -3; i < tipW + 3 && tipX+i < width(); i ++) { // draw a colorful rectangle around the words
+      for (int j = -3; j < tipH + 3 && tipY-j >= 0; j ++) {
+        final int lat = getLat(tipX+i, tipY-j);
+        if (lat != -1)
+          lats[tipY-j][tipX+i] = lat;
+        else
+          drawPx(tipX+i, tipY-j, new Color(lons[tipY-j][tipX+i]>>16, lons[tipY-j][tipX+i]%65536>>8, lons[tipY-j][tipX+i]%256));
+      }
+    }
     
     tipX = -1;
   }
@@ -113,9 +126,6 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
           drawPx(x, y, getColorBy(colorScheme, x, y));
     show();
   }
-  
-  
-  public abstract void replaceLat(int x, int y);
   
   
   public final Tile getTile(int x, int y) {
@@ -249,7 +259,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
                 if (i*i + j*j <= 9) // if in circle
                   if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
                     if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) ||
-                        glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).isWet()) // if it is near a tile owned by someone else or near ocean
+                        glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) // if it is near a tile owned by someone else or near ocean
                       return civ.emblem();
           
           return Color.white;

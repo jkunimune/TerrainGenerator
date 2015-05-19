@@ -35,4 +35,9 @@ public class Polar extends Map { // an equal-distant map centered on the north p
     
     initialPaint();
   }
+  
+  public final void replaceLat(int x, int y) {
+    if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius)
+      lats[y][x] = glb.latIndex(Math.sqrt((x-radius)*(x-radius) + (y-radius)*(y-radius))*Math.PI/radius);
+  }
 }

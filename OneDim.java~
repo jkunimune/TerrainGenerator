@@ -51,4 +51,8 @@ public class OneDim extends Map { // a one dimensional map that only sees the pr
     
     initialPaint();
   }
+  
+  
+  public final void showTileTip(int x, int y) { // no tile tips on onedimensional
+  }
 }

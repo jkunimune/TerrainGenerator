@@ -206,7 +206,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
       final Civi empire = start.owners.get(0);
       Civi rebels;
       
-      if (empire.sciLevel() >= Civi.space && !empire.getClass().getName().equals("Robots") && randChance(0)) // advanced human Civilizations sometimes have robot rebellions
+      if (empire.sciLevel() >= Civi.space && !empire.getClass().getName().equals("Robots") && randChance(-10)) // advanced human Civilizations sometimes have robot rebellions
         rebels = new Robots(start, civis, this, empire);
       else
         rebels = new Civi(start, civis, this, empire); // but revolutions are usually human
@@ -264,8 +264,8 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void spawnCivi(Tile til) {
-    if (randChance(-30))  civis.add(new CityState(til, civis, this)); // occasionally City-States spawn
-    else                 civis.add(new Civi(til, civis, this)); // but usually, they are empires
+    if (randChance(-40))  civis.add(new CityState(til, civis, this)); // occasionally City-States spawn
+    else                  civis.add(new Civi(til, civis, this)); // but usually, they are empires
   }
   
   
@@ -286,7 +286,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     if (agg.isAtPeaceWith(vic)) // if no land was disputed, nothing happens
       return;
     
-    //System.out.println(agg+" has invaded "+vic+"!");
+    System.out.println(agg+" has invaded "+vic+"!");
     agg.adversaries.add(vic); // civis know with whom they are at war
     vic.adversaries.add(agg);
   }

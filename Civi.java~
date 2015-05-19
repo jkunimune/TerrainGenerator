@@ -4,20 +4,20 @@ import java.awt.*;
 
 
 public class Civi {
-  public final String[][] alphabet = { { "w", "r", "r",  "r", "t", "t", "t", "t", "t", "t", "th", "th", "y", "p", "p", "p", "p", "p", "ph", "pp", "s",
+  public final String[][] alphabet = { { "w", "r", "r", "r", "t", "t", "t", "t", "t", "t", "th", "th", "y", "p", "p", "p", "p", "p", "ph", "pp", "s",
     "s", "s", "s", "s", "s", "sh", "sh", "sh", "st", "d", "d", "d", "d", "f", "f", "f", "f", "g", "g", "g", "g", "h", "h", "h", "j", "j", "j", "k",
-    "k", "k", "k", "k", "l", "l", "l", "l", "l", "z", "z", "z", "z", "z", "zh", "x", "c", "v", "v", "vr", "b", "b", "b", "b","b", "n", "n", "n", "n",
-    "n", "n", "nt", "ng", "ng", "ng", "m", "m", "m", "m", "m", "m", "", "", "" }, // syllable-ending consonants,
+    "k", "k", "k", "k", "l", "l", "l", "l", "l", "z", "z", "z", "zh", "x", "c", "v", "v", "vr", "b", "b", "b", "b","b", "n", "n", "n", "n",
+    "n", "n", "nt", "ng", "ng", "ng", "m", "m", "m", "m", "m", "m", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+      "", "", "", "", "", "", "", "" , "", "", "", "", "", "", "", "", "", "" , "", "" }, // syllable-ending consonants,
     { "a", "a", "a", "e", "a", "e", "i", "a", "e", "i", "o", "u", "a", "e", "i", "o", "u", "a", "e", "i", "o", "u", "y", "ae", "ai", "ao", "aw", "ar",
       "ay", "ea", "ee", "er", "ey", "ia", "ie", "io", "ir", "oa", "oe", "oi", "ou", "oo", "oo", "or", "ol", "ow" }, // vowels,
     { "qu", "w", "r", "r", "r", "r", "r", "r", "r", "ry", "t", "t", "t", "th", "th", "tr", "y", "y", "y", "p", "p", "ph", "pl", "pr", "py", "s", "s",
       "s", "s", "sh", "sh", "shr", "st", "str", "d", "d", "dr", "f", "f", "fl", "fr", "g", "g", "gh", "gr", "h", "h", "h", "h", "h", "h", "h", "j", "k",
       "k", "k", "kh", "kl", "ky", "l", "l", "l", "l", "l", "l", "l", "ll", "lh", "z", "z", "zh", "c", "ch", "cl", "cr","cz", "v", "vr", "b", "b", "br",
-      "bl", "n", "n", "n", "ng", "m", "m", "m", "mr", "'", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-      "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-      "", "", "", "", "", "", "", "" , "", "", "", "", "", "", "", "", "", "" , "", "" }, // syllable-starting consonants,
+      "bl", "n", "n", "n", "ng", "m", "m", "m", "mr", "'", "", "", "" }, // syllable-starting consonants,
     { "", "", "", "", "", "", "", "", "", "", "", "", " ", "-" } }; // and connectors for name generation
   
   public static final int ancient = 0;
@@ -28,7 +28,7 @@ public class Civi {
   public static final int space = 81920;
   public static final int prosperity = 98304;
   public static final int apocalypse = 114688;
-  public static final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -32, -40, -52, -60, -76, 0}; // how quickly civis spread over biomes
+  public static final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -32, -40, -52, -60, -72, 0}; // how quickly civis spread over biomes
   public static final int[] fertilityOf =     {0, -60, -68, -56, -64, -44, -36, -48, -36, -44, -40, -36, 0}; // how quickly civis develop them
                                           // mag, ocn, ice, ref, tre, tun, pln, des, jng, mtn, cap, wtr, SPAAAACE
   
@@ -74,7 +74,7 @@ public class Civi {
     scienceLevel = 0;
     militaryLevel = (int)(Math.random()*256-64);
     warChance = (int)(Math.random()*256);
-    deathTimer = 65536 + (int)(Math.random()*65536);
+    deathTimer = 32768 + (int)(Math.random()*32768);
     
     adversaries = new ArrayList<Civi>(0);
     
@@ -105,7 +105,7 @@ public class Civi {
     scienceLevel = motherland.scienceLevel;
     militaryLevel = motherland.militaryLevel + (int)(Math.random()*256-128);
     warChance = (int)(Math.random()*256);
-    deathTimer = 65536 + (int)(Math.random()*65536);
+    deathTimer = 32768 + (int)(Math.random()*32768);
     
     adversaries = new ArrayList<Civi>(1);
     
@@ -135,6 +135,7 @@ public class Civi {
       militaryLevel += 64;
     } 
     else if (scienceLevel >= space && scienceLevel < space+scienceRate) {
+      System.out.println(this+"has mastered space-travel!");
       militaryLevel += 64;
     }
     else if (scienceLevel >= modern && scienceLevel < modern+scienceRate) {
@@ -145,9 +146,11 @@ public class Civi {
       militaryLevel += 64;
     }
     else if (scienceLevel >= iron && scienceLevel < iron+scienceRate) {
+      System.out.println(this+" has discovered iron-working!");
       militaryLevel += 64;
     }
     if (!apocalypseBefore && deathTimer < 0) { // weakens the military during the apocalypse
+      System.out.println(this+" has begun to crumble!");
       militaryLevel -= 128;
     }
     apocalypseBefore = deathTimer < 0;
@@ -207,14 +210,14 @@ public class Civi {
           if (adj.development > 2) // cities can spread from civi to civi
             urbanAdjacency ++;
           if (adj.altitude < 0 || adj.biome == Tile.freshwater)
-            waterAdjacency = 5;
+            waterAdjacency = 10;
         }
       
         for (int i = 0; i < urbanAdjacency; i ++) // urbanization is like settlement but adjacency does not matter as much
           if (randChance((spreadRate>>3)-70) || (scienceLevel >= space && randChance((spreadRate>>3)-30))) // after the space age cities grow like crazy
             return true;
       
-        if (til.development == 2 && randChance(waterAdjacency + (spreadRate>>3) - 110)) // if still unurbanized
+        if (til.development == 2 && randChance(waterAdjacency + (spreadRate>>3) - 115)) // if still unurbanized
           return true; // it might seed a city
         return false;
       
@@ -250,12 +253,12 @@ public class Civi {
     
     ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
     for (Tile adj: adjacent) {
-      if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>8) - 30)) { // causes lands to be undeveloped during apocalypse
+      if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>7) - 30)) { // causes lands to be undeveloped during apocalypse
         if (!til.isCapital || randChance(-20)) // captials are less likely to be lost
           return true;
       }
     }
-    if (!til.isCapital && randChance(-(deathTimer>>8) - 140)) // even tiles not on the border can succumb to the apocalypse
+    if (!til.isCapital && randChance(-(deathTimer>>7) - 140)) // even tiles not on the border can succumb to the apocalypse
       return true;
     
     return false;
@@ -291,7 +294,7 @@ public class Civi {
     if (t.development == 0)
       t.development = 1;
     land.add(t);
-    deathTimer -= 7;
+    deathTimer -= 4;
   }
   
   
@@ -334,7 +337,7 @@ public class Civi {
   
   
   public void makePeaceWith(Civi civ) { // ends war with a civ
-    //System.out.println(this+" and "+civ+" have made peace!");
+    System.out.println(this+" and "+civ+" have made peace!");
     this.adversaries.remove(civ);
     civ.adversaries.remove(this);
   }
@@ -343,8 +346,8 @@ public class Civi {
   public boolean hasDiscontent(boolean urban) { // if a rebellion shall start here
     if (scienceLevel < classical || deathTimer < 0) // the ancient age is too early to start a revolution, and the apocalypse is too late
       return false;
-    if (urban)  return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>14) - 120); // big old weak warmongers are more likely to have revolutions
-    else        return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>14) - 150); // urban areas are more likely to seed revolutions
+    if (urban)  return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>13) - 120); // big old weak warmongers are more likely to have revolutions
+    else        return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>13) - 150); // urban areas are more likely to seed revolutions
   }
   
   
@@ -362,9 +365,9 @@ public class Civi {
         if (j == 0 || output.charAt(j-1) == ' ' || output.charAt(j-1) == '-' || output.charAt(j-1) == '\'')
           output = output.substring(0,j) + output.substring(j, j+1).toUpperCase() + output.substring(j+1);
     
-    switch ((int)(Math.pow(Math.random(),2)*5)) { // puts an ending onto it
+    switch ((int)(Math.pow(Math.random(),1.8)*5)) { // puts an ending onto it
       case 1:
-        output += "an";
+        output += alphabet[3][(int)(Math.random()*alphabet[3].length)] + "an";
         break;
       case 2:
         output += alphabet[2][(int)(Math.random()*alphabet[2].length)];
@@ -375,7 +378,7 @@ public class Civi {
         output += "land";
         break;
       default:
-        output += "ia";
+        output += alphabet[3][(int)(Math.random()*alphabet[3].length)] + "ia";
         break;
     }
     
@@ -397,7 +400,7 @@ public class Civi {
         if (j == 0 || output.charAt(j-1) == ' ' || output.charAt(j-1) == '-' || output.charAt(j-1) == '\'')
           output = output.substring(0,j) + output.substring(j, j+1).toUpperCase() + output.substring(j+1);
       
-      switch ((int)(Math.pow(Math.random(),2.0)*4)) { // puts an ending onto it
+      switch ((int)(Math.pow(Math.random(),2.2)*4)) { // puts an ending onto it
         case 1:
           output += " City";
           break;
