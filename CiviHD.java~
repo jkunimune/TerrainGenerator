@@ -36,6 +36,11 @@ public final class CiviHD { // the driver for my final project
       political.display(Map.territory);
       waitFor(10);
     }
+    
+    /*World world = new World();
+    while (true) {
+      world.spawnCivi(new Tile(0,0));
+    }*/
   }
   
   

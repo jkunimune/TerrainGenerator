@@ -20,7 +20,7 @@ public class OneDim extends Map { // a one dimensional map that only sees the pr
   
   
   @Override
-  public Color getColorBy(int scheme, int x, int y) {
+  public Color getColorBy(ColS c, int x, int y) {
     final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
     
     if (til.altitude < 0) { // for ocean tiles
@@ -28,7 +28,7 @@ public class OneDim extends Map { // a one dimensional map that only sees the pr
         return Color.black; // is black
       
       else if (y-height()/2 < -til.altitude*height()/256) // the middle section
-        return super.getColorBy(scheme, x, y); // references the tile color itself
+        return super.getColorBy(c, x, y); // references the tile color itself
       
       else // the bottom
         return new Color(15, 255, 7); // is a greyish green color
@@ -36,7 +36,7 @@ public class OneDim extends Map { // a one dimensional map that only sees the pr
     
     else { // for land tiles
       if (y-height()/2 >= -til.altitude*height()/256) // the middle section and lower half
-        return super.getColorBy(scheme, x, y); // references the tile color itself;
+        return super.getColorBy(c, x, y); // references the tile color itself;
 
       else // the top
         return Color.black; // is black

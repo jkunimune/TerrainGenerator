@@ -6,15 +6,6 @@ import javax.swing.*;
 
 public abstract class Map extends JPanel { // a class to manage the graphic elements of terrain generation
   public Font monaco;
-  public static final int biome = 0; // colorscheme codes
-  public static final int altitude = 1;
-  public static final int temperature = 2;
-  public static final int rainfall = 3;
-  public static final int climate = 4;
-  public static final int water = 5;
-  public static final int waterLevel = 6;
-  public static final int territory = 7;
-  public static final int hybrid = 8;
   public static final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(20, 70, 200), new Color(0,0,150),
     new Color(255,255,255), new Color(79,191,39), new Color(200,255,50), new Color(0,130,20), new Color(200,100,50), new Color(200,100,255),
     new Color(10,33,255), new Color(0,0,0)}; // colors of the biomes
@@ -131,11 +122,11 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   }
   
   
-  public void display(int colorScheme) { // displays the map
+  public void display(ColS theme) { // displays the map
     for (int x = 0; x < width(); x ++)
       for (int y = 0; y < height(); y ++)
         if (lats[y][x] != -1)
-          drawPx(x, y, getColorBy(colorScheme, x, y));
+          drawPx(x, y, getColorBy(theme, x, y));
     show();
   }
   
@@ -145,8 +136,8 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   }
   
   
-  public Color getColorBy(int type, int x, int y) { // gets the color at a point on the screen
-    switch (type) {
+  public Color getColorBy(ColS c, int x, int y) { // gets the color at a point on the screen
+    switch (c) {
       case biome: // otherwise calculate the color from that tile
         return getColorByBiome(x, y);
       case altitude:

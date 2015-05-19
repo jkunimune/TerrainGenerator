@@ -57,6 +57,18 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   public abstract int getLon(int x, int y);
   
   
+  public final void finishSuper() { // a method stupid Java forces me to put in because super must be the first thing in the constructor because the stupid constructor says so and I can't just put this dang thing in the constructor.
+    for (int x = 0; x < width(); x ++) { // and i cant use w or h or g because, again, stupid Java
+      for (int y = 0; y < height(); y ++) {
+        lats[y][x] = getLat(x,y);
+        lons[y][x] = getLon(x,y);
+      }
+    }
+    
+    initialPaint();
+  }
+    
+  
   public final void drawPx(int x, int y, Color z) { // draws a pixel to the buffered image
     final Graphics g = img.getGraphics();
     g.setColor(z);

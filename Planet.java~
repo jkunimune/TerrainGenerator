@@ -40,14 +40,13 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
       for (int j = 0; j < i; j ++)
         smooth(.4);
       map.display(Map.altitude);
-      rough(i*1.1);
+      rough(i*1.2);
       map.display(Map.altitude);
     }
     
     System.out.println("Raining...");
     rain();
     runoff();
-    for (int i = 0; i < 50; i ++)
     map.display(Map.altitude);
     
     System.out.println("Generating climate...");
@@ -146,7 +145,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
                 totalChange += rise; // it forms a sea trench
               }
               else if (thisTil.altitude > thatTil.altitude) { // if this is above that one
-                totalChange -= rise*.73; // it forms an island chain
+                totalChange -= rise*.71; // it forms an island chain
               }
               else { // if they are going at the same altitude
                 if (Math.random() < .5)  totalChange += rise/2.0; // it forms a random type thing

@@ -33,7 +33,7 @@ public final class CiviHD { // the driver for my final project
     while (true) {
       setTimer(0);
       earth.update();
-      political.display(Map.territory);
+      political.display(ColS.territory);
       waitFor(10);
     }
     
