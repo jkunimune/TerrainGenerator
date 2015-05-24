@@ -29,7 +29,7 @@ public class Civi {
   public static final int prosperity = 98304;
   public static final int apocalypse = 114688;
   public static final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -32, -40, -52, -60, -72, 0}; // how quickly civis spread over biomes
-  public static final int[] fertilityOf =     {0, -60, -68, -56, -64, -44, -36, -48, -36, -44, -40, -36, 0}; // how quickly civis develop them
+  public static final int[] fertilityOf =     {0, -56, -64, -52, -60, -44, -36, -48, -32, -44, -40, -36, 0}; // how quickly civis develop them
                                           // mag, ocn, ice, ref, tre, tun, pln, des, jng, mtn, cap, wtr, SPAAAACE
   
   public int serialNo; // the civi's serial number (unique per game)
@@ -74,7 +74,7 @@ public class Civi {
     scienceLevel = 0;
     militaryLevel = (int)(Math.random()*256-64);
     warChance = (int)(Math.random()*256);
-    deathTimer = 16384 + (int)(Math.random()*16384);
+    deathTimer = 24575 + (int)(Math.random()*24575);
     
     adversaries = new ArrayList<Civi>(0);
     
@@ -187,7 +187,7 @@ public class Civi {
           if (adj.development > 1 && adj.owners.equals(til.owners))
             settledAdjacency ++;
           if (adj.altitude < 0 || adj.biome == Tile.freshwater)
-            waterAdjacency = 30;
+            waterAdjacency = 50;
         }
       
         for (int i = 0; i < settledAdjacency; i ++)
@@ -294,7 +294,7 @@ public class Civi {
     if (t.development == 0)
       t.development = 1;
     land.add(t);
-    deathTimer -= 4;
+    deathTimer -= 3;
   }
   
   

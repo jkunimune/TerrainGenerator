@@ -100,9 +100,9 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
             if (ref.altitude >= -256 && randChance(-50 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
             tile.spreadFrom(ref);
           
-          if (tile.altitude == -257 && randChance(-145)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
+          if (tile.altitude == -257 && randChance(-142)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
             tile.startPlate(false); // seeds new plates occasionally
-          else if (tile.altitude == -257 && randChance(-133))
+          else if (tile.altitude == -257 && randChance(-130))
             tile.startPlate(true);
         }
       }
