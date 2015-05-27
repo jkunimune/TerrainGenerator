@@ -202,7 +202,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     if (start.owners.size() != 1 || start.isCapital || start.altitude < 0) // revolutions cannot happen in unclaimed, disputed, ocean, or capital territory
       return;
     
-    if (start.owners.get(0).hasDiscontent(start.development >= 3)) { // if a rebellion is going to happen
+    if (start.owners.get(0).hasDiscontent(start)) { // if a rebellion is going to happen
       final Civi empire = start.owners.get(0);
       Civi rebels;
       
@@ -272,6 +272,11 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   public final void wageWar(Civi agg, Civi vic) { // starts a war between two civis at a Tile
     if (agg.adversaries.contains(vic)) // if they are already at war
       return;
+    
+    for (Tile[] row: map)
+      for (Tile til: row)
+        if (til.altitude < 0 && til.owners.size() == 1 && til.owners.get(0).equals(vic))
+          agg.takes(til); // all ocean is immediately disputed
     
     for (int i = 0; i < 64; i ++) { // calls a random region between the empires into dispute
       for (int j = 0; j < agg.land.size(); j ++) {

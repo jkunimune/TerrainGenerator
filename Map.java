@@ -9,6 +9,50 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   public static final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(20, 70, 200), new Color(0,0,150),
     new Color(255,255,255), new Color(79,191,39), new Color(200,255,50), new Color(0,130,20), new Color(200,100,50), new Color(200,100,255),
     new Color(10,33,255), new Color(0,0,0)}; // colors of the biomes
+  public static final boolean[][][] key = {
+    {
+      {  true } // magma
+    }, {
+      { false } // ocean
+    }, {
+      { false, false }, // ice
+      { false,  true }
+    }, {
+      { false } // reef
+    }, {
+      { false } // trench
+    }, {
+      {  true,  true, false }, // tundra
+      {  true, false,  true },
+      { false,  true,  true }
+    }, {
+      {  true,  true,  true,  true }, // plains
+      {  true, false, false, false },
+      {  true,  true,  true,  true },
+      { false, false,  true, false }
+    }, {
+      {  true,  true }, // desert
+      {  true, false }
+    }, {
+      {  true,  true, false }, // jungle
+      {  true, false, false,  true }
+    }, {
+      {  true,  true,  true, false }, // mountains
+      { false,  true, false,  true },
+      {  true, false,  true,  true },
+      { false,  true,  true,  true }
+    }, {
+      {  true,  true,  true, false }, // snowy mountains
+      { false,  true, false, false },
+      {  true, false,  true,  true },
+      { false,  true,  true,  true }
+    }, {
+      { false,  true }, // ice
+      {  true,  true }
+    }, {
+      { false }
+    }
+  };
       
   private int tipX, tipY, tipW, tipH; // TileTip coordinates and dimensions
   private BufferedImage img;
