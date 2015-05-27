@@ -1,4 +1,4 @@
-public class Mercator extends Map { // a sphere projection designed to preserve shapes but distorts size near poles, which are not visible
+public class Gall extends Map { // a compromising projection that resembles Mercator, but shows the poles
   public Mercator(Globe g, int w, int h) {
     super(g, w, h);
     finishSuper();
@@ -6,10 +6,10 @@ public class Mercator extends Map { // a sphere projection designed to preserve 
   
   
   public final int getLat(int x, int y) {
-    if ((x>>1<<1 == width()/10>>1<<1 || x>>1<<1 == width()*9/10>>1<<1) && y/7%2 == 0) // draw dotted lines on sides
+    if ((x>>1<<1 == width()/10>>1<<1 || x>>1<<1 == width()*9/10>>1<<1) && y/7%2 == 0)
       return -1;
     else
-      return glb.latIndex(Math.PI/2 + Math.atan(Math.sinh(((double)y-height()/2.0) / (width()/(2*Math.PI)))));
+      return glb.latIndex(Math.PI/2 + 2*Math.atan((y-height()/2.0) / (height()/2.0)));
   }
   
   

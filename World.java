@@ -342,7 +342,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final boolean settlersLike(Tile til) { // determines whether to found a civi
-    if (til.altitude < 0 || til.biome == Tile.freshwater) // civis may not start on ocean or river
+    if (til.altitude < 0 || til.biome == Tile.freshwater || til.biome == Tile.tundra) // civis may not start on ocean or river or in tundra
       return false;
     
     ArrayList<Tile> adjacent = adjacentTo(til);

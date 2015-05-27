@@ -312,7 +312,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     
     victor.adversaries.remove(loser);
     loser.adversaries.remove(victor);
-    System.out.println(loser+" has surrendered to "+victor+"!");
+    //System.out.println(loser+" has surrendered to "+victor+"!");
   }
   
   

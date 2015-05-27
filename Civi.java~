@@ -273,11 +273,11 @@ public class Civi {
   }
   
   
-  public boolean cannotDefend(Tile til) { // decides if it can undispute a tile in the opponent's favor
+  public boolean cannotDefend(Tile til) { // decides if it can undispute a tile in the opponent's favor (weaker if at war with another Civi)
     if (til.biome == homeBiome)
-      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + (adversaries.size()>>3) + 30);
+      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + (adversaries.size()>>2) + 30);
     else
-      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + (adversaries.size()>>3) + 10);
+      return randChance(-(militaryLevel>>4) + explorabilityOf[til.biome] + (adversaries.size()>>2) + 10);
   }
   
   
@@ -352,7 +352,7 @@ public class Civi {
   
   
   public boolean canNuke(Tile til) {
-    return scienceLevel >= modern && randChance((militaryLevel>>4) + (til.development>>3) - 140);
+    return scienceLevel >= modern && randChance((militaryLevel>>4) + (til.development>>3) - 130);
   }
   
   

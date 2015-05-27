@@ -29,7 +29,7 @@ public class Civi {
   public static final int prosperity = 98304;
   public static final int apocalypse = 114688;
   public static final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -32, -40, -52, -60, -72, 0}; // how quickly civis spread over biomes
-  public static final int[] fertilityOf =     {0, -56, -64, -52, -60, -44, -36, -48, -32, -44, -40, -36, 0}; // how quickly civis develop them
+  public static final int[] fertilityOf =     {0, -64, -56, -60, -68, -44, -36, -48, -32, -44, -40, -36, 0}; // how quickly civis develop them
                                           // mag, ocn, ice, ref, tre, tun, pln, des, jng, mtn, cap, wtr, SPAAAACE
   
   public int serialNo; // the civi's serial number (unique per game)
