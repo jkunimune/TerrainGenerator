@@ -136,7 +136,9 @@ public class Globe { // a spherical surface
   
   
   public final int distance(Tile from, Tile to) { // calculates the distance between two tiles
-    return (new Vector(radius
+    return (int)(radius *
+                 (new Vector(1.0, from.lat*Math.PI/map.length, from.lon*2*Math.PI/map[from.lat].length)).angleTo
+                   (new Vector(1.0, to.lat*Math.PI/map.length, to.lon*2*Math.PI/map[to.lat].length)));
   }
   
   

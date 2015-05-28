@@ -10,9 +10,9 @@ public final class MapTest{ // a class to generate and display terrain onto a sp
     while (true) {
       Planet earth = new Planet(100);
       Map[] maps = new Map[3];
-      maps[0] = new Mercator(earth, 400, 200);
-      maps[1] = new Miller(earth, 400, 200);
-      maps[2] = new Gall(earth, 400, 200);
+      maps[0] = new Hemispherical(earth, 400, 200);
+      maps[1] = new Bipolar(earth, 400, 200);
+      maps[2] = new Stereographic(earth, 400, 200);
       
       for (Map theMap: maps)
         theMap.display(ColS.altitude);

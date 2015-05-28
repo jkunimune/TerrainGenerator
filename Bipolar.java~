@@ -7,13 +7,7 @@ public class Bipolar extends Map { // an equal-distant map showing polar project
     super(g, w, h);
     if (w < h)  radius = w/2;
     else        radius = h/2;
-    
-    for (int x = 0; x < 2*radius; x ++) {
-      for (int y = 0; y < 2*radius; y ++) {
-        lats[y][x] = getLat(x,y);
-        lons[y][x] = getLon(x,y);
-      }
-    }
+    finishSuper();
   }
   
   

@@ -191,7 +191,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   public final void startWar(Tile til) { // causes Civis to wage war on others from tiles occasionally
     if (til.owners.size() == 1 && til.owners.get(0).wantsWar()) { // Tiles occasionally decide to wage war on neighbors
-      final Tile adj = landBorderAt(til);
+      final Tile adj = borderAt(til);
       if (adj.lat != -1) // if there is a border and these civis are not already at war
         wageWar(til.owners.get(0), adj.owners.get(0));
     }
@@ -275,8 +275,8 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     
     for (Tile[] row: map)
       for (Tile til: row)
-        if (til.altitude < 0 && til.owners.size() == 1 && til.owners.get(0).equals(vic))
-          agg.takes(til); // all ocean is immediately disputed
+        if (til.development == 1 && til.altitude < 0 && til.owners.size() == 1 && til.owners.get(0).equals(vic))
+          agg.takes(til); // all ocean territory is immediately disputed
     
     for (int i = 0; i < 64; i ++) { // calls a random region between the empires into dispute
       for (int j = 0; j < agg.land.size(); j ++) {
@@ -321,10 +321,10 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   }
   
   
-  public final Tile landBorderAt(Tile til) { // decides if there is a land international border here
+  public final Tile borderAt(Tile til) { // decides if there is a international border here
     final ArrayList<Tile> adjacentList = adjacentTo(til);
     for (Tile adj: adjacentList)
-      if (adj.altitude >= 0 && adj.owners.size() == 1 && !adj.owners.equals(til.owners))
+      if (adj.owners.size() == 1 && !adj.owners.equals(til.owners))
         return adj;
     return new Tile(-1, -1);
   }

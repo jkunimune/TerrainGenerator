@@ -27,10 +27,10 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
       {  true,  true, false,  true },
       {  true,  true,  true, false }
     }, {
-      {  true,  true,  true,  true }, // plains
-      {  true,  true, false, false },
+      {  true,  true, false, false }, // plains
       {  true,  true,  true,  true },
-      { false, false,  true,  true }
+      { false, false,  true,  true },
+      {  true,  true,  true,  true }
     }, {
       {  true,  true,  true,  true }, // desert
       {  true, false,  true,  true },
@@ -406,8 +406,8 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
               for (int j = -3; j <= 3; j ++)
                 if (i*i + j*j <= 9) // if in circle
                   if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
-                    if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) ||
-                        (glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) && glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude >= 0) // if it is near a tile owned by someone else or a coast
+                    if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) || // if it is near a tile owned by someone else
+                        ((glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) && glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude >= 0)) // or a coast
                       return civ.emblem();
           
           return Color.white;

@@ -1,9 +1,9 @@
-public class Bipolar extends Map { // an equal-distant map showing polar projections of both hemispheres
+public class PartialStereographic extends Map { // a stereographic map that utilizes the entire space but does not display the entire globe
   int radius;
   
   
   
-  public Bipolar(Globe g, int w, int h) {
+  public Stereographic(Globe g, int w, int h) {
     super(g, w, h);
     if (w/2 < h)  radius = w/4;
     else          radius = h/2;
@@ -13,10 +13,10 @@ public class Bipolar extends Map { // an equal-distant map showing polar project
   
   public final int getLat(int x, int y) {
     if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius) // if inside the left circle
-      return glb.latIndex(Math.PI - Math.sqrt((x-radius)*(x-radius) + (y-radius)*(y-radius))*Math.PI/2/radius);
+      return glb.latIndex(Math.PI - 2*Math.atan(Math.sqrt((x-radius)*(x-radius) + (y-radius)*(y-radius))/radius));
     
     else if ((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < radius*radius) // if inside the right circle
-      return glb.latIndex(Math.sqrt((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius))*Math.PI/2/radius);
+      return glb.latIndex(2*Math.atan(Math.sqrt((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius))/radius));
       
     else
       return -1;

@@ -1,9 +1,9 @@
-public class Bipolar extends Map { // an equal-distant map showing polar projections of both hemispheres
+public class Stereographic extends Map { // an equal-distant map showing polar projections of both hemispheres
   int radius;
   
   
   
-  public Bipolar(Globe g, int w, int h) {
+  public Stereographic(Globe g, int w, int h) {
     super(g, w, h);
     if (w/2 < h)  radius = w/4;
     else          radius = h/2;

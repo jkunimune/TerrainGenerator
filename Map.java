@@ -27,10 +27,12 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
       {  true,  true, false,  true },
       {  true,  true,  true, false }
     }, {
-      {  true,  true, false, false }, // plains
-      {  true,  true,  true,  true },
-      { false, false,  true,  true },
-      {  true,  true,  true,  true }
+      {  true,  true, false, false, false,  true }, // plains
+      {  true,  true,  true,  true,  true,  true },
+      {  true,  true,  true,  true,  true,  true },
+      { false, false,  true,  true,  true, false },
+      {  true,  true,  true,  true,  true,  true },
+      {  true,  true,  true,  true,  true,  true }
     }, {
       {  true,  true,  true,  true }, // desert
       {  true, false,  true,  true },

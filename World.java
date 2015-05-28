@@ -273,17 +273,12 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     if (agg.adversaries.contains(vic)) // if they are already at war
       return;
     
-    for (Tile[] row: map)
-      for (Tile til: row)
-        if (til.development == 1 && til.altitude < 0 && til.owners.size() == 1 && til.owners.get(0).equals(vic))
-          agg.takes(til); // all ocean territory is immediately disputed
-    
     for (int i = 0; i < 64; i ++) { // calls a random region between the empires into dispute
       for (int j = 0; j < agg.land.size(); j ++) {
         final Tile til = agg.land.get(j);
         for (Tile adj: adjacentTo(til))
           if (adj.owners.size() == 1 && adj.owners.get(0).equals(vic)) // land owned only by the victim can be disputed by the aggressor
-            if (agg.canInvade(adj))
+            if (adj.isWet() || agg.canInvade(adj)) // naval territory is disputed immediately
               agg.takes(adj);
       }
     }
