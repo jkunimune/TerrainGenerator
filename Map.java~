@@ -9,6 +9,64 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   public static final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(20, 70, 200), new Color(0,0,150),
     new Color(255,255,255), new Color(79,191,39), new Color(200,255,50), new Color(0,130,20), new Color(200,100,50), new Color(200,100,255),
     new Color(10,33,255), new Color(0,0,0)}; // colors of the biomes
+  public static final boolean[][][] key = {
+    {
+      {  true } // magma
+    }, {
+      { false } // ocean
+    }, {
+      {  true, false }, // ice
+      { false, false }
+    }, {
+      { false } // reef
+    }, {
+      { false } // trench
+    }, {
+      { false,  true,  true,  true }, // tundra
+      {  true, false,  true,  true },
+      {  true,  true, false,  true },
+      {  true,  true,  true, false }
+    }, {
+      {  true,  true,  true,  true }, // plains
+      {  true,  true, false, false },
+      {  true,  true,  true,  true },
+      { false, false,  true,  true }
+    }, {
+      {  true,  true,  true,  true }, // desert
+      {  true, false,  true,  true },
+      {  true,  true,  true,  true },
+      {  true,  true,  true,  true }
+    }, {
+      {  true,  true,  true,  true }, // jungle
+      {  true, false, false, false },
+      {  true,  true, false,  true },
+      {  true,  true, false,  true }
+    }, {
+      {  true,  true,  true,  true,  true,  true,  true }, // mountains
+      {  true,  true,  true,  true,  true,  true, false },
+      { false,  true,  true,  true,  true, false,  true },
+      {  true, false,  true,  true, false,  true,  true },
+      {  true,  true, false, false,  true,  true,  true },
+      {  true,  true, false,  true,  true,  true,  true },
+      {  true, false,  true,  true,  true,  true,  true },
+      {  true,  true,  true,  true,  true,  true,  true }
+    }, {
+      {  true,  true,  true,  true,  true,  true,  true }, // mountains
+      {  true,  true,  true,  true,  true,  true, false },
+      { false,  true,  true,  true,  true, false, false },
+      { false, false,  true,  true, false, false, false },
+      {  true,  true, false, false,  true,  true,  true },
+      {  true,  true, false,  true,  true,  true,  true },
+      {  true, false,  true,  true,  true,  true,  true },
+      {  true,  true,  true,  true,  true,  true,  true }
+    }, {
+      { false, false, false }, // freshwater
+      { false,  true, false },
+      { false, false, false }
+    }, {
+      { false }
+    }
+  };
       
   private int tipX, tipY, tipW, tipH; // TileTip coordinates and dimensions
   private BufferedImage img;
@@ -156,6 +214,8 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
         return getColorByTerritory(x, y);
       case hybrid:
         return getColorByHybrid(x, y);
+      case drawn:
+        return getColorByDrawn(x, y);
       default:
         return new Color(255, 0, 150);
     }
@@ -306,6 +366,51 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
                       return civ.emblem();
           
           return getColorByBiome(x,y);
+          
+        case 2: // settlement
+          return civ.emblem();
+          
+        case 3: // urban area
+          return new Color(civ.emblem().getRed()>>1,
+                           civ.emblem().getGreen()>>1,
+                           civ.emblem().getBlue()>>1); // return darkened tile
+          
+        case 4: // utopia
+          return new Color(255- ((255-civ.emblem().getRed()) >>1), 
+                           255- ((255-civ.emblem().getGreen()) >>1), 
+                           255- ((255-civ.emblem().getBlue()) >>1)); // return lightened tile
+        default:
+          return new Color(255, 127, 0);
+      }
+    }
+  }
+  
+  
+  public Color getColorByDrawn(int x, int y) {
+    final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
+    
+    if (!key[til.biome][y%key[til.biome].length][x%key[til.biome][0].length])
+      return Color.black; // draws biomes in black patterns
+    
+    if (til.development == 0) {
+      return Color.white; // unclaimed land is white
+    }
+    else {
+      final Civi civ = til.owners.get((x+y >>2) % til.owners.size());
+      
+      switch (til.development) {
+        case 1: // territory
+          
+          for (int i = -3; i <= 3; i ++)
+            if (y+i >= 0 && y+i < lats.length) // if in bounds
+              for (int j = -3; j <= 3; j ++)
+                if (i*i + j*j <= 9) // if in circle
+                  if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
+                    if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) ||
+                        (glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) && glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude >= 0) // if it is near a tile owned by someone else or a coast
+                      return civ.emblem();
+          
+          return Color.white;
           
         case 2: // settlement
           return civ.emblem();

@@ -28,7 +28,7 @@ public class Civi {
   public static final int space = 81920;
   public static final int prosperity = 98304;
   public static final int apocalypse = 114688;
-  public static final int[] explorabilityOf = {0, -52, -56, -48, -52, -40, -36, -32, -40, -52, -60, -72, 0}; // how quickly civis spread over biomes
+  public static final int[] explorabilityOf = {0, -48, -56, -48, -48, -40, -36, -32, -40, -52, -60, -72, 0}; // how quickly civis spread over biomes
   public static final int[] fertilityOf =     {0, -64, -56, -60, -68, -44, -36, -48, -32, -44, -40, -36, 0}; // how quickly civis develop them
                                           // mag, ocn, ice, ref, tre, tun, pln, des, jng, mtn, cap, wtr, SPAAAACE
   
@@ -194,7 +194,7 @@ public class Civi {
           if (randChance(fertilityOf[til.biome] + (spreadRate>>3) + waterAdjacency))
             return true;
       
-        if (til.development == 1 && randChance(fertilityOf[til.biome]+waterAdjacency+(spreadRate>>3)-120)) // if still unsettled
+        if (til.development == 1 && randChance(fertilityOf[til.biome]+waterAdjacency+(spreadRate>>3)-110)) // if still unsettled
           return true; // it might get settled
         return false;
       
@@ -319,7 +319,7 @@ public class Civi {
   
   
   public boolean wantsWar() { // if the Civi feels like starting a war
-    return randChance((warChance>>3) - 120);
+    return randChance((warChance>>3) - 115);
   }
   
   
@@ -343,11 +343,17 @@ public class Civi {
   }
   
   
-  public boolean hasDiscontent(boolean urban) { // if a rebellion shall start here
+  public boolean hasDiscontent(Tile til) { // if a rebellion shall start here
     if (scienceLevel < classical || deathTimer < 0) // the ancient age is too early to start a revolution, and the apocalypse is too late
       return false;
-    if (urban)  return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>13) - 120); // big old weak warmongers are more likely to have revolutions
-    else        return randChance((warChance>>5) - (militaryLevel>>6) + (land.size()>>14) - (deathTimer>>13) - 150); // urban areas are more likely to seed revolutions
+    if (randChance(120 - (warChance>>5) + (militaryLevel>>6) - (land.size()>>14) + (deathTimer>>13))) // big old weak warmongers are more likely to have revolutions in cities
+      return false;
+    
+    final ArrayList<Tile> adjacentList = world.adjacentTo(til);
+    for (Tile adj: adjacentList)
+      if (!adj.owners.equals(til.owners) || adj.altitude < 0) // revolutions must happen on borders
+        return true;
+    return false;
   }
   
   

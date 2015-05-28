@@ -135,7 +135,7 @@ public class Civi {
       militaryLevel += 64;
     } 
     else if (scienceLevel >= space && scienceLevel < space+scienceRate) {
-      System.out.println(this+"has mastered space-travel!");
+      System.out.println(this+" has mastered space-travel!");
       militaryLevel += 64;
     }
     else if (scienceLevel >= modern && scienceLevel < modern+scienceRate) {
@@ -194,7 +194,7 @@ public class Civi {
           if (randChance(fertilityOf[til.biome] + (spreadRate>>3) + waterAdjacency))
             return true;
       
-        if (til.development == 1 && randChance(fertilityOf[til.biome]+waterAdjacency+(spreadRate>>3)-120)) // if still unsettled
+        if (til.development == 1 && randChance(fertilityOf[til.biome]+waterAdjacency+(spreadRate>>3)-110)) // if still unsettled
           return true; // it might get settled
         return false;
       

@@ -14,40 +14,60 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   
   
   
+  public final void generate() {
+    generate(new Map[0]);
+  }
+  
+  
   /* PRECONDITION: map's Globe is world */
   public final void generate(Map map) { // randomly generates a map and simultaneously displays it
-    map.display(ColS.altitude);
+    Map[] sheath = new Map[1];
+    sheath[0] = map;
+    generate(sheath);
+  }
+  
+  
+  /* PRECONDITION: each map's Globe is world */
+  public final void generate(Map[] maps) { // randomly generates a map and simultaneously displays it
+    for (Map map: maps)
+      map.display(ColS.altitude);
     System.out.println("Generating landmasses...");
-      
+    
     spawnFirstContinent();
     
     int t = 0;
     while (any(-257)) {
       spawnContinents();
       if (t%20 == 0)
-        map.display(ColS.altitude);
+        for (Map map: maps)
+          map.display(ColS.altitude);
       t ++;
     }
     if (t%20 != 1)
-      map.display(ColS.altitude);
+      for (Map map: maps)
+        map.display(ColS.altitude);
     
     System.out.println("Shifting continents...");
     plateTechtonics();
-    map.display(ColS.altitude);
+    for (Map map: maps)
+      map.display(ColS.altitude);
     
     System.out.println("Roughing up and smoothing down terrain...");
     for (int i = 64; i >= 1; i >>= 2) { // gradually randomizes and smooths out terrain
       for (int j = 0; j < i; j ++)
         smooth(.4);
-      map.display(ColS.altitude);
+      for (Map map: maps)
+        map.display(ColS.altitude);
       rough(i*1.2);
-      map.display(ColS.altitude);
+      for (Map map: maps)
+        map.display(ColS.altitude);
     }
     
     System.out.println("Raining...");
     rain();
     runoff();
-    map.display(ColS.altitude);
+    for (Map map: maps)
+      map.display(ColS.altitude);
     
     System.out.println("Generating climate...");
     acclimate(.1);
@@ -55,7 +75,8 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     
     System.out.println("Setting up biomes...");
     biomeAssign();
-    map.display(ColS.biome);
+    for (Map map: maps)
+      map.display(ColS.biome);
     
     System.out.println("Done!\n");
   }

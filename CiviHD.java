@@ -19,21 +19,21 @@ public final class CiviHD { // the driver for my final project
     loadSound();
     
     Planet protoEarth = new Planet(100);
-    Map topographical = new Gall(protoEarth, 600, 600);
+    Map topographical = new Gall(protoEarth, 700, 500);
     
     intro.play();
     protoEarth.generate(topographical);
     delay(3000);
     
     World earth = new World(protoEarth);
-    Map political = new Gall(earth, 600, 600);
+    Map political = new Miller(earth, 700, 500);
     
     music.loop();
     
     while (true) {
       setTimer(0);
       earth.update();
-      political.display(ColS.territory);
+      political.display(ColS.drawn);
       waitFor(10);
     }
     
