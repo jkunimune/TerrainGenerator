@@ -9,10 +9,14 @@ public final class MapTest{ // a class to generate and display terrain onto a sp
     
     while (true) {
       Planet earth = new Planet(100);
-      Map[] maps = new Map[3];
-      maps[0] = new Mercator(earth, 400, 200);
-      maps[1] = new Miller(earth, 400, 200);
-      maps[2] = new Gall(earth, 400, 200);
+      Map[] maps = new Map[7];
+      maps[0] = new Hemispherical(earth, 400, 200);
+      maps[1] = new Bipolar(earth, 400, 200);
+      maps[2] = new Stereographic(earth, 400, 200);
+      maps[3] = new Mercator(earth, 400, 200);
+      maps[4] = new Miller(earth, 400, 200);
+      maps[5] = new Gall(earth, 400, 200);
+      maps[6] = new Sinusoidal(earth, 400, 200);
       
       for (Map theMap: maps)
         theMap.display(ColS.altitude);
@@ -20,7 +24,7 @@ public final class MapTest{ // a class to generate and display terrain onto a sp
       earth.generate(maps);
       
       System.out.println("end");
-      delay(20000);
+      delay(30000);
     }
   }
   

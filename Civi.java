@@ -103,7 +103,7 @@ public class Civi {
     spreadRate = (int)(Math.random()*256); // randomize stats
     scienceRate = (int)(Math.random()*256);
     scienceLevel = motherland.scienceLevel;
-    militaryLevel = motherland.militaryLevel + (int)(Math.random()*256-128);
+    militaryLevel = motherland.militaryLevel + (int)(Math.random()*512-256);
     warChance = (int)(Math.random()*256);
     deathTimer = 32768 + (int)(Math.random()*32768);
     

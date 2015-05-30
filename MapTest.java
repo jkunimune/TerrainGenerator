@@ -1,4 +1,4 @@
-public final class MapTest{ // a class to generate and display terrain onto a spherical surface
+public final class MapTest{ // a class to experiment with and compare different map projections
   static long startTime = 0; // the time it was when we last checked
   static java.applet.AudioClip music; // the song that plays
   
@@ -10,9 +10,9 @@ public final class MapTest{ // a class to generate and display terrain onto a sp
     while (true) {
       Planet earth = new Planet(100);
       Map[] maps = new Map[3];
-      maps[0] = new Hemispherical(earth, 400, 200);
-      maps[1] = new Bipolar(earth, 400, 200);
-      maps[2] = new Stereographic(earth, 400, 200);
+      maps[0] = new SimpleSinusoidal(earth, 400, 628);
+      maps[1] = new SimpleTrig(earth, 400, 628);
+      maps[2] = new Hemispherical(earth, 600, 300);
       
       for (Map theMap: maps)
         theMap.display(ColS.altitude);
@@ -20,7 +20,7 @@ public final class MapTest{ // a class to generate and display terrain onto a sp
       earth.generate(maps);
       
       System.out.println("end");
-      delay(20000);
+      delay(30000);
     }
   }
   

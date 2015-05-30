@@ -135,7 +135,7 @@ public class Civi {
       militaryLevel += 64;
     } 
     else if (scienceLevel >= space && scienceLevel < space+scienceRate) {
-      System.out.println(this+"has mastered space-travel!");
+      System.out.println(this+" has mastered space-travel!");
       militaryLevel += 64;
     }
     else if (scienceLevel >= modern && scienceLevel < modern+scienceRate) {

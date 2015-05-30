@@ -260,6 +260,8 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void naturallyDisast(Tile til) { // causes natural disasters
+    if (randChance(-500))
+      meatyore(til);
   }
   
   
@@ -273,17 +275,12 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     if (agg.adversaries.contains(vic)) // if they are already at war
       return;
     
-    for (Tile[] row: map)
-      for (Tile til: row)
-        if (til.development == 1 && til.altitude < 0 && til.owners.size() == 1 && til.owners.get(0).equals(vic))
-          agg.takes(til); // all ocean territory is immediately disputed
-    
     for (int i = 0; i < 64; i ++) { // calls a random region between the empires into dispute
       for (int j = 0; j < agg.land.size(); j ++) {
         final Tile til = agg.land.get(j);
         for (Tile adj: adjacentTo(til))
           if (adj.owners.size() == 1 && adj.owners.get(0).equals(vic)) // land owned only by the victim can be disputed by the aggressor
-            if (agg.canInvade(adj))
+            if ((adj.isWet() && randChance(-10)) || agg.canInvade(adj)) // naval territory is disputed very quickly
               agg.takes(adj);
       }
     }
@@ -379,7 +376,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   }
   
   
-  public final void meteor(Tile t) { // shoots a meteor of random size at the specified Tile
+  public final void meatyore(Tile t) { // shoots a meteor of random size at the specified Tile
     blast.play();
     System.out.println("A meteor has struck!");
     

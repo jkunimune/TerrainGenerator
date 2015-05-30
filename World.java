@@ -260,6 +260,8 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void naturallyDisast(Tile til) { // causes natural disasters
+    if (randChance(-170))
+      meatyore(til);
   }
   
   
@@ -278,7 +280,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
         final Tile til = agg.land.get(j);
         for (Tile adj: adjacentTo(til))
           if (adj.owners.size() == 1 && adj.owners.get(0).equals(vic)) // land owned only by the victim can be disputed by the aggressor
-            if (adj.isWet() || agg.canInvade(adj)) // naval territory is disputed immediately
+            if ((adj.isWet() && randChance(-10)) || agg.canInvade(adj)) // naval territory is disputed very quickly
               agg.takes(adj);
       }
     }
@@ -374,7 +376,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   }
   
   
-  public final void meteor(Tile t) { // shoots a meteor of random size at the specified Tile
+  public final void meatyore(Tile t) { // shoots a meteor of random size at the specified Tile
     blast.play();
     System.out.println("A meteor has struck!");
     
