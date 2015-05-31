@@ -1,58 +1,28 @@
-public class PartialStereo extends Map { // a stereographic map that utilizes the entire space but does not display the entire globe
+public class PartialStereo extends Map { // a stereographic map that utilizes the entire space but only displays the south portion of the globe
   int radius;
   
   
   
   public PartialStereo(Globe g, int w, int h) {
     super(g, w, h);
-    if (w/2 < h)  radius = w/4;
-    else          radius = h/2;
+    radius = (int)(Math.sqrt(w*w + h*h)/6); // the radius of the map (from pole to equator) is an eighth of the diagonal of the screen
     finishSuper();
   }
   
   
   public final int getLat(int x, int y) {
-    if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius) // if inside the left circle
-      return glb.latIndex(Math.PI - 2*Math.atan(Math.sqrt((x-radius)*(x-radius) + (y-radius)*(y-radius))/radius));
-    
-    else if ((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < radius*radius) // if inside the right circle
-      return glb.latIndex(2*Math.atan(Math.sqrt((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius))/radius));
-      
-    else
-      return -1;
+    return glb.latIndex(2*Math.atan(Math.sqrt((x-width()/2)*(x-width()/2) + (y-height()/2)*(y-height()/2)) / radius));
   }
   
   
   public final int getLon(int x, int y) {
-    if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius) { // if inside the left circle
-      if (x > radius) // if x is on right of circle
-        return glb.lonIndex(lats[y][x], Math.atan((double)(y-radius)/(x-radius)));
-      else if (x < radius) // if point is on left of circle
-        return glb.lonIndex(lats[y][x], Math.atan((double)(y-radius)/(x-radius)) + Math.PI);
-      else { // if point is on vertical line of symetry
-        if (y > radius)  return glb.lonIndex(lats[y][x], Math.PI/2);
-        else             return glb.lonIndex(lats[y][x], 3*Math.PI/2);
-      }
-    }
-    
-    else if (lats[y][x] != -1) { // if inside the right circle
-      if (x > 3*radius) // if x is on right of circle
-        return glb.lonIndex(lats[y][x], Math.atan((double)(y-radius)/(3*radius-x)) + Math.PI);
-      else if (x < 3*radius) // if point is on left of circle
-        return glb.lonIndex(lats[y][x], Math.atan((double)(y-radius)/(3*radius-x)));
-      else { // if point is on vertical line of symetry
-        if (y > radius)  return glb.lonIndex(lats[y][x], Math.PI/2);
-        else             return glb.lonIndex(lats[y][x], 3*Math.PI/2);
-      }
-    }
-    
-    else if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < (3+radius)*(3+radius) || 
-             (x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < (3+radius)*(3+radius)) { // if it is on the edge of the circle
-      return 0;
-    }
-    
-    else {
-      return 16777215;
+    if (x > width()/2) // if x is on right of circle
+      return glb.lonIndex(lats[y][x], Math.atan((double)(y-height()/2)/(x-width()/2)));
+    else if (x < width()/2) // if point is on left of circle
+      return glb.lonIndex(lats[y][x], Math.atan((double)(y-height()/2)/(x-width()/2)) + Math.PI);
+    else { // if point is on vertical line of symetry
+      if (y > height()/2)  return glb.lonIndex(lats[y][x], Math.PI/2);
+      else                 return glb.lonIndex(lats[y][x], 3*Math.PI/2);
     }
   }
 }

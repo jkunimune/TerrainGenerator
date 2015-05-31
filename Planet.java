@@ -38,12 +38,12 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     int t = 0;
     while (any(-257)) {
       spawnContinents();
-      if (t%20 == 0)
+      if (t%30 == 0)
         for (Map map: maps)
           map.display(ColS.altitude);
       t ++;
     }
-    if (t%20 != 1)
+    if (t%30 != 1)
       for (Map map: maps)
         map.display(ColS.altitude);
     
@@ -118,8 +118,8 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
         if (tile.altitude == -257) {
           ArrayList<Tile> adjacent = adjacentTo(tile);
           for (Tile ref: adjacent) // reads all adjacent tiles to look for land or sea
-            if (ref.altitude >= -256 && randChance(-50 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
-            tile.spreadFrom(ref);
+            if (ref.altitude >= -256 && randChance(-55 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
+              tile.spreadFrom(ref);
           
           if (tile.altitude == -257 && randChance(-142)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
             tile.startPlate(false); // seeds new plates occasionally

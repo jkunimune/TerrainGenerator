@@ -52,7 +52,7 @@ public class Robots extends Civi {
   
   @Override
   public final boolean randChance(int p) { // like randChance, but less random
-    return year % (1+Math.pow(Math.E, -.1*p)) == 0;
+    return year % (int)(1+Math.pow(Math.E, -.1*p)) == 0;
   }
   
   

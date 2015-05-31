@@ -266,7 +266,8 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void spawnCivi(Tile til) {
-    if (randChance(-40))  civis.add(new CityState(til, civis, this)); // occasionally City-States spawn
+    if (randChance(-45))  civis.add(new CityState(til, civis, this)); // occasionally City-States spawn
+    if (randChance(-45))  civis.add(new Purple(til, civis, this)); // occasionally the "glitched" purple civi
     else                  civis.add(new Civi(til, civis, this)); // but usually, they are empires
   }
   

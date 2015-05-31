@@ -260,7 +260,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void naturallyDisast(Tile til) { // causes natural disasters
-    if (randChance(-500))
+    if (randChance(-170))
       meatyore(til);
   }
   

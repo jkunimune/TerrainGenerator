@@ -8,7 +8,7 @@ public final class CustomTrig extends Map { // a compromising projection based o
   public final int getLat(int x, int y) {
     if (Math.abs(x-width()/2.0) < Math.sin(Math.PI*y/height())*width()/2.0 ||
         Math.abs(x-width()/2.0) - 3 >= Math.sin(Math.PI*(y+2)/(height()+4))*width()/2.0) // if it is inside the sin curve or outside the sine curve
-      return glb.latIndex(Math.acos(Math.pow(Math.E,-Math.pow(2.0*x/width()-1,2)/2) * Math.cos(y*Math.PI/height())));
+      return glb.latIndex(Math.acos(Math.exp(-Math.pow(2.0*x/width()-1,2)/2) * Math.cos(y*Math.PI/height())));
     
     else // if it is on the edge
       return -1;

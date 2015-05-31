@@ -9,12 +9,6 @@ public class Robots extends Civi {
   
   
   
-  public Robots(Tile start, ArrayList<Civi> existing, World wholeNewWorld) {
-    super(start, existing, wholeNewWorld);
-    year = 0;
-  }
-  
-  
   public Robots(Tile start, ArrayList<Civi> existing, World wholeNewWorld, Civi motherland) {
     super(start, existing, wholeNewWorld, motherland);
     year = 0;
@@ -30,11 +24,17 @@ public class Robots extends Civi {
   
   
   @Override
-  public boolean hasDiscontent(boolean urban) { // human rebellions are the only random fator for robots
+  public boolean hasDiscontent(Tile til) { // human rebellions are the only random fator for robots
     if (sciLevel() < classical || dthTimer() < 0) // the ancient age is too early to start a revolution, and the apocalypse is too late
       return false;
-    if (urban)  return super.randChance((warChance()>>5) - (milLevel()>>6) + (land.size()>>14) - (dthTimer()>>14) - 130); // big old weak warmongers are more likely to have revolutions
-    else        return super.randChance((warChance()>>5) - (milLevel()>>6) + (land.size()>>14) - (dthTimer()>>14) - 160); // urban areas are more likely to seed revolutions
+    if (super.randChance(120 - (warChance()>>5) + (milLevel()>>6) - (land.size()>>14) + (dthTimer()>>13))) // big old weak warmongers are more likely to have revolutions in cities
+      return false;
+    
+    final ArrayList<Tile> adjacentList = world.adjacentTo(til);
+    for (Tile adj: adjacentList)
+      if (!adj.owners.equals(til.owners) || adj.altitude < 0) // revolutions must happen on borders
+        return true;
+    return false;
   }
   
   

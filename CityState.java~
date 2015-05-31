@@ -58,13 +58,13 @@ public class CityState extends Civi { // a Civi that expands to only a few tiles
   public String newName() {
     String output = "";
     
-    output = ""; // otherwise create a custom captial name
+    output = "";
     
     for (int i = (int)(Math.random()*2)*4+2; i >= 0; i --)
       output += alphabet[i%4][(int)(Math.random()*alphabet[i%4].length)]; // strings together a bunch of random syllables
     for (int j = 0; j < output.length()-1; j ++) // capitalizes all words
       if (j == 0 || output.charAt(j-1) == ' ' || output.charAt(j-1) == '-' || output.charAt(j-1) == '\'')
-      output = output.substring(0,j) + output.substring(j, j+1).toUpperCase() + output.substring(j+1);
+        output = output.substring(0,j) + output.substring(j, j+1).toUpperCase() + output.substring(j+1);
     
     switch ((int)(Math.pow(Math.random(),2.2)*6)) { // puts an ending onto it
       case 1:

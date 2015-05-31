@@ -1,0 +1,36 @@
+import java.util.*;
+import java.awt.*;
+import org.apache.commons.lang3.RandomStringUtils;
+
+
+
+public class Purple extends Civi {
+  public Purple(Tile start, ArrayList<Civi> existing, World wholeNewWorld) {
+    super(start, existing, wholeNewWorld);
+    year = 0;
+  }
+  
+  
+  public Purple(Tile start, ArrayList<Civi> existing, World wholeNewWorld, Civi motherland) {
+    super(start, existing, wholeNewWorld, motherland);
+    year = 0;
+  }
+  
+  
+  
+  @Override
+  public String newName() {
+    return "Purple"; // this Civ's name is "Purple" names are random strings
+  }
+  
+  
+  @Override
+  public final boolean randChance(int p) { // like randChance, but less random
+    return true;
+  }
+  
+  
+  public String toString() { // says "Purple"
+    return "Purple";
+  }
+}

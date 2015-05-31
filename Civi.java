@@ -495,6 +495,8 @@ public class Civi {
       return "red";
     else if (emblem.getRed() == 255 && emblem.getBlue() >= 128 && emblem.getGreen() < 128)
       return "magenta";
+//    else if (emblem.getRed() == 150 && emblem.getBlue() == 255 && emblem.getGreen() == 0)
+//      return "purple";
     else if (emblem.getRed() >= 128 && emblem.getBlue() >= 128 && emblem.getGreen() < 128)
       return "violet";
     else if (emblem.getRed() < 128 && emblem.getBlue() >= 128 && emblem.getGreen() < 196)
