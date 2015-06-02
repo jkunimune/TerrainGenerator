@@ -1,4 +1,4 @@
-public class Hemispherical extends Map { // a realistic globe projection that shows each hemisphere seperately and resembles FromSpace
+public class Hemispherical extends Map { // a realistic globe projection that mimics what the planet would look like if viewed from an infinite distance
   int radius;
   
   

@@ -14,12 +14,6 @@ public class CityState extends Civi { // a Civi that expands to only a few tiles
   }
   
   
-  public CityState(Tile start, ArrayList<Civi> existing, World wholeNewWorld, Civi motherland) {
-    super(start, existing, wholeNewWorld, motherland);
-    year = 0;
-  }
-  
-  
   
   @Override
   public void advance() {
