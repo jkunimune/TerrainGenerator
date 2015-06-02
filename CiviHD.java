@@ -7,7 +7,7 @@ import java.util.*;
 
 
 
-public final class CiviHD { // the driver for my final project
+public final class CiviHD { // the driver for my independent project
   static java.applet.AudioClip intro; // songs for generation and CiviHD
   static java.applet.AudioClip music;
   
@@ -19,14 +19,14 @@ public final class CiviHD { // the driver for my final project
     loadSound();
     
     Planet protoEarth = new Planet(100);
-    Map topographical = new Lemons(protoEarth, 800, 400);
+    Map topographical = new Lambert(protoEarth, 800, 400);
     
     intro.play();
     protoEarth.generate(topographical);
     delay(3000);
     
     World earth = new World(protoEarth);
-    Map political = new Lemons(earth, 800, 400);
+    Map political = new Lambert(earth, 800, 400);
     
     music.loop();
     

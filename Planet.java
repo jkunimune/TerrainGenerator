@@ -121,9 +121,9 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
             if (ref.altitude >= -256 && randChance(-55 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
               tile.spreadFrom(ref);
           
-          if (tile.altitude == -257 && randChance(-142)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
+          if (tile.altitude == -257 && randChance(-140)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
             tile.startPlate(false); // seeds new plates occasionally
-          else if (tile.altitude == -257 && randChance(-130))
+          else if (tile.altitude == -257 && randChance(-127))
             tile.startPlate(true);
         }
       }
@@ -481,7 +481,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
           else if (til.temperature >= 150 && til.rainfall >= 229) { // if hot and wet
             til.biome = Tile.jungle;
           }
-          else if ((255-til.temperature)*(255-til.temperature) + (til.rainfall-180)*(til.rainfall-180) < 2600) { // if hot and dry
+          else if ((255-til.temperature)*(255-til.temperature) + (til.rainfall-180)*(til.rainfall-180) < 2800) { // if hot and dry
             til.biome = Tile.desert;
           }
           else { // if neutral
