@@ -260,7 +260,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void naturallyDisast(Tile til) { // causes natural disasters
-    if (randChance(-170))
+    if (randChance(-180))
       meatyore(til);
   }
   
@@ -381,7 +381,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     blast.play();
     System.out.println("A meteor has struck!");
     
-    int size = 50 + (int)(Math.random()*50);
+    int size = 100 + (int)(Math.random()*100);
     for (Tile[] row: map)
       for (Tile til: row)
         if (distance(t, til) < size)
