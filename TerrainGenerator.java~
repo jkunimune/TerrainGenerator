@@ -11,7 +11,7 @@ public final class TerrainGenerator{ // a class to generate and display terrain 
       Planet earth = new Planet(100);
       Map theMap = new Hemispherical(earth, 800, 400);
       
-      theMap.display(Map.altitude);
+      theMap.display(ColS.altitude);
       
       earth.generate(theMap);
       

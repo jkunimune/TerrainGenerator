@@ -219,7 +219,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
       case drawn:
         return getColorByDrawn(x, y);
       default:
-        return new Color(255, 0, 150);
+        return new Color(150, 0, 255);
     }
   }
   

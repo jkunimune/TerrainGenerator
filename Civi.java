@@ -18,7 +18,7 @@ public class Civi {
       "s", "s", "sh", "sh", "shr", "st", "str", "d", "d", "dr", "f", "f", "fl", "fr", "g", "g", "gh", "gr", "h", "h", "h", "h", "h", "h", "h", "j", "k",
       "k", "k", "kh", "kl", "ky", "l", "l", "l", "l", "l", "l", "l", "ll", "lh", "z", "z", "zh", "c", "ch", "cl", "cr","cz", "v", "vr", "b", "b", "br",
       "bl", "n", "n", "n", "ng", "m", "m", "m", "mr", "'", "", "", "" }, // syllable-starting consonants,
-    { "", "", "", "", "", "", "", "", "", "", "", "", " ", "-" } }; // and connectors for name generation
+    { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", " ", "-" } }; // and connectors for name generation
   
   public static final int ancient = 0;
   public static final int classical = 16384; // science values of the different ages
@@ -367,9 +367,6 @@ public class Civi {
     
     for (int i = (int)(Math.random()*3)*4+2; i >= 0; i --) // i decrements from a random number whose %4 is 2
       output += alphabet[i%4][(int)(Math.random()*alphabet[i%4].length)]; // strings together a bunch of random syllables
-      for (int j = 0; j < output.length()-1; j ++) // capitalizes all words
-        if (j == 0 || output.charAt(j-1) == ' ' || output.charAt(j-1) == '-' || output.charAt(j-1) == '\'')
-          output = output.substring(0,j) + output.substring(j, j+1).toUpperCase() + output.substring(j+1);
     
     switch ((int)(Math.pow(Math.random(),1.8)*5)) { // puts an ending onto it
       case 1:
@@ -387,6 +384,10 @@ public class Civi {
         output += alphabet[3][(int)(Math.random()*alphabet[3].length)] + "ia";
         break;
     }
+    
+    for (int j = 0; j < output.length()-1; j ++) // capitalizes all words
+      if (j == 0 || output.charAt(j-1) == ' ' || output.charAt(j-1) == '-' || output.charAt(j-1) == '\'')
+        output = output.substring(0,j) + output.substring(j, j+1).toUpperCase() + output.substring(j+1);
     
     return output;
   }
