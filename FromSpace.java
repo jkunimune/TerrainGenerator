@@ -4,18 +4,27 @@ import java.awt.*;
 
 public class FromSpace extends Map { // like hemispherical, but it spins!
   public static final double camPeriod = 3000.0; // the rate at which the globe seems to turn on screen in msec/rad
-  public static final double sunPeriod = -150.0; // the rate at which the sun seems to go around the globe in msec/rad
-  double camAngle;
-  double sunAngle;
-  int radius;
+  public static final double sunPeriod = -900.0; // the rate at which the sun seems to go around the globe in msec/rad
+  private double camAngle;
+  private double sunAngle;
+  private double[][] longitudes; // like lons but carries actual angles, not indicies, and remains static
+  private int radius;
   
   
   
   public FromSpace(Globe g, int w, int h) {
     super(g, w, h);
+    
     if (w/2 < h)  radius = w/4;
     else          radius = h/2;
+    
     updateAngle();
+    
+    longitudes = new double[h][w];
+    for (int x = 0; x < w; x ++)
+      for (int y = 0; y < h; y ++)
+        longitudes[y][x] = getLongitude(x,y);
+    
     finishSuper();
   }
   
@@ -53,7 +62,25 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
   @Override
   public Color getColorBy(ColS c, int x, int y) { // gets the color at a point on the screen
     final Color daytime = super.getColorBy(c,x,y);
-    return daytime;
+    final double scaleFactor = Math.sin(longitudes[y][x] + sunAngle) * 2.0/3.0 + 1/3.0;
+    if (scaleFactor < 0)
+      return Color.black;
+    // make cities glow
+    else
+      return new Color((int)(daytime.getRed()*scaleFactor),
+                       (int)(daytime.getGreen()*scaleFactor),
+                       (int)(daytime.getBlue()*scaleFactor));
+  }
+
+
+  public final double getLongitude(int x, int y) {
+    if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius) // if it is in the left circle
+      return Math.asin((x-radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + Math.PI/2;
+    
+    else if (lats[y][x] != -1) // if it is in the right circle
+      return Math.asin((x-3*radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + 3*Math.PI/2;
+    
+    return 0;
   }
   
   
@@ -70,11 +97,8 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
   
   
   public final int getLon(int x, int y) {
-    if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius) // if it is in the left circle
-      return glb.lonIndex(lats[y][x], Math.asin((x-radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + Math.PI/2 + camAngle);
-    
-    else if (lats[y][x] != -1) // if it is in the right circle
-      return glb.lonIndex(lats[y][x], Math.asin((x-3*radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + 3*Math.PI/2 + camAngle);
+    if (lats[y][x] != -1) // if it is in the left circle
+      return glb.lonIndex(lats[y][x], longitudes[y][x] + camAngle);
     
     else if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < (3+radius)*(3+radius) ||
              (x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < (3+radius)*(3+radius)) // if it is on the edge of a circle

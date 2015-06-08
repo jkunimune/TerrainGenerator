@@ -215,7 +215,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   public void rough(double amount) { // randomizes the terrain a bit
     for (Tile[] row: map) {
       for (Tile t: row) {
-        t.altitude += (int)((Math.random()-.5)*amount);
+        t.altitude += (int)((Math.random()-.5)*amount*(t.altitude*t.altitude/65536.0+1));
       }
     }
   }
@@ -318,7 +318,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
       for (Tile til: row) {
         til.temp3 = 0;
         til.water <<= 5;
-        til.altitude += til.water>>7; // accounts for erosion later on
+        til.altitude += til.water>>8; // accounts for erosion later on
       }
     }
     
@@ -328,7 +328,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     
     for (Tile[] row: map)
       for (Tile til: row)
-        til.altitude -= til.water>>7; // erodes
+        til.altitude -= til.water>>8; // erodes
   }
   
   
