@@ -4,7 +4,7 @@ import java.awt.*;
 
 public class FromSpace extends Map { // like hemispherical, but it spins!
   public static final double camPeriod = 3000.0; // the rate at which the globe seems to turn on screen in msec/rad
-  public static final double sunPeriod = -900.0; // the rate at which the sun seems to go around the globe in msec/rad
+  public static final double sunPeriod = -800.0; // the rate at which the sun seems to go around the globe in msec/rad
   private double camAngle;
   private double sunAngle;
   private double[][] longitudes; // like lons but carries actual angles, not indicies, and remains static
@@ -62,10 +62,14 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
   @Override
   public Color getColorBy(ColS c, int x, int y) { // gets the color at a point on the screen
     final Color daytime = super.getColorBy(c,x,y);
-    final double scaleFactor = Math.sin(longitudes[y][x] + sunAngle) * 2.0/3.0 + 1/3.0;
+    final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
+    final double scaleFactor = Math.sin(longitudes[y][x] + sunAngle) * .5 + .5;
+    if (til.development == 3 && scaleFactor < .4)
+      return Color.yellow;
+    if (til.development == 4 && scaleFactor < .5)
+      return Color.cyan;
     if (scaleFactor < 0)
       return Color.black;
-    // make cities glow
     else
       return new Color((int)(daytime.getRed()*scaleFactor),
                        (int)(daytime.getGreen()*scaleFactor),

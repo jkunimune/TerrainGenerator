@@ -1,3 +1,7 @@
+import java.util.Scanner;
+
+
+
 public final class TerrainGenerator{ // a class to generate and display terrain onto a spherical surface
   static long startTime = 0; // the time it was when we last checked
   static java.applet.AudioClip music; // the song that plays
@@ -8,7 +12,7 @@ public final class TerrainGenerator{ // a class to generate and display terrain 
     startMusic();
     
     while (true) {
-      Planet earth = new Planet(100);
+      Planet earth = new Planet(100, new Scanner(System.in));
       FromSpace theMap = new FromSpace(earth, 800, 400);
       
       theMap.display(ColS.altitude);
