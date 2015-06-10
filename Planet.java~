@@ -3,6 +3,30 @@ import java.util.*;
 
 
 public final class Planet extends Globe { // a subclass of Globe that handles all geological elements
+  private String[] valueNames = {"Ocean Frequency ", "Land Frequency  ", "Plate Speed     ", "Trench Depth    ", "Mountain Height ", "Island Size     ", "Rift Height     ",
+             "Valley Depth    ", "Coastal Blur    ", "Feature Size    ", "Crust Stiffness ", "Randomness      ", "Biome Size      ", "Wind Speed      ", "Air Density     ",
+             "Freeze Point SW ", "Freeze Point FW ", "Water Opacity   ", "Water Toxicity  ", "Lake Size       ", "River Length    ", "Net Humidity    ", "GreenhouseEffect",
+             "World Age       "};
+    
+  private String[] valueAbbvs = {"OF    ",           "LF    ",           "PS    ",           "TD    ",           "MH    ",           "IS    ",           "RH    ",
+             "VD    ",           "WA    ",           "FS    ",           "CS    ",           "Rm    ",           "BS    ",           "WS    ",           "GE    ",
+             "FPS   ",           "FPF   ",           "WO    ",           "WT    ",           "LS    ",           "RL    ",           "NH    ",           "ER    ",
+             "WA    "};
+    
+  private String[] valueSugtn = {"-200 - -100     ", "-200 - -100     ", "0 - 100         ", "0 - 1           ", "0 - 1           ", "0 - 1           ", "0 - 1           ",
+             "0 - 1           ", "0 - 200         ", "0 - 10          ", "0 - 1           ", "0 - 10          ", "0 - 1           ", "0 - 50          ", "0 - 10          ",
+             "0 - 256         ", "0 - 256         ", "-256 - 0        ", "0 - 256         ", "0 - 10          ", "0 - 1000        ", "0 - 256         ", "0 - 256       ",
+             "0 - 65536       "};
+    
+  private double[] values     = {-127,               -140,               40.0,               1.0,                1.0,                .72,                .02,
+             .5,                 64,                 2,                  0.4,                1.2,                0.1,                16,                 3,
+             100,                140,                -100,               236,                8,                  480,                229,                180,
+             2800};
+    
+  //                             0                   1                   2                  3                   4                   5                   6
+  
+  
+  
   public Planet(int r) {
     super(r);
   }
@@ -10,6 +34,37 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   
   public Planet(Globe g) {
     super(g);
+  }
+  
+  
+  public Planet(int r, Scanner in) {
+    super(r);
+ 
+    String variable;
+    do {
+      boolean unrecognized = true;
+      
+      System.out.println("To set values, enter the abbreviation, press return, and then enter the desired value. Enter \"done\" when finished");
+      System.out.println("CHANGEABLE VALUE | ABBV. | SUGGESTED RANGE | DEFAULT");
+      for (int i = 0; i < values.length; i ++)
+        System.out.println(valueNames[i] + " | " + valueAbbvs[i] + "|" + valueSugtn[i] + " | " + values[i]);
+      
+      variable = in.nextLine();
+      if (variable.equals(""))  continue;
+      for (int i = 0; i < values.length; i ++) {
+        if (variable.equals(valueAbbvs[i].trim()) || variable.equals(valueNames[i].trim())) {
+          values[i] = in.nextDouble();
+          unrecognized = false;
+          break;
+        }
+      }
+      
+      if (variable.equalsIgnoreCase("done"))
+        break;
+      if (unrecognized)
+        System.out.println("I do not recognize that value. Please check your spelling and try again.");
+      System.out.println();
+    } while (true);
   }
   
   
@@ -121,9 +176,9 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
             if (ref.altitude >= -256 && randChance(-55 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
               tile.spreadFrom(ref);
           
-          if (tile.altitude == -257 && randChance(-140)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
+          if (tile.altitude == -257 && randChance((int)values[1])) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
             tile.startPlate(false); // seeds new plates occasionally
-          else if (tile.altitude == -257 && randChance(-127))
+          else if (tile.altitude == -257 && randChance((int)values[0]))
             tile.startPlate(true);
         }
       }
@@ -143,52 +198,52 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
         double totalChange = 0; // keeps track of how much to change the altitude
         final List<Tile> adjacentList = adjacentTo(thisTil);
         for (Tile adj: adjacentList) {
-        final List<Tile> nearbyList = adjacentTo(adj);
-        for (Tile thatTil: nearbyList) {
-          if (thisTil.temp2 == thatTil.temp2 && thisTil.temp3 == thatTil.temp3) // if they are on the same plate
-            continue; // skip this pair
-          
-          final Vector r1 = new Vector(1, thisTil.lat*Math.PI/map.length, thisTil.lon*2*Math.PI/map[thisTil.lat].length);
-          final Vector r2 = new Vector(1, thatTil.lat*Math.PI/map.length, thatTil.lon*2*Math.PI/map[thatTil.lat].length);
-          
-          Vector delTheta = r1.cross(r2);
-          delTheta.setR(1.0);
-          
-          Vector omega1 = new Vector(1, thisTil.temp2/128.0, thisTil.temp3/128.0);
-          Vector omega2 = new Vector(1, thatTil.temp2/128.0, thatTil.temp3/128.0);
-          Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
-          
-          double rise = 40.0*delOmega.dot(delTheta);
-          
-          if (thisTil.altitude < 0) { // if this is ocean
-            if (rise < 0) { // if they are going towards each other
-              if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
-                totalChange += rise; // it forms a sea trench
+          final List<Tile> nearbyList = adjacentTo(adj);
+          for (Tile thatTil: nearbyList) {
+            if (thisTil.temp2 == thatTil.temp2 && thisTil.temp3 == thatTil.temp3) // if they are on the same plate
+              continue; // skip this pair
+            
+            final Vector r1 = new Vector(1, thisTil.lat*Math.PI/map.length, thisTil.lon*2*Math.PI/map[thisTil.lat].length);
+            final Vector r2 = new Vector(1, thatTil.lat*Math.PI/map.length, thatTil.lon*2*Math.PI/map[thatTil.lat].length);
+            
+            Vector delTheta = r1.cross(r2);
+            delTheta.setR(1.0);
+            
+            Vector omega1 = new Vector(1, thisTil.temp2/128.0, thisTil.temp3/128.0);
+            Vector omega2 = new Vector(1, thatTil.temp2/128.0, thatTil.temp3/128.0);
+            Vector delOmega = omega1.minus(omega2); // how fast they are moving toward each other
+            
+            double rise = values[2]*delOmega.dot(delTheta);
+            
+            if (thisTil.altitude < 0) { // if this is ocean
+              if (rise < 0) { // if they are going towards each other
+                if (thisTil.altitude < thatTil.altitude) { // if this is lower than that one
+                  totalChange += rise*values[3]; // it forms a sea trench
+                }
+                else if (thisTil.altitude > thatTil.altitude) { // if this is above that one
+                  totalChange -= rise*values[5]; // it forms an island chain
+                }
+                else { // if they are going at the same altitude
+                  if (Math.random() < .5)  totalChange += rise/2.0; // it forms a random type thing
+                  else                     totalChange -= rise/2.0;
+                  
+                }
               }
-              else if (thisTil.altitude > thatTil.altitude) { // if this is above that one
-                totalChange -= rise*.72; // it forms an island chain
-              }
-              else { // if they are going at the same altitude
-                if (Math.random() < .5)  totalChange += rise/2.0; // it forms a random type thing
-                else                     totalChange -= rise/2.0;
-                
+              else { // if they are going away from each other
+                totalChange += rise*values[6]; // it forms an ocean rift
               }
             }
-            else { // if they are going away from each other
-              totalChange += rise/64; // it forms an ocean rift
+            else { // if this is land
+              if (rise < 0) { // if they are going towards each other
+                totalChange -= rise*values[4]; // it forms a mountain range
+              }
+              else { // if they are going away from each other
+                totalChange -= rise*values[7]; // it forms a valley
+              }
             }
           }
-          else { // if this is land
-            if (rise < 0) { // if they are going towards each other
-              totalChange -= rise; // it forms a mountain range
-            }
-            else { // if they are going away from each other
-              totalChange -= rise/2; // it forms a valley
-            }
-          }
+          thisTil.temp1 += totalChange;
         }
-        thisTil.temp1 += totalChange;
-      }
       }
     }
     
@@ -464,7 +519,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
           else if (til.altitude < -100) { // if super deep
             til.biome = Tile.trench;
           }
-          else if (til.temperature < 235) { // if warm
+          else if (til.temperature < 236) { // if warm
             til.biome = Tile.ocean;
           }
           else { // if hot

@@ -3,11 +3,30 @@ import java.util.*;
 
 
 public final class Planet extends Globe { // a subclass of Globe that handles all geological elements
-  private String[] valueNames = {"Ocean Frequency ", "Land Frequency  ", "Plate Speed     ", "Trench Depth    ", "Mountain Height ", "Island Size     ", "Rift Height     ", "Valley Depth    "};
-  private String[] valueAbbvs = {"Of    ",            "Lf    ",            "Ps    ",           "Td    ",            "Mh    ",            "Is    ",            "Rh    ",            "Vd    "};
-  private String[] valueSugtn = {"-200 - -100     ",  "-200 - -100     ",  "0 - 100         ",  "0 - 1           ",  "0 - 1           ",  "0 - 1           ",  "0 - 1           ",  "0 - 1           "};
-  private double[] values     = {-127,               -140,               40.0,              1.0,                1.0,                .72,                .02,            .5};
-  //                             0                   1                   2                  3                   4                   5                   6                   7
+  private String[] valueNames = {"Ocean Frequency ", "Land Frequency  ", "Plate Speed     ", "Trench Depth    ", "Mountain Height ", "Island Size     ", "Rift Height     ",
+             "Valley Depth    ", "Coastal Blur    ", "Roughness Factor", "Crust Stiffness ", "Randomness      ", "Biome Size      ", "Wind Speed      ", "Air Density     ",
+             "Freeze Point SW ", "Freeze Point FW ", "Water Opacity   ", "Water Toxicity  ", "Lake Size       ", "River Length    ", "Net Humidity    ", "Surface Gravity ",
+             "GreenhouseEffect", "World Age       ", "Gound Softness  ", "Biome Roughness "};
+    
+  private String[] valueAbbvs = {"OF    ",           "LF    ",           "PS    ",           "TD    ",           "MH    ",           "IS    ",           "RH    ",
+             "VD    ",           "CB    ",           "RF    ",           "CS    ",           "Rm    ",           "BS    ",           "WS    ",           "AD    ",
+             "FPS   ",           "FPF   ",           "WO    ",           "WT    ",           "LS    ",           "RL    ",           "NH    ",           "SG    ",
+             "GE    ",           "WA    ",           "GS    ",           "BR    "};
+    
+  private String[] valueSugtn = {"-200 - -100     ", "-200 - -100     ", "0 - 1000        ", "0 - 1           ", "0 - 1           ", "0 - 1           ", "0 - 1           ",
+             "0 - 1           ", "0 - 200         ", "1 - 10          ", "0 - 1           ", "0 - 10          ", "0 - 1000        ", "0 - 50          ", "0 - 10          ",
+             "0 - 256         ", "0 - 256         ", "-256 - 0        ", "0 - 256         ", "0 - 10          ", "0 - 1000        ", "0 - 256         ", "0 - 256         ",
+             "0 - 256         ", "0 - 65536       ", "0 - 31          ", "0 - 1           "};
+    
+  private double[] values     = {-127,               -140,               40.0,               1.0,                1.0,                .72,                .02,
+             .5,                 64,                 2,                  0.4,                1.2,                12,                 16,                 3,
+             100,                140,                -100,               237,                5,                  480,                229,                64,
+             180,                2800,               8,                  0.1};
+    
+  //                             0                   1                   2                  3                   4                   5                    6
+  //         7                   8                   9                   10                 11                  12                  13                   14
+  //         15                  16                  17                  18                 19                  20                  21                   22
+  //         23                  24                  25                  26
   
   
   
@@ -28,14 +47,15 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     do {
       boolean unrecognized = true;
       
-      System.out.println("To set values, enter the abbreviation, press return, and then enter the desired value. Enter \"done\" when finished");
+      System.out.println("\nTo set values, enter the abbreviation, press return, and then enter the desired value. Enter \"done\" when finished");
       System.out.println("CHANGEABLE VALUE | ABBV. | SUGGESTED RANGE | DEFAULT");
       for (int i = 0; i < values.length; i ++)
         System.out.println(valueNames[i] + " | " + valueAbbvs[i] + "|" + valueSugtn[i] + " | " + values[i]);
       
       variable = in.nextLine();
+      if (variable.equals(""))  continue;
       for (int i = 0; i < values.length; i ++) {
-        if (variable.equals(valueAbbvs[i].trim()) || variable.equals(valueNames[i].trim())) {
+        if (variable.equalsIgnoreCase(valueAbbvs[i].trim()) || variable.equalsIgnoreCase(valueNames[i].trim())) {
           values[i] = in.nextDouble();
           unrecognized = false;
           break;
@@ -46,7 +66,6 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
         break;
       if (unrecognized)
         System.out.println("I do not recognize that value. Please check your spelling and try again.");
-      System.out.println();
     } while (true);
   }
   
@@ -91,12 +110,12 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
       map.display(ColS.altitude);
     
     System.out.println("Roughing up and smoothing down terrain...");
-    for (int i = 64; i >= 1; i >>= 2) { // gradually randomizes and smooths out terrain
+    for (int i = (int)values[8]; i >= 1; i >>= (int)values[9]) { // gradually randomizes and smooths out terrain
       for (int j = 0; j < i; j ++)
-        smooth(.4);
+        smooth(values[10]);
       for (Map map: maps)
         map.display(ColS.altitude);
-      rough(i*1.2);
+      rough(i*values[11]);
       for (Map map: maps)
         map.display(ColS.altitude);
     }
@@ -108,7 +127,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
       map.display(ColS.altitude);
     
     System.out.println("Generating climate...");
-    acclimate(.1);
+    acclimate(values[26]);
     climateEnhance();
     
     System.out.println("Setting up biomes...");
@@ -146,7 +165,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
       for (Tile til: row)
         til.temp1 = 9001; // initializes temp1
     
-    this.getTile(Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI).startPlate(randChance(10)); // spawns a plate
+    this.getTile(Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI).startPlate(Math.random() < (1+Math.exp(.1*values[1]))/(1+Math.exp(-.1*values[0]))); // spawns a plate
   }
   
   
@@ -288,19 +307,19 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   }
   
   
-  public int moisture(Tile til, int dir, int dist) { // determines how much moisture blows in from a given direction
+  public int moisture(Tile til, int dir, double dist) { // determines how much moisture blows in from a given direction
     if (dist <= 0)
       return 0;
     
     int here;
     if (til.altitude < 0)        here = (int)Math.sqrt(dist)>>1; // if this is an ocean, draw moisture from it
-    else if (til.water > 450)    here = (int)Math.sqrt(dist)>>1; // if this is a river, draw less moisture from it
-    else if (til.altitude < 64)  here = (int)Math.sqrt(dist)>>3; // if low altitude, draw a little bit of moisture from it
+    else if (til.water > values[20])    here = (int)Math.sqrt(dist)>>1; // if this is a river, draw less moisture from it
+    else if (til.altitude < values[22])  here = (int)Math.sqrt(dist)>>3; // if low altitude, draw a little bit of moisture from it
     else here = 0; // if it is a mountain, no moisture
     
     final Tile next = map[til.lat][(til.lon+dir+map[til.lat].length)%map[til.lat].length];
     
-    if (next.altitude >= 64) // if there is a mountain range coming up
+    if (next.altitude >= values[22]) // if there is a mountain range coming up
       return here;
     else
       return here + moisture(next, dir, dist-1);
@@ -355,8 +374,8 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     for (Tile[] row: map) {
       for (Tile til: row) {
         til.temp3 = 0;
-        til.water <<= 5;
-        til.altitude += til.water>>8; // accounts for erosion later on
+        til.water <<= (int)values[19];
+        til.altitude += til.water>>(int)values[25]; // accounts for erosion later on
       }
     }
     
@@ -366,7 +385,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     
     for (Tile[] row: map)
       for (Tile til: row)
-        til.altitude -= til.water>>8; // erodes
+        til.altitude -= til.water>>(int)values[25]; // erodes
   }
   
   
@@ -462,7 +481,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
   
   
   public void climateEnhance() {
-    for (int i = 0; i < 16; i ++) { // smooths out the climate
+    for (int i = 0; i < values[12]; i ++) { // smooths out the climate
       for (Tile[] row: map) {
         for (Tile til: row) {
           ArrayList<Tile> set = adjacentTo(til);
@@ -483,10 +502,10 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
         if (til.altitude < 0) // applies orographic effect (tiles draw moisture from sea winds)
           til.rainfall = 255;
         else {
-          til.rainfall += moisture(til, -1, 16);
-          til.rainfall += moisture(til, 1, 16);
+          til.rainfall += moisture(til, -1, values[13]);
+          til.rainfall += moisture(til, 1, values[13]);
         }
-        til.temperature -= (int)Math.abs(til.altitude) >> 3; // cools down extreme altitudes
+        til.temperature -= (int)Math.abs(til.altitude) >> (int)values[14]; // cools down extreme altitudes
       }
     }
   }
@@ -496,38 +515,38 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     for (Tile[] row: map) {
       for (Tile til: row) {
         if (til.altitude < 0) { // if below sea level
-          if (til.temperature + 8*Math.sin(til.rainfall) < 100) { // if cold
+          if (til.temperature + 8*Math.sin(til.rainfall) < values[15]) { // if cold
             til.biome = Tile.ice;
           }
-          else if (til.altitude < -100) { // if super deep
+          else if (til.altitude < values[17]) { // if super deep
             til.biome = Tile.trench;
           }
-          else if (til.temperature < 235) { // if warm
+          else if (til.temperature < values[18]) { // if warm
             til.biome = Tile.ocean;
           }
           else { // if hot
             til.biome = Tile.reef;
           }
         }
-        else if (til.water > 480) { // if has freshwater on it
+        else if (til.water > values[20]) { // if has freshwater on it
           til.biome = Tile.freshwater;
         }
-        else if (til.altitude < 64) { // if low altitude
-          if (til.temperature + 4*(Math.sin(til.rainfall)) < 140) { // if cold
+        else if (til.altitude < values[22]) { // if low altitude
+          if (til.temperature + 4*(Math.sin(til.rainfall)) < values[16]) { // if cold
             til.biome = Tile.tundra;
           }
-          else if (til.temperature >= 150 && til.rainfall >= 229) { // if hot and wet
-            til.biome = Tile.jungle;
-          }
-          else if ((255-til.temperature)*(255-til.temperature) + (til.rainfall-180)*(til.rainfall-180) < 2800) { // if hot and dry
+          else if ((255-til.temperature)*(255-til.temperature) + (til.rainfall-values[23])*(til.rainfall-values[23]) < values[24]) { // if hot and dry
             til.biome = Tile.desert;
+          }
+          else if (til.temperature >= 150 && til.rainfall >= values[21]) { // if hot and wet
+            til.biome = Tile.jungle;
           }
           else { // if neutral
             til.biome = Tile.plains;
           }
         }
         else { // if mountainous
-          if (til.temperature + 4*(Math.sin(til.rainfall)) < 140) { // if cold
+          if (til.temperature + 4*(Math.sin(til.rainfall)) < values[16]) { // if cold
             til.biome = Tile.snowcap;
           }
           else { // if warm
