@@ -2,7 +2,7 @@
 
 
 
-import java.util.*;
+//import java.util.*;
 
 
 
@@ -19,14 +19,14 @@ public final class CiviHD { // the driver for my independent project
     loadSound();
     
     Planet protoEarth = new Planet(100);
-    Map topographical = new Hemispherical(protoEarth, 600, 300);
+    Map topographical = new Gall(protoEarth, 600, 400);
     
     intro.play();
     protoEarth.generate(topographical);
     delay(3000);
     
     World earth = new World(protoEarth);
-    Map political = new FromSpace(earth, 800, 400);
+    Map political = new Gall(earth, 600, 400);
     
     music.loop();
     

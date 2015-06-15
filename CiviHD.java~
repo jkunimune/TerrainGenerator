@@ -26,7 +26,7 @@ public final class CiviHD { // the driver for my independent project
     delay(3000);
     
     World earth = new World(protoEarth);
-    Map political = new FromSpace(earth, 600, 300);
+    Map political = new FromSpace(earth, 800, 400);
     
     music.loop();
     

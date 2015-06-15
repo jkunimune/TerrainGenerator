@@ -30,6 +30,9 @@ public final class World extends Globe { // a subclass of Globe to handle all po
       for (Tile[] row: map)
         for (Tile til: row)
           spread(til);
+//    for (int i = 0; i < 30; i ++)
+//      update();
+//    startPlague(civis.get(0).capital);
   }
   
   
@@ -262,6 +265,44 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   public final void naturallyDisast(Tile til) { // causes natural disasters
     if (randChance(-180))
       meatyore(til);
+    updatePlague(til);
+    if (til.development > 0 && randChance((til.development<<3) - 200))
+      startPlague(til);
+  }
+  
+  
+  public final void startPlague(Tile start) {
+    System.out.println(start.owners.get(0) + "has been beset by plague!");
+    for (Tile[] row: map)
+      for (Tile til: row)
+        til.diseases.add(Plague.sterile);
+    start.diseases.set(start.diseases.size()-1, Plague.infected);
+  }
+  
+  
+  public final void updatePlague(Tile til) { // causes diseases to spread
+    if (til.development == 0)
+      return;
+    
+    for (int i = 0; i < til.diseases.size(); i ++) {
+      switch (til.diseases.get(i)) {
+        case sterile: // infect sterile tiles
+          final ArrayList<Tile> adjacentList = adjacentTo(til);
+          for (Tile adj: adjacentList)
+            if (adj.diseases.get(i) != Plague.sterile)
+              if (randChance(til.development<<3))
+                til.infect(i);
+          return;
+        case infected: // and cure/kill infected ones
+          if (til.owners.size() == 1 && randChance((til.owners.get(0).sciLevel()>>8) - 65536))
+            til.cure(i);
+          else if (til.development < 4 && randChance(0))
+            til.kill();
+          return;
+        case immune:
+          return;
+      }
+    }
   }
   
   

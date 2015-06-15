@@ -14,6 +14,7 @@ public final class Tile { // keeps track of a single point on a globe
   public ArrayList<Civi> owners;
   public boolean isCapital; // if it is a capital city
   public boolean radioactive;
+  public ArrayList<Plague> diseases; // this tile's status with regard to different plagues
   public int temp1; // to store various values only necessary during generation
   public int temp2;
   public int temp3;
@@ -47,6 +48,9 @@ public final class Tile { // keeps track of a single point on a globe
     biome = 0;
     development = 0;
     owners = new ArrayList<Civi>(1);
+    isCapital = false;
+    radioactive = false;
+    diseases = new ArrayList<Plague>(0);
   }
   
   
@@ -60,6 +64,9 @@ public final class Tile { // keeps track of a single point on a globe
     biome = newBiome;
     development = 0;
     owners = new ArrayList<Civi>(1);
+    isCapital = false;
+    radioactive = false;
+    diseases = new ArrayList<Plague>(0);
   }
   
   
@@ -76,6 +83,9 @@ public final class Tile { // keeps track of a single point on a globe
     temp3 = source.temp3;
     development = source.development;
     owners = source.owners;
+    isCapital = source.isCapital;
+    radioactive = source.radioactive;
+    diseases = source.diseases;
   }
   
   
@@ -118,15 +128,37 @@ public final class Tile { // keeps track of a single point on a globe
   public final void getsHitByMeteor() { // causes this tile to be partially destroyed
     if (development < 4) {
       development = 0;
-      owners.clear();
       for (Civi civ: owners)
         civ.land.remove(this);
+      owners.clear();
     }
   }
   
   
   public final boolean isWet() { // is it a water biome?
     return biome==ocean || biome==ice || biome==trench || biome==reef || biome==freshwater;
+  }
+  
+  
+  public final void infect(int i) { // infects tile with given disease
+    diseases.set(i, Plague.infected);
+  }
+  
+  
+  public final void cure(int i) { // makes tile immune to given disease
+    diseases.set(i, Plague.immune);
+  }
+  
+  
+  public final void kill() { // removes development due to disease
+    if (development > 0)
+      development --;
+    
+    if (development == 0) {
+      for (Civi civ: owners)
+        civ.land.remove(this);
+      owners.clear();
+    }
   }
   
   
