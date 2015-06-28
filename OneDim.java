@@ -27,7 +27,7 @@ public class OneDim extends Map { // a one dimensional map that only sees the pr
       if (y < height()/2) // the upper half
         return Color.black; // is black
       
-      else if (y-height()/2 < -til.altitude*height()/512) // the middle section
+      else if (y-height()/2 < -til.altitude*height()/256) // the middle section
         return super.getColorBy(c, x, y); // references the tile color itself
       
       else // the bottom
@@ -35,7 +35,7 @@ public class OneDim extends Map { // a one dimensional map that only sees the pr
     }
     
     else { // for land tiles
-      if (y-height()/2 >= -til.altitude*height()/512) // the middle section and lower half
+      if (y-height()/2 >= -til.altitude*height()/256) // the middle section and lower half
         return super.getColorBy(c, x, y); // references the tile color itself;
 
       else // the top

@@ -5,22 +5,22 @@ import java.util.*;
 public final class Planet extends Globe { // a subclass of Globe that handles all geological elements
   private String[] valueNames = {"Ocean Frequency ", "Land Frequency  ", "Plate Speed     ", "Trench Depth    ", "Mountain Height ", "Island Size     ", "Rift Height     ",
              "Valley Depth    ", "Coastal Blur    ", "Roughness Factor", "Crust Stiffness ", "Randomness      ", "Biome Size      ", "Wind Speed      ", "Air Density     ",
-             "Freeze Point SW ", "Freeze Point FW ", "Water Opacity   ", "Water Toxicity  ", "Lake Size       ", "River Length    ", "Net Humidity    ", "Atmosphere Depth",
+             "Freeze Point SW ", "Freeze Point FW ", "Water Opacity   ", "Water Toxicity  ", "Lake Size       ", "River Length    ", "Net Humidity    ", "Surface Gravity ",
              "GreenhouseEffect", "World Age       ", "Gound Softness  ", "Biome Roughness "};
     
   private String[] valueAbbvs = {"OF    ",           "LF    ",           "PS    ",           "TD    ",           "MH    ",           "IS    ",           "RH    ",
              "VD    ",           "CB    ",           "RF    ",           "CS    ",           "Rm    ",           "BS    ",           "WS    ",           "AD    ",
-             "FPS   ",           "FPF   ",           "WO    ",           "WT    ",           "LS    ",           "RL    ",           "NH    ",           "AD    ",
+             "FPS   ",           "FPF   ",           "WO    ",           "WT    ",           "LS    ",           "RL    ",           "NH    ",           "SG    ",
              "GE    ",           "WA    ",           "GS    ",           "BR    "};
     
   private String[] valueSugtn = {"-200 - -100     ", "-200 - -100     ", "0 - 1000        ", "0 - 1           ", "0 - 1           ", "0 - 1           ", "0 - 1           ",
              "0 - 1           ", "0 - 200         ", "1 - 10          ", "0 - 1           ", "0 - 10          ", "0 - 1000        ", "0 - 50          ", "0 - 10          ",
              "0 - 256         ", "0 - 256         ", "-256 - 0        ", "0 - 256         ", "0 - 10          ", "0 - 1000        ", "0 - 256         ", "0 - 256         ",
              "0 - 256         ", "0 - 65536       ", "0 - 31          ", "0 - 1           "};
-    
-  private double[] values     = {-140,               -162,               40.0,               1.5,                1.0,                1.5,                0.1,
-             1.0,                 64,                   2,                0.4,               1.5,                12,                 16,                 4,
-             100,                140,                -128,                237,               5,                  480,                229,                128,
+
+  private double[] values     = {-127,               -141,               40.0,               1.0,                1.0,                .72,                .02,
+             .5,                 64,                 2,                  0.4,                1.2,                12,                 16,                 3,
+             100,                140,                -100,               237,                5,                  480,                229,                64,
              180,                2800,               8,                  0.1};
     
   //                             0                   1                   2                  3                   4                   5                    6
@@ -95,12 +95,12 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     int t = 0;
     while (any(-257)) {
       spawnContinents();
-      if (t%60 == 0)
+      if (t%30 == 0)
         for (Map map: maps)
           map.display(ColS.altitude);
       t ++;
     }
-    if (t%60 != 1)
+    if (t%30 != 1)
       for (Map map: maps)
         map.display(ColS.altitude);
     
@@ -175,7 +175,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
         if (tile.altitude == -257) {
           ArrayList<Tile> adjacent = adjacentTo(tile);
           for (Tile ref: adjacent) // reads all adjacent tiles to look for land or sea
-            if (ref.altitude >= -256 && randChance(-100 + ((int)Math.pow(ref.altitude,2)>>8))) // deeper/higher continents spread faster
+            if (ref.altitude >= -256 && randChance(-55 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
               tile.spreadFrom(ref);
           
           if (tile.altitude == -257 && randChance((int)values[1])) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
