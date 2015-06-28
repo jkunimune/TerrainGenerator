@@ -77,6 +77,8 @@ public class Globe { // a spherical surface
   
   
   public final int latIndex(double lattitude) { // converts a lattitude to an index
+    if (lattitude == Math.PI)
+      return map.length-1;
     return (int)(lattitude*map.length/Math.PI);
   }
   

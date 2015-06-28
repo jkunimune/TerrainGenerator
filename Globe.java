@@ -17,7 +17,6 @@ public class Globe { // a spherical surface
     
     for (int lat = 1; lat <= map.length/2; lat ++) {
       int width = (int)(2*Math.PI * r * Math.sin(lat*Math.PI/map.length)); // the length of each row is determined with trig
-      width = width / map[lat-1].length * map[lat-1].length; // each row has length divisible with row above it (for convinience)
       
       map[lat] = new Tile[width];
       map[map.length-lat-1] = new Tile[width]; // the top and bottom are symmetrical
@@ -109,19 +108,22 @@ public class Globe { // a spherical surface
     if (tile.lat == map.length-1)
       return new ArrayList<Tile>(Arrays.asList(map[map.length-2]));
     
-    //System.out.println("Running adjacentTo for the tile with index "+tile.lat+", "+tile.lon);
     ArrayList<Tile> output = new ArrayList<Tile>(); // initializes the output
     output.add(map [tile.lat] [(tile.lon+1)%map[tile.lat].length]); // adds the tiles laterally adjacent
     output.add(map [tile.lat] [(tile.lon-1+map[tile.lat].length)%map[tile.lat].length]); // does a bunch of complex addition and moduli to keep it in bounds
     if (tile.lat < map.length/2) { // behaves differently from here for the northern and southern hemispheres
       output.add(map [tile.lat-1] [tile.lon*map[tile.lat-1].length/map[tile.lat].length]); // adds the one north of it
-      for (int i = 0; i < map [tile.lat+1].length/map[tile.lat].length; i ++) // adds all the ones south of it
-        output.add(map [tile.lat+1] [tile.lon*map[tile.lat+1].length/map[tile.lat].length+i]);
+      final int min = tile.lon*map[tile.lat+1].length/map[tile.lat].length;
+      final int max = (tile.lon+1)*map[tile.lat+1].length/map[tile.lat].length;
+      for (int i = min; i < max; i ++) // adds all the ones south of it
+        output.add(map [tile.lat+1] [i]);
     }
     else {
-      output.add(map[tile.lat+1][tile.lon*map[tile.lat+1].length/map[tile.lat].length]); // adds the one north of it
-      for (int i = 0; i < map[tile.lat-1].length/map[tile.lat].length; i ++) // adds all the ones south of it
-        output.add(map[tile.lat-1][tile.lon*map[tile.lat-1].length/map[tile.lat].length+i]);
+      output.add(map[tile.lat+1][tile.lon*map[tile.lat+1].length/map[tile.lat].length]); // adds the one south of it
+      final int min = tile.lon*map[tile.lat-1].length/map[tile.lat].length;
+      final int max = (tile.lon+1)*map[tile.lat-1].length/map[tile.lat].length;
+      for (int i = min; i < max; i ++) // adds all the ones north of it
+        output.add(map [tile.lat-1] [i]);
     }
     
     return output;
