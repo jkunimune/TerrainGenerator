@@ -64,9 +64,9 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
     final Color daytime = super.getColorBy(c,x,y);
     final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
     final double scaleFactor = Math.sin(longitudes[y][x] + sunAngle) * .5 + .5;
-    if (til.development == 3 && scaleFactor < .5)
+    if (til.development == 3 && scaleFactor < .4)
       return Color.yellow;
-    if (til.development == 4 && scaleFactor < .6)
+    if (til.development == 4 && scaleFactor < .5)
       return Color.cyan;
     if (scaleFactor < 0)
       return Color.black;

@@ -3,7 +3,7 @@ public final class Lemons extends Map { // a clich "unfolding"-type lemon-y map
   
   
   
-  public SimpleSinusoidal(Globe g, int w, int h) {
+  public Lemons(Globe g, int w, int h) {
     super(g, w, h);
     lemonWidth = w/12;
     finishSuper();
@@ -11,21 +11,23 @@ public final class Lemons extends Map { // a clich "unfolding"-type lemon-y map
   
   
   public final int getLat(int x, int y) {
+    if (x/lemonWidth >= 12) // only show 12 lemons
+      return -1;
+    
     if (Math.abs(x%lemonWidth-lemonWidth/2.0) < Math.sin(Math.PI*y/height())*lemonWidth/2.0) // if it is inside a sin curve
       return glb.latIndex(y*Math.PI/height());
     
-    else
-      return -1;
+    return -1;
   }
   
   
   public final int getLon(int x, int y) {
-    if (Math.abs(x-width()/2.0) < Math.sin(Math.PI*y/height())*width()/2.0) { // if it is inside the sin curve
-      return glb.lonIndex(lats[y][x], Math.PI * (x-width()/2.0) / (Math.sin(Math.PI*y/height())*width()/2.0));
+    if (lats[y][x] != -1) { // if it is inside the sin curve
+      return glb.lonIndex(lats[y][x], Math.PI * (x%lemonWidth-lemonWidth/2.0) / (Math.sin(Math.PI*y/height())*lemonWidth*6.0) + x/lemonWidth*Math.PI/6);
     }
     
-    else { // if it is outside the sine curve
-      return 16777215;
+    else { // if it is outside a sine curve
+      return 0;
     }
   }
 }

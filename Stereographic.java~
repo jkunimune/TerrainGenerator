@@ -13,10 +13,10 @@ public class Stereographic extends Map { // a shape-preserving azimuthal map sho
   
   public final int getLat(int x, int y) {
     if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius) // if inside the left circle
-      return glb.latIndex(Math.PI - 2*Math.atan(Math.sqrt((x-radius)*(x-radius) + (y-radius)*(y-radius))/radius));
+      return glb.latIndex(Math.PI - 2*Math.atan(Math.hypot(x-radius, y-radius)/radius));
     
     else if ((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < radius*radius) // if inside the right circle
-      return glb.latIndex(2*Math.atan(Math.sqrt((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius))/radius));
+      return glb.latIndex(2*Math.atan(Math.hypot(x-3*radius, y-radius)/radius));
       
     else
       return -1;

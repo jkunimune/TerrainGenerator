@@ -1,5 +1,5 @@
 public class Gall extends Map { // a compromising projection that resembles Mercator, but shows the poles
-  public Mercator(Globe g, int w, int h) {
+  public Gall(Globe g, int w, int h) {
     super(g, w, h);
     finishSuper();
   }

@@ -12,7 +12,7 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
   
   
   
-  public FromSpace(Globe g, int w, int h) {
+  public FromSpace(Surface g, int w, int h) {
     super(g, w, h);
     
     if (w/2 < h)  radius = w/4;
@@ -62,7 +62,7 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
   @Override
   public Color getColorBy(ColS c, int x, int y) { // gets the color at a point on the screen
     final Color daytime = super.getColorBy(c,x,y);
-    final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
+    final Tile til = sfc.getTileByIndex(lats[y][x], lons[y][x]);
     final double scaleFactor = Math.sin(longitudes[y][x] + sunAngle) * .5 + .5;
     if (til.development == 3 && scaleFactor < .4)
       return Color.yellow;
@@ -90,10 +90,10 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
   
   public final int getLat(int x, int y) {
     if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius)
-      return glb.latIndex(Math.acos(1-(double)y/radius));
+      return sfc.latIndex(Math.acos(1-(double)y/radius));
     
     else if ((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < radius*radius)
-      return glb.latIndex(Math.acos(1-(double)y/radius));
+      return sfc.latIndex(Math.acos(1-(double)y/radius));
     
     else
       return -1;
@@ -102,7 +102,7 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
   
   public final int getLon(int x, int y) {
     if (lats[y][x] != -1) // if it is in the left circle
-      return glb.lonIndex(lats[y][x], longitudes[y][x] + camAngle);
+      return sfc.lonIndex(lats[y][x], longitudes[y][x] + camAngle);
     
     else if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < (3+radius)*(3+radius) ||
              (x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < (3+radius)*(3+radius)) // if it is on the edge of a circle

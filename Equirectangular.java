@@ -1,5 +1,5 @@
 public class Equirectangular extends Map { // a simple globe projection that is easy to calculate
-  public Equirectangular(Globe g, int w, int h) {
+  public Equirectangular(Surface g, int w, int h) {
     super(g, w, h);
     finishSuper();
   }
@@ -9,7 +9,7 @@ public class Equirectangular extends Map { // a simple globe projection that is 
     if ((x>>1<<1 == width()/10>>1<<1 || x>>1<<1 == width()*9/10>>1<<1) && y/7%2 == 0) // draw dotted lines on sides
       return -1;
     else
-      return glb.latIndex(y*Math.PI/height());
+      return sfc.latIndex(y*Math.PI/height());
   }
   
   
@@ -17,6 +17,6 @@ public class Equirectangular extends Map { // a simple globe projection that is 
     if (lats[y][x] == -1) // draw dotted lines on sides
       return 0;
     else
-      return glb.lonIndex(lats[y][x], (x*5/4)%width()*2*Math.PI/width());
+      return sfc.lonIndex(lats[y][x], (x*5/4)%width()*2*Math.PI/width());
   }
 }

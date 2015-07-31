@@ -333,9 +333,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
           return civ.emblem();
           
         case 3: // urban area
-          return new Color(civ.emblem().getRed()>>1,
-                           civ.emblem().getGreen()>>1,
-                           civ.emblem().getBlue()>>1); // return darkened tile
+          return civ.emblem().darker(); // return darkened tile
           
         case 4: // utopia
           return new Color(255- ((255-civ.emblem().getRed()) >>1), 

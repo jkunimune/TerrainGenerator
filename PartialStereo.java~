@@ -5,13 +5,13 @@ public class PartialStereo extends Map { // a stereographic map that utilizes th
   
   public PartialStereo(Globe g, int w, int h) {
     super(g, w, h);
-    radius = (int)(Math.sqrt(w*w + h*h)/6); // the radius of the map (from pole to equator) is an eighth of the diagonal of the screen
+    radius = (int)(Math.hypot(w, h)/6); // the radius of the map (from pole to equator) is an eighth of the diagonal of the screen
     finishSuper();
   }
   
   
   public final int getLat(int x, int y) {
-    return glb.latIndex(2*Math.atan(Math.sqrt((x-width()/2)*(x-width()/2) + (y-height()/2)*(y-height()/2)) / radius));
+    return glb.latIndex(2*Math.atan(Math.hypot(x-width()/2, y-height()/2) / radius));
   }
   
   
