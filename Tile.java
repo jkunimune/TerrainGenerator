@@ -3,8 +3,7 @@ import java.util.*;
 
 
 public final class Tile { // keeps track of a single point on a globe
-  public int lat; // lattitude (actually an array index)
-  public int lon; // longitude (actually an array index)
+  public int alt, lat, lon; // altitude lattitude and longitude (actually array indices)
   public int altitude; // sea level is 0, goes from -256 to 255
   public int temperature; // temperature from 0 to 255
   public int rainfall; // measure of how wet a climate is from 0 (parched) to 255 (Kauai)
@@ -15,9 +14,7 @@ public final class Tile { // keeps track of a single point on a globe
   public boolean isCapital; // if it is a capital city
   public boolean radioactive;
   public ArrayList<Plague> diseases; // this tile's status with regard to different plagues
-  public int temp1; // to store various values only necessary during generation
-  public int temp2;
-  public int temp3;
+  public int temp1, temp2, temp3; // to store various values only necessary during generation
   
   public static final int magma = 0; // biome values
   public static final int ocean = 1;
@@ -54,6 +51,23 @@ public final class Tile { // keeps track of a single point on a globe
   }
   
   
+  public Tile(int newLat, int newLon, int newAlt) { // initializes with default values
+    lat = newLat;
+    lon = newLon;
+    alt = newAlt;
+    altitude = -257;
+    temperature = 256;
+    rainfall = -1;
+    water = 0;
+    biome = 0;
+    development = 0;
+    owners = new ArrayList<Civi>(1);
+    isCapital = false;
+    radioactive = false;
+    diseases = new ArrayList<Plague>(0);
+  }
+  
+  
   public Tile(int newLat, int newLon, int newAlt, int newTemp, int newRain, int newWater, int newBiome) { // initializes with given values
     lat = newLat;
     lon = newLon;
@@ -73,6 +87,7 @@ public final class Tile { // keeps track of a single point on a globe
   public Tile(Tile source) { // copies another tile
     lat = source.lat;
     lon = source.lon;
+    alt = source.alt;
     altitude = source.altitude;
     temperature = source.temperature;
     rainfall = source.rainfall;

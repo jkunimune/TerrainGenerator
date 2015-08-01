@@ -2,7 +2,7 @@ import java.util.*;
 
 
 
-public class Globe { // a spherical surface
+public class Globe implements Surface{ // a spherical surface
   public Tile[][] map; // the irregular matrix of tiles representing the surface
   private int radius; // the radius of the sphere
   
@@ -54,6 +54,7 @@ public class Globe { // a spherical surface
   
   
   
+  @Override
   public final Tile getTile(double lat, double lon) { // returns a tile at a given coordinate
     if (lat < 0 || lat >= Math.PI) {
       System.out.println("Error accessing "+lat+","+lon);
@@ -70,11 +71,13 @@ public class Globe { // a spherical surface
   }
   
   
+  @Override
   public final Tile getTileByIndex(int lat, int lon) {
     return map[lat][lon];
   }
   
   
+  @Override
   public final int latIndex(double lattitude) { // converts a lattitude to an index
     if (lattitude == Math.PI)
       return map.length-1;
@@ -82,6 +85,7 @@ public class Globe { // a spherical surface
   }
   
   
+  @Override
   public final int lonIndex(int lat, double longitude) { // converts an index and a longitude to a secondary index.
     if (longitude < 0) // makes longitude valid
       longitude = 2*Math.PI - ((-longitude)%(2*Math.PI));
@@ -102,6 +106,7 @@ public class Globe { // a spherical surface
   }
   
   
+  @Override
   public final ArrayList<Tile> adjacentTo(Tile tile) { // returns an arrayList of tiles adjacent to a given tile
     if (tile.lat == 0)
       return new ArrayList<Tile>(Arrays.asList(map[1])); // returns a whole row if it is a pole
@@ -130,6 +135,7 @@ public class Globe { // a spherical surface
   }
   
   
+  @Override
   public final boolean any(int testAlt) { // checks if any of a given altitude exists on the map
     for (Tile[] row: map)
       for (Tile t: row)
@@ -139,13 +145,15 @@ public class Globe { // a spherical surface
   }
   
   
+  @Override
   public final int distance(Tile from, Tile to) { // calculates the distance between two tiles
     return (int)(radius *
                  (new Vector(1.0, from.lat*Math.PI/map.length, from.lon*2*Math.PI/map[from.lat].length)).angleTo
-                   (new Vector(1.0, to.lat*Math.PI/map.length, to.lon*2*Math.PI/map[to.lat].length)));
+                 (new Vector(1.0, to.lat*Math.PI/map.length, to.lon*2*Math.PI/map[to.lat].length)));
   }
   
   
+  @Override
   public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
     return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
   }
