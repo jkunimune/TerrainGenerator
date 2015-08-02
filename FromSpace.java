@@ -49,7 +49,7 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
     for (int x = 0; x < width(); x ++) {
       for (int y = 0; y < height(); y ++) {
         if (lats[y][x] != -1) {
-          lons[y][x] = getLon(x,y);
+          lons[y][x] = getCoords(x,y).x;
           drawPx(x, y, getColorBy(theme, x, y));
         }
       }
@@ -88,27 +88,20 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
   }
   
   
-  public final int getLat(int x, int y) {
+  public final java.awt.Point getCoords(int x, int y) {
     if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius)
-      return sfc.latIndex(Math.acos(1-(double)y/radius));
+      return sfc.tilByAngles(Math.acos(1-(double)y/radius),
+                             longitudes[y][x] + camAngle);
     
     else if ((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < radius*radius)
-      return sfc.latIndex(Math.acos(1-(double)y/radius));
-    
-    else
-      return -1;
-  }
-  
-  
-  public final int getLon(int x, int y) {
-    if (lats[y][x] != -1) // if it is in the left circle
-      return sfc.lonIndex(lats[y][x], longitudes[y][x] + camAngle);
+      return sfc.tilByAngles(Math.acos(1-(double)y/radius),
+                          longitudes[y][x] + camAngle);
     
     else if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < (3+radius)*(3+radius) ||
              (x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < (3+radius)*(3+radius)) // if it is on the edge of a circle
-      return 8355839;
+      return new java.awt.Point(8355839, -1);
     
     else
-      return 0;
+      return new java.awt.Point(0, -1);
   }
 }

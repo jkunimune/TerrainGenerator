@@ -11,30 +11,20 @@ public class Hemispherical extends Map { // a realistic globe projection that mi
   }
   
   
-  public final int getLat(int x, int y) {
-    if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius)
-      return sfc.latIndex(Math.acos(1-(double)y/radius));
+  public final java.awt.Point getCoords(int x, int y) {
+    if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius) // if in the left circle
+      return sfc.tilByAngles(Math.acos(1-(double)y/radius),
+                             Math.asin((x-radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))));
     
-    else if ((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < radius*radius)
-      return sfc.latIndex(Math.acos(1-(double)y/radius));
-    
-    else
-      return -1;
-  }
-  
-  
-  public final int getLon(int x, int y) {
-    if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius) // if it is in the left circle
-      return sfc.lonIndex(lats[y][x], Math.asin((x-radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + Math.PI/2);
-    
-    else if ((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < radius*radius) // if it is in the right circle
-      return sfc.lonIndex(lats[y][x], Math.asin((x-3*radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + 3*Math.PI/2);
-    
+    else if ((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < radius*radius) // if in the right
+      return sfc.tilByAngles(Math.acos(1-(double)y/radius),
+                             Math.asin((x-3*radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + 3*Math.PI/2);
+                             
     else if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < (3+radius)*(3+radius) ||
              (x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < (3+radius)*(3+radius)) // if it is on the edge of a circle
-      return 8355839;
+      return new java.awt.Point(8355839, -1);
     
     else
-      return 0;
+      return new java.awt.Point(0, -1);
   }
 }

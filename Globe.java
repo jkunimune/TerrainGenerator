@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.util.*;
 
 
@@ -78,21 +79,22 @@ public class Globe implements Surface{ // a spherical surface
   
   
   @Override
-  public final int latIndex(double lattitude) { // converts a lattitude to an index
+  public final Point tilByAngles(double lattitude, double longitude) { // converts a lattitude and longitude to indicies
     if (lattitude == Math.PI)
-      return map.length-1;
-    return (int)(lattitude*map.length/Math.PI);
-  }
-  
-  
-  @Override
-  public final int lonIndex(int lat, double longitude) { // converts an index and a longitude to a secondary index.
-    if (longitude < 0) // makes longitude valid
-      longitude = 2*Math.PI - ((-longitude)%(2*Math.PI));
-    if (longitude >= 2*Math.PI)
-      longitude = longitude%(2*Math.PI);
+      lattitude = Math.sin(Math.PI);
     
-    return (int)(longitude*map[lat].length/(2*Math.PI));
+    if (lattitude < 0 || lattitude > Math.PI) {
+      System.out.println("Error accessing "+lattitude+","+longitude);
+      return new Point(-1, -1);
+    }
+    
+    if (longitude < 0)
+      longitude += 2*Math.PI;
+    longitude %= 2*Math.PI;
+    
+    int y = (int)(lattitude*map.length/Math.PI);
+    int x = (int)(longitude*map[y].length/(2*Math.PI));
+    return new Point(y, x);
   }
   
   

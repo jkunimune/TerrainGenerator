@@ -9,13 +9,8 @@ public class OneDim extends Map { // a one dimensional map that only sees the pr
   }
   
   
-  public int getLat(int x, int y) { // updates the matrices
-    return sfc.latIndex(x*Math.PI/width());
-  }
-  
-  
-  public int getLon(int x, int y) {
-    return 0;
+  public java.awt.Point getCoords(int x, int y) { // updates the matrices
+    return sfc.tilByAngles(x*Math.PI/width(), 0);
   }
   
   

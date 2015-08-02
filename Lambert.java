@@ -5,18 +5,11 @@ public class Lambert extends Map { // an equal area globe projection that distor
   }
   
   
-  public final int getLat(int x, int y) {
+  public final java.awt.Point getCoords(int x, int y) {
     if ((x>>1<<1 == width()/10>>1<<1 || x>>1<<1 == width()*9/10>>1<<1) && y/7%2 == 0)
-      return -1;
+      return new java.awt.Point(0, -1);
     else
-      return sfc.latIndex(Math.PI/2 + Math.asin((y-height()/2.0) / (height()/2.0)));
-  }
-  
-  
-  public final int getLon(int x, int y) {
-    if (lats[y][x] == -1)
-      return 0;
-    else
-      return sfc.lonIndex(lats[y][x], (x*5/4)%width() * 2*Math.PI / width());
+      return sfc.tilByAngles(Math.PI/2 + Math.asin((y-height()/2.0) / (height()/2.0)),
+                          (x*5/4)%width() * 2*Math.PI / width());
   }
 }

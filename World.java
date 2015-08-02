@@ -2,7 +2,7 @@ import java.util.*;
 
 
 
-public final class World extends Globe { // a subclass of Globe to handle all political elements
+public final class World extends Disc { // a subclass of Globe to handle all political elements
   public ArrayList<Civi> civis;
   public java.applet.AudioClip boom;
   public java.applet.AudioClip blast;
@@ -21,7 +21,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   }
   
   
-  public World(Globe g) {
+  public World(Disc g) {
     super(g);
     loadSound();
     civis = new ArrayList<Civi>();

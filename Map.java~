@@ -73,29 +73,31 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   private int tipX, tipY, tipW, tipH; // TileTip coordinates and dimensions
   private BufferedImage img;
   public int[][] lats, lons; // remembers which tile goes to which pixels (remembr to initialize in subclass constructor)
-  public Globe glb;          // if a lat is -1, the lon is the rgb value of the color to put there
+  public Surface sfc;          // if a lat is -1, the lon is the rgb value of the color to put there
   
   
   
-  public Map(Globe newWorld, int w, int h) {
+  public Map(Surface newWorld, int w, int h) {
     monaco = new Font("Monaco", 0, 12);
     tipX = -1;
     tipY = -1;
     tipW = -1;
     tipH = -1;
-    glb = newWorld;
+    sfc = newWorld;
     
     lats = new int[h][w];
     lons = new int[h][w];
     
     JFrame frame = new JFrame();
+    frame.setTitle("Civi-HD");
     img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB_PRE);
     img.getGraphics().setFont(monaco);
     setPreferredSize(new Dimension(w, h));
     frame.add(this);
     if (newWorld.getClass().getName().equals("World"))
-      frame.addMouseListener(new GodInterface(this, (World)glb)); // only Worlds get interfaces
+      frame.addMouseListener(new GodInterface(this, (World)sfc)); // only Worlds get interfaces
     frame.setResizable(false);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.pack();
     frame.setVisible(true);
   }
@@ -132,7 +134,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     if (lats[y][x] == -1) // if no tile here
       return; // do nothing
     
-    final String[] tip = glb.getTileByIndex(lats[y][x], lons[y][x]).getTip();
+    final String[] tip = sfc.getTileByIndex(lats[y][x], lons[y][x]).getTip();
     
     if (x < width()/2)  tipX = x; // left is the left side of the tip, which changes based on what side of the screen you are on
     else                   tipX = x - tip[0].length()*7;
@@ -192,7 +194,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   
   public final Tile getTile(int x, int y) {
-    return glb.getTileByIndex(lats[y][x], lons[y][x]);
+    return sfc.getTileByIndex(lats[y][x], lons[y][x]);
   }
   
   
@@ -225,12 +227,12 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   
   public Color getColorByBiome(int x, int y) {
-    return colors[glb.getTileByIndex(lats[y][x], lons[y][x]).biome];
+    return colors[sfc.getTileByIndex(lats[y][x], lons[y][x]).biome];
   }
   
   
   public Color getColorByAlt(int x, int y) {
-    int alt = glb.getTileByIndex(lats[y][x], lons[y][x]).altitude;
+    int alt = sfc.getTileByIndex(lats[y][x], lons[y][x]).altitude;
     if (alt < -256) // if altitude is below minimum, return black
       return Color.black;
     else if (alt >= 256) // if altitude is above maximum, return white
@@ -245,7 +247,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   
   public Color getColorByRain(int x, int y) {
-    int dryness = 255 - glb.getTileByIndex(lats[y][x], lons[y][x]).rainfall;
+    int dryness = 255 - sfc.getTileByIndex(lats[y][x], lons[y][x]).rainfall;
     if (dryness < 0)
       return new Color(0, 0, 255);
     if (dryness >= 256)
@@ -255,7 +257,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   
   public Color getColorByTemp(int x, int y) {
-    int coldness = 255 - glb.getTileByIndex(lats[y][x], lons[y][x]).temperature;
+    int coldness = 255 - sfc.getTileByIndex(lats[y][x], lons[y][x]).temperature;
     if (coldness >= 256)
       return new Color(255, 0, 0);
     if (coldness < 0)
@@ -264,25 +266,25 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   }
   
   
-  public Color getColorByClimate(int x, int y) {
-    int temp = 255-glb.getTileByIndex(lats[y][x], lons[y][x]).temperature;
-    int rain = 255-glb.getTileByIndex(lats[y][x], lons[y][x]).rainfall;
-    if (temp < 0)
-      return new Color(255, 0, 0);
-    if (temp >= 256)
-      return new Color(255, 255, 255);
-    if (rain < 0)
-      return new Color(0, 0, 255);
-    if (rain >= 256)
-      return new Color(255, 255, 255);
-    return new Color(rain, (temp+rain)/2, rain);
+  public Color getColorByClimate(int x, int y) { // returns a pastoral combination of cyan and magenta corresponding to humidity and temperature
+    int coldness = 255-sfc.getTileByIndex(lats[y][x], lons[y][x]).temperature;
+    int dryness = 255-sfc.getTileByIndex(lats[y][x], lons[y][x]).rainfall;
+    if (coldness < 0)
+      coldness = 0;
+    if (coldness >= 256)
+      coldness = 255;
+    if (dryness < 0)
+      dryness = 0;
+    if (dryness >= 256)
+      dryness = 255;
+    return new Color(coldness, dryness, (coldness+dryness)>>1);
   }
   
   
   public Color getColorByWater(int x, int y) {
-    if (glb.getTileByIndex(lats[y][x], lons[y][x]).altitude < 0)
+    if (sfc.getTileByIndex(lats[y][x], lons[y][x]).altitude < 0)
       return Color.red;
-    int dryness = 255 - glb.getTileByIndex(lats[y][x], lons[y][x]).water;
+    int dryness = 255 - sfc.getTileByIndex(lats[y][x], lons[y][x]).water;
     if (dryness >= 256)
       return new Color(255, 255, 255);
     if (dryness < 0)
@@ -292,7 +294,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   
   public Color getColorByWaterLevel(int x, int y) {
-    int height = glb.getTileByIndex(lats[y][x], lons[y][x]).waterLevel();
+    int height = sfc.getTileByIndex(lats[y][x], lons[y][x]).waterLevel();
     if (height >= 256)
       return Color.white;
     if (height < 0)
@@ -302,7 +304,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   
   public Color getColorByTerritory(int x, int y) {
-    final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
+    final Tile til = sfc.getTileByIndex(lats[y][x], lons[y][x]);
     
     if (til.development == 0) {
       if (til.isWet()) // unsettled water is black
@@ -323,8 +325,8 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
               for (int j = -3; j <= 3; j ++)
                 if (i*i + j*j <= 9) // if in circle
                   if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
-                    if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) ||
-                        glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) // if it is near a tile owned by someone else or near ocean
+                    if (!til.owners.equals(sfc.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) ||
+                        sfc.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) // if it is near a tile owned by someone else or near ocean
                       return civ.emblem();
           
           return Color.white;
@@ -347,7 +349,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   
   public Color getColorByHybrid(int x, int y) {
-    final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
+    final Tile til = sfc.getTileByIndex(lats[y][x], lons[y][x]);
     
     if (til.development == 0) {
       return getColorByBiome(x, y);
@@ -362,7 +364,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
               for (int j = -3; j <= 3; j ++)
                 if (i*i + j*j <= 9) // if in circle
                   if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
-                    if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners)) // if it is near a tile owned by someone else
+                    if (!til.owners.equals(sfc.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners)) // if it is near a tile owned by someone else
                       return civ.emblem();
           
           return getColorByBiome(x,y);
@@ -387,7 +389,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   
   public Color getColorByDrawn(int x, int y) {
-    final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
+    final Tile til = sfc.getTileByIndex(lats[y][x], lons[y][x]);
     
     if (!key[til.biome][y%key[til.biome].length][x%key[til.biome][0].length])
       return Color.black; // draws biomes in black patterns
@@ -406,8 +408,8 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
               for (int j = -3; j <= 3; j ++)
                 if (i*i + j*j <= 9) // if in circle
                   if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
-                    if (!til.owners.equals(glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) || // if it is near a tile owned by someone else
-                        ((glb.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) && til.altitude >= 0)) // or a coast
+                    if (!til.owners.equals(sfc.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) || // if it is near a tile owned by someone else
+                        ((sfc.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) && til.altitude >= 0)) // or a coast
                       return civ.emblem();
           
           return Color.white;
@@ -431,8 +433,8 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   }
   
   
-  public void setGlobe(Globe newGlb) {
-    glb = newGlb;
+  public void setSurface(Surface newSfc) {
+    sfc = newSfc;
   }
   
   

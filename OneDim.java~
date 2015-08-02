@@ -3,14 +3,14 @@ import java.awt.*;
 
 
 public class OneDim extends Map { // a one dimensional map that only sees the prime meridian
-  public OneDim(Globe g, int w, int h) {
+  public OneDim(Surface g, int w, int h) {
     super(g, w, h);
     finishSuper();
   }
   
   
   public int getLat(int x, int y) { // updates the matrices
-    return glb.latIndex(x*Math.PI/width());
+    return sfc.latIndex(x*Math.PI/width());
   }
   
   
@@ -21,7 +21,7 @@ public class OneDim extends Map { // a one dimensional map that only sees the pr
   
   @Override
   public Color getColorBy(ColS c, int x, int y) {
-    final Tile til = glb.getTileByIndex(lats[y][x], lons[y][x]);
+    final Tile til = sfc.getTileByIndex(lats[y][x], lons[y][x]);
     
     if (til.altitude < 0) { // for ocean tiles
       if (y < height()/2) // the upper half

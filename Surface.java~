@@ -7,7 +7,7 @@ public interface Surface {
   
   public abstract boolean any(int i);
   
-  public abstract int distance(Tile t1, Tile t2);
+  public abstract double distance(Tile t1, Tile t2);
   
   public abstract boolean randChance(int i);
   

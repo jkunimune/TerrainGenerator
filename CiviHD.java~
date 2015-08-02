@@ -20,7 +20,7 @@ public final class CiviHD { // the driver for my independent project
     
     Planet protoEarth = new Planet(100);
     Map topographical = new Gall(protoEarth, 600, 400);
-    Map.setTitle("Civi-HD");
+    //Map.setTitle("Civi-HD");
     
     intro.play();
     protoEarth.generate(topographical);

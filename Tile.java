@@ -3,7 +3,7 @@ import java.util.*;
 
 
 public final class Tile { // keeps track of a single point on a globe
-  public int alt, lat, lon; // altitude lattitude and longitude (actually array indices)
+  public int lat, lon; // lattitude and longitude (actually array indices)
   public int altitude; // sea level is 0, goes from -256 to 255
   public int temperature; // temperature from 0 to 255
   public int rainfall; // measure of how wet a climate is from 0 (parched) to 255 (Kauai)
@@ -51,23 +51,6 @@ public final class Tile { // keeps track of a single point on a globe
   }
   
   
-  public Tile(int newLat, int newLon, int newAlt) { // initializes with default values
-    lat = newLat;
-    lon = newLon;
-    alt = newAlt;
-    altitude = -257;
-    temperature = 256;
-    rainfall = -1;
-    water = 0;
-    biome = 0;
-    development = 0;
-    owners = new ArrayList<Civi>(1);
-    isCapital = false;
-    radioactive = false;
-    diseases = new ArrayList<Plague>(0);
-  }
-  
-  
   public Tile(int newLat, int newLon, int newAlt, int newTemp, int newRain, int newWater, int newBiome) { // initializes with given values
     lat = newLat;
     lon = newLon;
@@ -87,7 +70,6 @@ public final class Tile { // keeps track of a single point on a globe
   public Tile(Tile source) { // copies another tile
     lat = source.lat;
     lon = source.lon;
-    alt = source.alt;
     altitude = source.altitude;
     temperature = source.temperature;
     rainfall = source.rainfall;
