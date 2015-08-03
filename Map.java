@@ -174,15 +174,10 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   
   public final void initialPaint() {
-    for (int x = 0; x < width(); x ++) { // draws background colors
-      for (int y = 0; y < height(); y ++) {
-        if (lats[y][x] == -1) {
-          try {
+    for (int x = 0; x < width(); x ++) // draws background colors
+      for (int y = 0; y < height(); y ++)
+        if (lats[y][x] == -1)
           drawPx(x, y, new Color(lons[y][x]>>16, lons[y][x]%65536>>8, lons[y][x]%256)); // draw the color found in the rgb value
-          } catch(Error e) {}
-        }
-      }
-    }
     show();
   }
   

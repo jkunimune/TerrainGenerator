@@ -2,11 +2,6 @@
 
 
 
-//import java.util.*;
-
-
-
-
 public final class CiviHD { // the driver for my independent project
   static java.applet.AudioClip intro; // songs for generation and CiviHD
   static java.applet.AudioClip music;
@@ -18,16 +13,15 @@ public final class CiviHD { // the driver for my independent project
   public static final void main(String args[]) {
     loadSound();
     
-    Galaxy protoEarth = new Galaxy(100);
+    Galaxy protoEarth = new Galaxy(200);
     Map topographical = new Polar(protoEarth, 500, 500);
     
     intro.play();
     protoEarth.generate(topographical);
-    //delay(3000);
-    System.out.println("Generated");
+    delay(3000);
     
     World earth = new World(protoEarth);
-    Map political = new Gall(earth, 500, 500);
+    Map political = new Polar(earth, 500, 500);
     
     music.loop();
     

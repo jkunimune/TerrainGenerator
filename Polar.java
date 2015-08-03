@@ -19,7 +19,6 @@ public class Polar extends Map { // an equal-distant map centered on the north p
       return new java.awt.Point(0, -1);
     
     else
-      //return new java.awt.Point(16777215, -1);
-      return new java.awt.Point(0, -1);
+      return new java.awt.Point(16777215, -1);
   }
 }

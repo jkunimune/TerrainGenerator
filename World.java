@@ -30,7 +30,7 @@ public final class World extends Disc { // a subclass of Globe to handle all pol
       for (Tile[] row: map)
         for (Tile til: row)
           spread(til);
-//    for (int i = 0; i < 30; i ++)
+//    for (int i = 0; i < 30; i ++) // for testing
 //      update();
 //    startPlague(civis.get(0).capital);
   }
@@ -115,13 +115,10 @@ public final class World extends Disc { // a subclass of Globe to handle all pol
     
     final ArrayList<Tile> adjacent = adjacentTo(til);
     
-    for (Tile adj: adjacent) { // for all adjacent tiles
-      if (adj.owners.size() == 1 && adj.temp3 != -1) { // if that one is settled and this is not and that one is not succumbing to the apocalypse
-        if (adj.owners.get(0).wants(til)) { // if they want this tile
+    for (Tile adj: adjacent) // for all adjacent tiles
+      if (adj.owners.size() == 1 && adj.temp3 != -1) // if that one is settled and this is not and that one is not succumbing to the apocalypse
+        if (adj.owners.get(0).wants(til)) // if they want this tile
           til.temp1 = civis.indexOf(adj.owners.get(0));
-        }
-      }
-    }
     
     if (til.development == 0 && settlersLike(til)) // spawns new civis
       spawnCivi(til);
