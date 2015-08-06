@@ -77,7 +77,7 @@ public class Galaxy extends Disc {
           til.radioactive = true;
         if (Math.pow(til.lat-map.length/2,2) + Math.pow(til.lon-map.length/2,2)
               < Math.pow(map.length/16.0,2))
-          til.altitude = 32;
+          til.altitude = 24;
         else
           til.altitude = -8;
       }

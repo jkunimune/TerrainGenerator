@@ -1,8 +1,4 @@
-// by Justin Kunimune
-
-
-
-public final class CiviHD { // the driver for my independent project
+public final class CiviInSpace { // the driver for the interstellar version of Civi HD (will not compile until all instances of "Globe" in World are replaced with "Disc"
   static java.applet.AudioClip intro; // songs for generation and CiviHD
   static java.applet.AudioClip music;
   

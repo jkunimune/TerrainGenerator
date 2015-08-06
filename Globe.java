@@ -28,6 +28,12 @@ public class Globe implements Surface{ // a spherical surface
         map[lat][lon] = new Tile(lat, lon);
       }
     }
+// FOR TESTING
+//    for (Tile[] row: map) {
+//      for (Tile til: row)
+//        System.out.print(".");
+//      System.out.println(row.length);
+//    }
   }
   
   
@@ -40,7 +46,6 @@ public class Globe implements Surface{ // a spherical surface
     
     for (int lat = 1; lat <= map.length/2; lat ++) {
       int width = (int)(2*Math.PI * radius * Math.sin(lat*Math.PI/map.length)); // the length of each row is determined with trig
-      width = width / map[lat-1].length * map[lat-1].length; // each row has length divisible with row above it (for convinience)
       
       map[lat] = new Tile[width];
       map[map.length-lat-1] = new Tile[width]; // the top and bottom are symmetrical
@@ -80,21 +85,20 @@ public class Globe implements Surface{ // a spherical surface
   
   @Override
   public final Point tilByAngles(double lattitude, double longitude) { // converts a lattitude and longitude to indicies
-    if (lattitude == Math.PI)
-      lattitude = Math.sin(Math.PI);
-    
-    if (lattitude < 0 || lattitude > Math.PI) {
+    if (lattitude < 0 || lattitude > Math.PI) { // extraneous lattitudes will not do
       System.out.println("Error accessing "+lattitude+","+longitude);
       return new Point(-1, -1);
     }
     
-    if (longitude < 0)
+    while (longitude < 0) // puts longitudes into a usable range
       longitude += 2*Math.PI;
     longitude %= 2*Math.PI;
     
     int y = (int)(lattitude*map.length/Math.PI);
+    if (y == map.length) // forces pixels looking for pi to look at the southmost tile
+      y --;
     int x = (int)(longitude*map[y].length/(2*Math.PI));
-    return new Point(y, x);
+    return new Point(x, y);
   }
   
   
