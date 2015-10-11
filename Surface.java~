@@ -1,4 +1,5 @@
 import java.util.*;
+import java.awt.*;
 
 
 
@@ -15,7 +16,5 @@ public interface Surface {
   
   public abstract Tile getTileByIndex(int lat, int lon);
   
-  public abstract int latIndex(double lattitude);
-  
-  public abstract int lonIndex(int lat, double longitude);
+  public abstract Point tilByAngles(double lat, double lon);
 } 

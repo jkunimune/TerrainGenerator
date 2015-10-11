@@ -2,34 +2,36 @@ import java.util.*;
 
 
 
-public final class World extends Globe { // a subclass of Globe to handle all political elements
+public final class World { // a subclass of Globe to handle all political elements
   public ArrayList<Civi> civis;
   public java.applet.AudioClip boom;
   public java.applet.AudioClip blast;
   
   
   
+  private Surface map;
+  
+  
+  
   public World(int r) {
-    super(r);
+    map = new Globe(r);
     loadSound();
     civis = new ArrayList<Civi>();
     
     while (civis.size() == 0) // skips ahead to the founding of the first civi
-      for (Tile[] row: map)
-        for (Tile til: row)
-          spread(til);
+      for (Tile til: map.list())
+        spread(til);
   }
   
   
-  public World(Globe g) {
-    super(g);
+  public World(Surface s) {
+    map = s;
     loadSound();
     civis = new ArrayList<Civi>();
     
     while (civis.size() == 0) // skips ahead to the founding of the first civi
-      for (Tile[] row: map)
-        for (Tile til: row)
-          spread(til);
+      for (Tile til: map.list())
+        spread(til);
 //    for (int i = 0; i < 30; i ++) // for testing
 //      update();
 //    startPlague(civis.get(0).capital);
@@ -37,45 +39,40 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public World() { // FOR TESTING PURPOSES ONLY: DO NOT CALL
-    super(1);
+    map = new Globe(1);
   }
   
   
   
   public final void update() { // updates the world a frame
-    for (Tile[] row: map) { // for each tile in map
-      for (Tile til: row) {
-        
-        naturallyDisast(til);
-        
-        collapse(til);
-        
-        develop(til);
-        
-        spread(til);
-        
-        fightWar(til);
-        
-        startWar(til);
-        
-        startRevolution(til);
-      }
+    for (Tile til: map.list()) { // for each tile in map
+      naturallyDisast(til);
+      
+      collapse(til);
+      
+      develop(til);
+      
+      spread(til);
+      
+      fightWar(til);
+      
+      startWar(til);
+      
+      startRevolution(til);
     }
     
-    for (Tile[] row: map) { // asssigns all new values
-      for (Tile til: row) {
-        if (til.temp1 >= 0)
-          civis.get(til.temp1).takes(til);
-        
-        if (til.temp2 >= 0)
-          civis.get(til.temp2).failsToDefend(til);
-        
-        if (til.temp3 > 0 && til.owners.size() == 1)
-          til.development ++;
-        
-        else if (til.temp3 < 0 && til.owners.size() == 1)
-          til.owners.get(0).loseGraspOn(til);
-      }
+    for (Tile til: map.list()) { // asssigns all new values
+      if (til.temp1 >= 0)
+        civis.get(til.temp1).takes(til);
+      
+      if (til.temp2 >= 0)
+        civis.get(til.temp2).failsToDefend(til);
+      
+      if (til.temp3 > 0 && til.owners.size() == 1)
+        til.development ++;
+      
+      else if (til.temp3 < 0 && til.owners.size() == 1)
+        til.owners.get(0).loseGraspOn(til);
     }
     
     endWar();
@@ -113,7 +110,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     if (til.development > 0) // only run for unclaimed tiles
       return;
     
-    final ArrayList<Tile> adjacent = adjacentTo(til);
+    final ArrayList<Tile> adjacent =map.adjacentTo(til);
     
     for (Tile adj: adjacent) // for all adjacent tiles
       if (adj.owners.size() == 1 && adj.temp3 != -1) // if that one is settled and this is not and that one is not succumbing to the apocalypse
@@ -144,7 +141,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     if (til.development == 0 || til.owners.get(0).adversaries.size() == 0) // only run for tiles in civis at war
       return;
     
-    final ArrayList<Tile> adjacentList = adjacentTo(til);
+    final ArrayList<Tile> adjacentList =map.adjacentTo(til);
     
     if (til.owners.size() == 1) { // if it is not disputed
       for (Civi enemy: til.owners.get(0).adversaries)
@@ -216,7 +213,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
       for (int i = 0; i < 64; i ++) { // gives rebels a head start
         for (int j = 0; j < rebels.land.size(); j ++) {
           final Tile til = rebels.land.get(j);
-          for (Tile adj: adjacentTo(til))
+          for (Tile adj:map.adjacentTo(til))
             if (adj.owners.size() == 1 && adj.owners.get(0).equals(empire)) // imperial land can be invaded by rebel land
               if (rebels.canInvade(adj))
                 rebels.takes(adj);
@@ -233,7 +230,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
         for (int i = 0; i < 128; i ++) { // give rebels more disputed territory if they have not won yet
           for (int j = 0; j < rebels.land.size(); j ++) {
             final Tile til = rebels.land.get(j);
-            for (Tile adj: adjacentTo(til))
+            for (Tile adj:map.adjacentTo(til))
               if (adj.owners.size() == 1 && adj.owners.get(0).equals(empire)) // imperial land can be invaded by rebel land
                 if (rebels.canInvade(adj))
                   rebels.takes(adj);
@@ -260,7 +257,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final void naturallyDisast(Tile til) { // causes natural disasters
-    if (randChance(-180))
+    if (randChance(-190))
       meatyore(til);
     updatePlague(til);
     if (til.development > 0 && randChance((til.development<<3) - 200))
@@ -270,9 +267,8 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   public final void startPlague(Tile start) {
     System.out.println(start.owners.get(0) + "has been beset by plague!");
-    for (Tile[] row: map)
-      for (Tile til: row)
-        til.diseases.add(Plague.sterile);
+    for (Tile til: map.list())
+      til.diseases.add(Plague.sterile);
     start.diseases.set(start.diseases.size()-1, Plague.infected);
   }
   
@@ -284,7 +280,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     for (int i = 0; i < til.diseases.size(); i ++) {
       switch (til.diseases.get(i)) {
         case sterile: // infect sterile tiles
-          final ArrayList<Tile> adjacentList = adjacentTo(til);
+          final ArrayList<Tile> adjacentList =map.adjacentTo(til);
           for (Tile adj: adjacentList)
             if (adj.diseases.get(i) != Plague.sterile)
               if (randChance(til.development<<3))
@@ -317,7 +313,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     for (int i = 0; i < 64; i ++) { // calls a random region between the empires into dispute
       for (int j = 0; j < agg.land.size(); j ++) {
         final Tile til = agg.land.get(j);
-        for (Tile adj: adjacentTo(til))
+        for (Tile adj:map.adjacentTo(til))
           if (adj.owners.size() == 1 && adj.owners.get(0).equals(vic)) // land owned only by the victim can be disputed by the aggressor
             if ((adj.isWet() && randChance(-10)) || agg.canInvade(adj)) // naval territory is disputed very quickly
               agg.takes(adj);
@@ -358,7 +354,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   
   
   public final Tile borderAt(Tile til) { // decides if there is a international border here
-    final ArrayList<Tile> adjacentList = adjacentTo(til);
+    final ArrayList<Tile> adjacentList =map.adjacentTo(til);
     for (Tile adj: adjacentList)
       if (adj.owners.size() == 1 && !adj.owners.equals(til.owners))
         return adj;
@@ -366,27 +362,11 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   }
   
   
-  public final void test() {
-    civis.add(new Civi(map[0][0], civis, this));
-    civis.add(new Civi(map[313][0], civis, this));
-    wageWar(civis.get(0), civis.get(1));
-    
-    for (Tile[] row: map) {
-      for (Tile til: row) {
-        if (til.lat > 100)
-          civis.get(0).takes(til);
-        if (til.lat < 200)
-          civis.get(1).takes(til);
-      }
-    }
-  }
-  
-  
   public final boolean settlersLike(Tile til) { // determines whether to found a civi
     if (til.altitude < 0 || til.biome == Tile.freshwater || til.biome == Tile.tundra) // civis may not start on ocean or river or in tundra
       return false;
     
-    ArrayList<Tile> adjacent = adjacentTo(til);
+    ArrayList<Tile> adjacent =map.adjacentTo(til);
     for (Tile adj: adjacent)
       if (adj.altitude < 0 || adj.biome == Tile.freshwater) // civis spawn a lot near rivers and oceans
         return randChance(-115);
@@ -409,7 +389,7 @@ public final class World extends Globe { // a subclass of Globe to handle all po
   public final void nuke(Tile t) { // shoots a nuclear warhead at the specified Tile
     boom.play(); // BOOM
     t.getsNuked();
-    final ArrayList<Tile> adjacentList = adjacentTo(t);
+    final ArrayList<Tile> adjacentList =map.adjacentTo(t);
     for (Tile adj: adjacentList) // spews radiation onto this and all surrounding tiles
       adj.getsNuked();
   }
@@ -420,10 +400,9 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     System.out.println("A meteor has struck!");
     
     int size = 100 + (int)(Math.random()*100);
-    for (Tile[] row: map)
-      for (Tile til: row)
-        if (distance(t, til) < size)
-          til.getsHitByMeteor();
+    for (Tile til: map.list())
+      if (map.distance(t, til) < size)
+        til.getsHitByMeteor();
   }
   
   
@@ -435,5 +414,15 @@ public final class World extends Globe { // a subclass of Globe to handle all po
     catch (java.net.MalformedURLException error) {
       System.out.println(error);
     }
+  }
+  
+  
+  public Surface getSurface() {
+    return map;
+  }
+  
+  
+  public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
+    return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
   }
 }

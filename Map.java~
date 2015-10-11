@@ -73,7 +73,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   private int tipX, tipY, tipW, tipH; // TileTip coordinates and dimensions
   private BufferedImage img;
   public int[][] lats, lons; // remembers which tile goes to which pixels (remembr to initialize in subclass constructor)
-  public Surface sfc;          // if a lat is -1, the lon is the rgb value of the color to put there
+  public Surface sfc;        // if a lat is -1, the lon is the rgb value of the color to put there
   
   
   
@@ -104,17 +104,15 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   
   
-  public abstract int getLat(int x, int y);
-  
-  
-  public abstract int getLon(int x, int y);
+  public abstract Point getCoords(int x, int y); // the tile coordinates for any given pixel
   
   
   public final void finishSuper() { // a method stupid Java forces me to put in because super must be the first thing in the constructor because the stupid constructor says so and I can't just put this dang thing in the constructor.
-    for (int x = 0; x < width(); x ++) { // and i cant use w or h or g because, again, stupid Java
-      for (int y = 0; y < height(); y ++) {
-        lats[y][x] = getLat(x,y);
-        lons[y][x] = getLon(x,y);
+    for (int x = 0; x < lats[0].length; x ++) { // and i cant use w or h or g because, again, stupid Java
+      for (int y = 0; y < lats.length; y ++) {
+        final Point pt = getCoords(x,y);
+        lats[y][x] = pt.y;
+        lons[y][x] = pt.x;
       }
     }
     
@@ -163,7 +161,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     
     for (int i = -3; i < tipW + 3 && tipX+i < width(); i ++) { // draw a colorful rectangle around the words
       for (int j = -3; j < tipH + 3 && tipY-j >= 0; j ++) {
-        final int lat = getLat(tipX+i, tipY-j);
+        final int lat = getCoords(tipX+i, tipY-j).y;
         if (lat != -1)
           lats[tipY-j][tipX+i] = lat;
         else

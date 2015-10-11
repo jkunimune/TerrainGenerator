@@ -122,6 +122,7 @@ public final class Planet extends Globe { // a subclass of Globe that handles al
     
     System.out.println("Raining...");
     rain();
+    System.out.println("Eroding...");
     runoff();
     for (Map map: maps)
       map.display(ColS.altitude);

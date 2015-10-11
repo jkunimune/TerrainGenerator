@@ -13,15 +13,15 @@ public final class CiviHD { // the driver for my independent project
   public static final void main(String args[]) {
     loadSound();
     
-    Galaxy protoEarth = new Galaxy(200);
-    Map topographical = new Polar(protoEarth, 500, 500);
+    Planet protoEarth = new Planet(100);
+    Map topographical = new Gall(protoEarth, 600, 400);
     
     intro.play();
     protoEarth.generate(topographical);
     delay(3000);
     
     World earth = new World(protoEarth);
-    Map political = new Polar(earth, 500, 500);
+    Map political = new Gall(earth, 600, 400);
     
     music.loop();
     

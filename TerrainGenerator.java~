@@ -13,13 +13,13 @@ public final class TerrainGenerator{ // a class to generate and display terrain 
     
     while (true) {
       Planet earth = new Planet(100, new Scanner(System.in));
-      FromSpace theMap = new FromSpace(earth, 800, 400);
+      Map theMap = new Gall(earth, 800, 400);
       
       theMap.display(ColS.altitude);
       
       earth.generate(theMap);
       
-      theMap.exhibit(ColS.biome, 30000);
+      //theMap.exhibit(ColS.biome, 30000);
     }
   }
   

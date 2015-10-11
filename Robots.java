@@ -30,7 +30,7 @@ public class Robots extends Civi {
     if (super.randChance(120 - (warChance()>>5) + (milLevel()>>6) - (land.size()>>14) + (dthTimer()>>13))) // big old weak warmongers are more likely to have revolutions in cities
       return false;
     
-    final ArrayList<Tile> adjacentList = world.adjacentTo(til);
+    final ArrayList<Tile> adjacentList = world.getSurface().adjacentTo(til);
     for (Tile adj: adjacentList)
       if (!adj.owners.equals(til.owners) || adj.altitude < 0) // revolutions must happen on borders
         return true;

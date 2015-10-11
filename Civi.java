@@ -181,7 +181,7 @@ public class Civi {
         if ((til.altitude < 0 || til.biome == Tile.freshwater) && scienceLevel < space) // water biomes may not be settled prior to the space era
           return false;
         
-        ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
+        ArrayList<Tile> adjacent = world.getSurface().adjacentTo(til); // counts all adjacent tiles
         int waterAdjacency = 0; // if it is adjacent to water
         int settledAdjacency = 0; // how much settlement it is adjacent to
         for (Tile adj: adjacent) {
@@ -203,7 +203,7 @@ public class Civi {
         if (scienceLevel < industrial) // urbanization may not happen prior to industrial era
           return false;
         
-        adjacent = world.adjacentTo(til); // counts all adjacent tiles
+        adjacent = world.getSurface().adjacentTo(til); // counts all adjacent tiles
         waterAdjacency = -20; // if it is adjacent to water
         int urbanAdjacency = 0; // how much urbanization it is adjacent to
         
@@ -226,7 +226,7 @@ public class Civi {
         if (scienceLevel < prosperity) // utopianization is not possible before prosperity age
           return false;
         
-        ArrayList<Tile> adjacento = world.adjacentTo(til); // counts all adjacent tiles
+        ArrayList<Tile> adjacento = world.getSurface().adjacentTo(til); // counts all adjacent tiles
         int utopiaAdjacency = 0; // how much utopia it is adjacent to
         
         for (Tile adj: adjacento)
@@ -252,7 +252,7 @@ public class Civi {
     if (deathTimer >= 0)
       return false;
     
-    ArrayList<Tile> adjacent = world.adjacentTo(til); // counts all adjacent tiles
+    ArrayList<Tile> adjacent = world.getSurface().adjacentTo(til); // counts all adjacent tiles
     for (Tile adj: adjacent) {
       if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>7) - 30)) { // causes lands to be undeveloped during apocalypse
         if (!til.isCapital || randChance(-20)) // captials are less likely to be lost
@@ -350,7 +350,7 @@ public class Civi {
     if (randChance(120 - (warChance>>5) + (militaryLevel>>6) - (land.size()>>14) + (deathTimer>>13))) // big old weak warmongers are more likely to have revolutions in cities
       return false;
     
-    final ArrayList<Tile> adjacentList = world.adjacentTo(til);
+    final ArrayList<Tile> adjacentList = world.getSurface().adjacentTo(til);
     for (Tile adj: adjacentList)
       if (!adj.owners.equals(til.owners) || adj.altitude < 0) // revolutions must happen on borders
         return true;

@@ -13,7 +13,7 @@ public final class TerrainGenerator{ // a class to generate and display terrain 
     
     while (true) {
       Planet earth = new Planet(100, new Scanner(System.in));
-      Map theMap = new Gall(earth, 800, 400);
+      Map theMap = new Gall(earth.getSurface(), 800, 400);
       
       theMap.display(ColS.altitude);
       

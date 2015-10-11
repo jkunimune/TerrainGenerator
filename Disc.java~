@@ -32,13 +32,13 @@ public class Disc implements Surface { // a thin three-dimensional disc
   
   @Override
   public final Tile getTile(double lat, double lon) { // returns a tile at a given coordinate
-    if (lat < 0) {
+    if (lat < 0 || lat > Math.PI) {
       System.out.println("Error accessing "+lat+","+lon);
       return new Tile(-1, -1);
     }
     
-    int y = (int)(lat*radius/Math.PI*Math.sin(lon));
-    int x = (int)(lat*radius/Math.PI*Math.cos(lon));
+    int y = (int)(lat*radius/Math.PI*Math.sin(lon)+radius);
+    int x = (int)(lat*radius/Math.PI*Math.cos(lon)+radius);
     
     return map[y][x];
   }
@@ -78,18 +78,11 @@ public class Disc implements Surface { // a thin three-dimensional disc
     int y = tile.lat;
     ArrayList<Tile> output = new ArrayList<Tile>(6); // initializes the output
     
-    try {
-      output.add(map[y][x-1]);
-    } catch (Error e) {}
-    try {
-      output.add(map[y][x+1]);
-    } catch (Error e) {}
-    try {
-      output.add(map[y-1][x]);
-    } catch (Error e) {}
-    try {
-      output.add(map[y+1][x]);
-    } catch (Error e) {}
+    for (int dx = -2; dx <= 2; dx ++)
+      for (int dy = -2; dy <= 2; dy ++)
+        if (dx*dx+dy*dy < 7 && (dx!=0 || dy!= 0)) // adjacent tiles can actually have some distance between them in Discs, to simulate 3 dimensions
+          if (x+dx>=0 && x+dx<map[0].length && y+dy>=0 && y+dy<map.length)
+            output.add(map[y+dy][x+dx]);
     
     return output;
   }
