@@ -1,15 +1,18 @@
 import java.awt.*;
 import java.util.*;
+import org.apache.commons.lang3.ArrayUtils;
 
 
 
 public class Globe implements Surface{ // a spherical surface
   public Tile[][] map; // the irregular matrix of tiles representing the surface
   private int radius; // the radius of the sphere
+  private Point index; // the current Tile in the list
   
   
   
   public Globe(int r) {
+    index = new Point(0,0);
     radius = r;
     map = new Tile[(int)(r * Math.PI)][]; // the map is a matrix of tiles with varying width
     
@@ -61,6 +64,15 @@ public class Globe implements Surface{ // a spherical surface
   
   
   @Override
+  public final Tile[] list() {
+    Tile[] output = new Tile[0];
+    for (Tile[] row: map)
+      output = ArrayUtils.addAll(output, row);
+    return output;
+  }
+  
+  
+  @Override
   public final Tile getTile(double lat, double lon) { // returns a tile at a given coordinate
     if (lat < 0 || lat >= Math.PI) {
       System.out.println("Error accessing "+lat+","+lon);
@@ -99,6 +111,18 @@ public class Globe implements Surface{ // a spherical surface
       y --;
     int x = (int)(longitude*map[y].length/(2*Math.PI));
     return new Point(x, y);
+  }
+  
+  
+  @Override
+  public final double latByTil(Tile til) {
+    return (double)til.lat/radius;
+  }
+  
+  
+  @Override
+  public final double lonByTil(Tile til) {
+    return (double)til.lon/radius;
   }
   
   
@@ -159,7 +183,6 @@ public class Globe implements Surface{ // a spherical surface
   }
   
   
-  @Override
   public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
     return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
   }

@@ -95,7 +95,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
     spawnFirstContinent();
     
     int t = 0;
-    while (map.any(-257)) {
+    while (map.count(-256) > 0) { // while there is still lava
       spawnContinents();
       if (t%30 == 0)
         for (Map map: maps)

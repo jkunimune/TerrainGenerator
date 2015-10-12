@@ -94,9 +94,10 @@ public final class Tile { // keeps track of a single point on a globe
   
   
   public final void spreadFrom(Tile source) { // joins the continental plate of another tile (but only temporarily; remember to copy temp1 to biome!)
-    temp1 = source.altitude + (int)(Math.random()*4-2) - (source.altitude/128); // temp1 is the altitude, which drifts randomly over time
+    temp1 = source.altitude + (int)(Math.random()*4-2); // temp1 is the altitude, which drifts randomly over time
     temp2 = source.temp2; // temp2 represents lattitudinal component of new motion
     temp3 = source.temp3; // temp3 represents longitudinal component of new motion
+    temperature = source.temperature + (int)(Math.random()*4-2); // temerature represents how quickly the plate should spread
   }
   
   
@@ -105,6 +106,15 @@ public final class Tile { // keeps track of a single point on a globe
     else      temp1 = (int)(Math.random()*16+56); // randomizes altitude from 56 to 72
     temp2 = (int)(Math.random()*Math.PI*128); // randomizes drift velocity
     temp3 = (int)(Math.random()*2*Math.PI*128); // these numbers represent a vector, so they are coordinates representing a point on the axis of the plate's rotation, which also goes through the center of the sphere
+    temperature = (int)(Math.random()*8); // randomizes drift speed
+  }
+  
+  
+  public final void startPlate() { // becomes the seed for a continental plate
+    temp1 = (int)(Math.random()*128+128); // randomizes from -64 to 64
+    temp2 = (int)(Math.random()*Math.PI*128); // randomizes drift velocity
+    temp3 = (int)(Math.random()*2*Math.PI*128); // these numbers represent a vector, so they are coordinates representing a point on the axis of the plate's rotation, which also goes through the center of the sphere
+    temperature = (int)(Math.random()*8); // randomizes spread speed
   }
   
   

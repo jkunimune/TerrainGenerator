@@ -10,9 +10,9 @@ public final class MapTest{ // a class to experiment with and compare different 
     while (true) {
       Planet earth = new Planet(100);
       Map[] maps = new Map[3];
-      maps[0] = new SimpleSinusoidal(earth, 400, 628);
-      maps[1] = new SimpleTrig(earth, 400, 628);
-      maps[2] = new Hemispherical(earth, 600, 300);
+      maps[0] = new SimpleSinusoidal(earth.getSurface(), 400, 628);
+      maps[1] = new SimpleTrig(earth.getSurface(), 400, 628);
+      maps[2] = new Hemispherical(earth.getSurface(), 600, 300);
       
       for (Map theMap: maps)
         theMap.display(ColS.altitude);

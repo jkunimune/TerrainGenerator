@@ -10,11 +10,15 @@ public interface Surface {
   
   public abstract double distance(Tile t1, Tile t2);
   
-  public abstract boolean randChance(int i);
-  
   public abstract Tile getTile(double lat, double lon);
   
   public abstract Tile getTileByIndex(int lat, int lon);
   
   public abstract Point tilByAngles(double lat, double lon);
+  
+  public abstract double latByTil(Tile til);
+  
+  public abstract double lonByTil(Tile til);
+  
+  public abstract Tile[] list();
 } 

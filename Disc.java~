@@ -1,15 +1,18 @@
 import java.util.*;
 import java.awt.*;
+import org.apache.commons.lang3.ArrayUtils;
 
 
 
 public class Disc implements Surface { // a thin three-dimensional disc
   public Tile[][] map; // the irregular matrix of tiles representing the surface
   private int radius; // the radius of the disc
+  private Point index;
   
   
   
   public Disc(int r) {
+    index = new Point(0,0);
     radius = r;
     map = new Tile[radius<<1][radius<<1]; // the map is a plane of tiles one-eight as deep as it is wide
     
@@ -28,6 +31,14 @@ public class Disc implements Surface { // a thin three-dimensional disc
         map[lat][lon] = new Tile(source.getTileByIndex(lat,lon));
   }
   
+  
+  @Override
+  public final Tile[] list() {
+    Tile[] output = new Tile[0];
+    for (Tile[] row: map)
+      output = ArrayUtils.addAll(output, row);
+    return output;
+  }
   
   
   @Override
@@ -104,8 +115,19 @@ public class Disc implements Surface { // a thin three-dimensional disc
   }
   
   
-  @Override
   public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
     return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
+  }
+  
+  
+  @Override
+  public double latByTil(Tile til) { // lattitude angle of til
+    return Math.hypot(til.lat-radius,til.lon-radius)*Math.PI/radius;
+  }
+  
+  
+  @Override
+  public double lonByTil(Tile til) { // longitude angle of til
+    return Math.atan2(til.lat-radius,til.lon-radius);
   }
 }

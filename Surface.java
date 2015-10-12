@@ -6,7 +6,7 @@ import java.awt.*;
 public interface Surface {
   public abstract ArrayList<Tile> adjacentTo(Tile t);
   
-  public abstract boolean any(int i);
+  public abstract int count(int i);
   
   public abstract double distance(Tile t1, Tile t2);
   

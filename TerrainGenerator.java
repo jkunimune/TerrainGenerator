@@ -12,14 +12,16 @@ public final class TerrainGenerator{ // a class to generate and display terrain 
     startMusic();
     
     while (true) {
-      Planet earth = new Planet(100, new Scanner(System.in));
-      Map theMap = new Gall(earth.getSurface(), 800, 400);
+      //Planet earth = new Planet(100, new Scanner(System.in));
+      AdvancedPlanet earth = new AdvancedPlanet(100);
+      Map theMap = new Gall(earth.getSurface(), 800, 500);
       
       theMap.display(ColS.altitude);
       
       earth.generate(theMap);
       
       //theMap.exhibit(ColS.biome, 30000);
+      delay(150000);
     }
   }
   
