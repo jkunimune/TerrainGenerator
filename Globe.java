@@ -7,12 +7,10 @@ import org.apache.commons.lang3.ArrayUtils;
 public class Globe implements Surface{ // a spherical surface
   public Tile[][] map; // the irregular matrix of tiles representing the surface
   private int radius; // the radius of the sphere
-  private Point index; // the current Tile in the list
   
   
   
   public Globe(int r) {
-    index = new Point(0,0);
     radius = r;
     map = new Tile[(int)(r * Math.PI)][]; // the map is a matrix of tiles with varying width
     

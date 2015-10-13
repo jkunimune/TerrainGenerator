@@ -166,12 +166,13 @@ public class Globe implements Surface{ // a spherical surface
   
   
   @Override
-  public final boolean any(int testAlt) { // checks if any of a given altitude exists on the map
+  public final int count(int testAlt) { // checks if any of a given altitude exists on the map
+    int count = 0;
     for (Tile[] row: map)
       for (Tile t: row)
-        if (t.altitude == testAlt)
-          return true;
-    return false;
+        if (t.altitude < testAlt)
+          count ++;
+    return count;
   }
   
   

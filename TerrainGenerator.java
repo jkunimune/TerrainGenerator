@@ -1,4 +1,4 @@
-import java.util.Scanner;
+//import java.util.Scanner;
 
 
 
@@ -21,7 +21,7 @@ public final class TerrainGenerator{ // a class to generate and display terrain 
       earth.generate(theMap);
       
       //theMap.exhibit(ColS.biome, 30000);
-      delay(150000);
+      delay(20000);
     }
   }
   

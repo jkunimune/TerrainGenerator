@@ -1,0 +1,11 @@
+public class Plate extends ArrayList<Tile> { // a tectonic plate
+  public Vector w; // the angular velocity of the plate
+  
+  
+  
+  public Plate() {
+    tiles = new ArrayList<Tile>();
+    w = new Vector(Math.random(), Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI);
+  }
+}
+    

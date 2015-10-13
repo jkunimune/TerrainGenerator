@@ -4,6 +4,7 @@ import java.util.*;
 
 public final class AdvancedPlanet { // a subclass of Globe that handles all geological elements  
   private Globe map;
+  private List<Plate> crust;
   
   
   
@@ -44,12 +45,16 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       spawnContinents();
       if (t%30 == 0)
         for (Map map: maps)
-          map.display(ColS.altitude);
+          map.display(ColS.altitude2);
       t ++;
     }
     if (t%30 != 1)
       for (Map map: maps)
-        map.display(ColS.altitude);
+        map.display(ColS.altitude2);
+    
+    System.out.println("Shifting continents...");
+    for (int i = 0; i < 5; i += 1)
+      shiftPlates(.1);
     
     System.out.println("Filling in oceans...");
     fillOceans();
@@ -70,7 +75,8 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     for (Tile til: map.list())
       til.temp1 = 9001; // initializes temp1
     
-    map.getTile(Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI).startPlate(); // spawns a plate
+    crust = new ArrayList<Plate>(1);
+    crust.add(new Plate(0, map.getTile(Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI))); // spawns a plate at a random tile
   }
   
   
@@ -78,12 +84,15 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     for (Tile tile: map.list()) {
       if (tile.altitude < 0) {
         ArrayList<Tile> adjacent = map.adjacentTo(tile);
-        for (Tile ref: adjacent) // reads all adjacent tiles to look for land or sea
-          if (ref.altitude > 0 && randChance(ref.temperature-20)) // hotter continents spread faster
-          tile.spreadFrom(ref);
+        for (Tile ref: adjacent) { // reads all adjacent tiles to look for land or sea
+          if (ref.altitude > 0 && randChance(ref.temp3-20)) { // hotter continents spread faster
+            tile.join(ref);
+            crust.get(ref.temp2).add(tile);
+          }
+        }
         
-        if (tile.altitude < 0 && randChance(-125)) // I realize I check that the biome is 0 kind of a lot, but I just want to avoid any excess computations
-          tile.startPlate(); // seeds new plates occasionally
+        if (tile.altitude < 0 && randChance(-135)) // seeds new plates occasionally
+          crust.add(new Plate(crust.size(),tile));
       }
     }
     
@@ -93,16 +102,18 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public final void plateTechtonics() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
-    
+  public final void shiftPlates(double delT) { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
+    for (Tile til: map.list()) { // delT is the number of radians each plate moves
+      
+    }
   }
   
   
   public final void fillOceans() { // fills in the oceans to about 70% of the surface
     final int target = (int)(4*Math.PI*map.getRadius()*map.getRadius()*.7); // the approximate number of tiles we want underwater
-    int seaLevel = 127;
+    int seaLevel = 255;
     int min = 0;
-    int max = 255;
+    int max = 511;
     
     for (int i = 0; i < 5; i ++) {
       if (map.count(seaLevel) < target) { // if too many are abovewater
