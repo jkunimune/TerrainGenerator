@@ -72,10 +72,12 @@ public class Globe implements Surface{ // a spherical surface
   
   @Override
   public final Tile getTile(double lat, double lon) { // returns a tile at a given coordinate
-    if (lat < 0 || lat >= Math.PI) {
-      System.out.println("Error accessing "+lat+","+lon);
+    if (lat < 0 || lat > Math.PI) {
+      System.err.println("Error accessing "+lat+","+lon);
       return new Tile(-1, -1);
     }
+    if (lat == Math.PI)
+      return map[map.length-1][0];
     
     lon %= 2*Math.PI;
     if (lon < 0)
@@ -114,13 +116,13 @@ public class Globe implements Surface{ // a spherical surface
   
   @Override
   public final double latByTil(Tile til) {
-    return (double)til.lat/radius;
+    return (til.lat+.5)/radius;
   }
   
   
   @Override
   public final double lonByTil(Tile til) {
-    return (double)til.lon/radius;
+    return 2*Math.PI*til.lon/map[til.lat].length;
   }
   
   

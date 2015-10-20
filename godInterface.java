@@ -17,7 +17,7 @@ public final class GodInterface implements MouseListener {
   
   
   public final void mouseClicked(MouseEvent e) {
-    if (e.getButton() == e.BUTTON3)
+    if (e.getButton() == MouseEvent.BUTTON3)
       world.meatyore(display.getTile(e.getX(), e.getY()-23));
   }
   
@@ -31,13 +31,13 @@ public final class GodInterface implements MouseListener {
   
   
   public final void mouseReleased(MouseEvent e) {
-    if (e.getButton() == e.BUTTON1)
+    if (e.getButton() == MouseEvent.BUTTON1)
       display.hideTileTip();
   }
   
   
   public final void mousePressed(MouseEvent e) {
-    if (e.getButton() == e.BUTTON1)
+    if (e.getButton() == MouseEvent.BUTTON1)
       display.showTileTip(e.getX(), e.getY()-23); // left clicking shows the a TileTip
   }
 }

@@ -85,13 +85,13 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       if (tile.altitude < 0) {
         ArrayList<Tile> adjacent = map.adjacentTo(tile);
         for (Tile ref: adjacent) { // reads all adjacent tiles to look for land or sea
-          if (ref.altitude > 0 && randChance(ref.temperature-25)) { // hotter continents spread faster
+          if (ref.altitude > 0 && randChance(ref.temp3-20)) { // hotter continents spread faster
             tile.join(ref);
             crust.get(ref.temp2).add(tile);
           }
         }
         
-        if (tile.altitude < 0 && randChance(-125)) // seeds new plates occasionally
+        if (tile.altitude < 0 && randChance(-135)) // seeds new plates occasionally
           crust.add(new Plate(crust.size(),tile));
       }
     }

@@ -2,7 +2,6 @@ import java.util.*;
 import java.awt.*;
 
 
-
 public interface Surface {
   public abstract ArrayList<Tile> adjacentTo(Tile t);
   

@@ -53,8 +53,11 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
         map.display(ColS.altitude2);
     
     System.out.println("Shifting continents...");
-    for (int i = 0; i < 5; i += 1)
-      shiftPlates(.1);
+    for (int i = 0; i < 5; i += 1) {
+      shiftPlates(0.1);
+      for (Map map: maps)
+        map.display(ColS.altitude2);
+    }
     
     System.out.println("Filling in oceans...");
     fillOceans();
@@ -103,8 +106,18 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   
   
   public final void shiftPlates(double delT) { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
-    for (Tile til: map.list()) { // delT is the number of radians each plate moves
-      
+    for (Tile til: map.list()) {
+      til.altitude = til.temp1;
+      til.temp1 = 0;
+    }
+    
+    for (Tile til: map.list()) {
+      Vector w = crust.get(til.temp2).w;
+      Vector r0 = new Vector (map.getRadius(), map.latByTil(til), map.lonByTil(til));
+      Vector v = w.cross(r0);
+      Vector r = r0.plus(v.times(delT));
+      Tile dest = map.getTile(r.getA(),r.getB());
+      dest.temp1 += til.altitude;
     }
   }
   

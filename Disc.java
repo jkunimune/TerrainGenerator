@@ -7,12 +7,10 @@ import org.apache.commons.lang3.ArrayUtils;
 public class Disc implements Surface { // a thin three-dimensional disc
   public Tile[][] map; // the irregular matrix of tiles representing the surface
   private int radius; // the radius of the disc
-  private Point index;
   
   
   
   public Disc(int r) {
-    index = new Point(0,0);
     radius = r;
     map = new Tile[radius<<1][radius<<1]; // the map is a plane of tiles one-eight as deep as it is wide
     

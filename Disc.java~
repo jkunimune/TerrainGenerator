@@ -100,12 +100,13 @@ public class Disc implements Surface { // a thin three-dimensional disc
   
   
   @Override
-  public final boolean any(int testAlt) { // checks if any of a given altitude exists on the map
+  public final int count(int testAlt) { // counts tiles under a given altitude existing on the map
+    int count = 0;
     for (Tile[] row: map)
       for (Tile til: row)
-        if (til.altitude == testAlt)
-          return true;
-    return false;
+        if (til.altitude < testAlt)
+          count ++;
+    return count;
   }
   
   

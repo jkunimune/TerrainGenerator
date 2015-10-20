@@ -7,15 +7,8 @@ public final class Vector {
   
   public Vector(double newX, double newY, double newZ, boolean cartesian) { // constructs a new vector given horizontal, vertical, and depthual lengths
     r = Math.sqrt(newX*newX + newY*newY + newZ*newZ);
-    a = Math.acos(newY/r);
-    if (newX != 0) { // accounts for various cases for beta
-      if (newX > 0)  b = Math.atan(newZ/newX);
-      else           b = Math.atan(newZ/newX)+Math.PI;
-    }
-    else {
-      if (newZ > 0)  b = Math.PI/2;
-      else           b = 3*Math.PI/2;
-    }
+    a = Math.acos(-newY/r);
+    b = Math.atan2(newZ,newX);
   }
   
   
