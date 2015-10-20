@@ -104,18 +104,17 @@ public final class Tile { // keeps track of a single point on a globe
   public final void startPlate(boolean wet) { // becomes the seed for a continental plate
     if (wet)  temp1 = (int)(Math.random()*16-72); // randomizes altitude from -72 to -56
     else      temp1 = (int)(Math.random()*16+56); // randomizes altitude from 56 to 72
-    temp2 = (int)(Math.random()*Math.PI*128); // randomizes drift velocity
+    temp2 = (int)(Math.random()*Math.PI*128); // randomizes drift velocity (/ by 128 to decode)
     temp3 = (int)(Math.random()*2*Math.PI*128); // these numbers represent a vector, so they are coordinates representing a point on the axis of the plate's rotation, which also goes through the center of the sphere
     temperature = (int)(Math.random()*8); // randomizes drift speed
   }
   
   
-  public final void startPlate() { // becomes the seed for a continental plate
-    temp1 = (int)(Math.random()*128+128); // randomizes from -64 to 64
-    temp2 = (int)(Math.random()*Math.PI*128); // randomizes drift velocity
-    temp3 = (int)(Math.random()*2*Math.PI*128); // these numbers represent a vector, so they are coordinates representing a point on the axis of the plate's rotation, which also goes through the center of the sphere
-    temperature = (int)(Math.random()*8); // randomizes spread speed
-  }
+  public final void join(Tile ref) { // join the same Plate as ref
+    temp1 = ref.altitude + (int)(Math.random()*4-2); // temp 1 is altitude
+    temp2 = ref.temp2; // temp2 is the indes of the plate it is a part of
+    temp3 = ref.temp3; // temp3 is how quickly this plate spreads
+  } 
   
   
   public final int waterLevel() {

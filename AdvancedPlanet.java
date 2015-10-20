@@ -45,18 +45,18 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       spawnContinents();
       if (t%30 == 0)
         for (Map map: maps)
-          map.display(ColS.altitude2);
+          map.display(ColS.altitude);
       t ++;
     }
     if (t%30 != 1)
       for (Map map: maps)
-        map.display(ColS.altitude2);
+        map.display(ColS.altitude);
     
     System.out.println("Shifting continents...");
-    for (int i = 0; i < 5; i += 1) {
+    for (int i = 0; i < 50; i += 1) {
       shiftPlates(0.1);
       for (Map map: maps)
-        map.display(ColS.altitude2);
+        map.display(ColS.altitude);
     }
     
     System.out.println("Filling in oceans...");
@@ -85,16 +85,16 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   
   public final void spawnContinents() { // sets all tiles to a random altitude aranged in plates
     for (Tile tile: map.list()) {
-      if (tile.altitude < 0) {
+      if (tile.altitude < -256) {
         ArrayList<Tile> adjacent = map.adjacentTo(tile);
         for (Tile ref: adjacent) { // reads all adjacent tiles to look for land or sea
-          if (ref.altitude > 0 && randChance(ref.temp3-20)) { // hotter continents spread faster
+          if (ref.altitude > -256 && randChance(ref.temp3-20)) { // hotter continents spread faster
             tile.join(ref);
             crust.get(ref.temp2).add(tile);
           }
         }
         
-        if (tile.altitude < 0 && randChance(-135)) // seeds new plates occasionally
+        if (tile.altitude < -256 && randChance(-135)) // seeds new plates occasionally
           crust.add(new Plate(crust.size(),tile));
       }
     }
@@ -107,7 +107,10 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   
   public final void shiftPlates(double delT) { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
     for (Tile til: map.list()) {
-      til.altitude = til.temp1;
+      if (til.temp1 == 0) // if this tile is in the gap between two plates
+        til.altitude *= .7; // cut its original altitude
+      else
+        til.altitude = til.temp1;
       til.temp1 = 0;
     }
     
@@ -117,6 +120,8 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       Vector v = w.cross(r0);
       Vector r = r0.plus(v.times(delT));
       Tile dest = map.getTile(r.getA(),r.getB());
+      if (til.altitude > dest.temp1) // if this is the highest tile to land here
+        dest.temp2 = til.temp2; // it joins this plate
       dest.temp1 += til.altitude;
     }
   }
@@ -124,9 +129,9 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   
   public final void fillOceans() { // fills in the oceans to about 70% of the surface
     final int target = (int)(4*Math.PI*map.getRadius()*map.getRadius()*.7); // the approximate number of tiles we want underwater
-    int seaLevel = 255;
-    int min = 0;
-    int max = 511;
+    int seaLevel = 0;
+    int min = -256;
+    int max = 255;
     
     for (int i = 0; i < 5; i ++) {
       if (map.count(seaLevel) < target) { // if too many are abovewater

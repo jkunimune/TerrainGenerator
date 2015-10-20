@@ -122,7 +122,7 @@ public class Globe implements Surface{ // a spherical surface
   
   @Override
   public final double lonByTil(Tile til) {
-    return 2*Math.PI*til.lon/map[til.lat].length;
+    return (til.lon+.5)/map[til.lat].length*(2*Math.PI);
   }
   
   

@@ -111,7 +111,7 @@ public final class Tile { // keeps track of a single point on a globe
   
   
   public final void join(Tile ref) { // join the same Plate as ref
-    temp1 = ref.altitude + (int)(Math.random()*4-2); // temp 1 is altitude
+    temp1 = ref.altitude + (int)(Math.random()*6-3); // temp 1 is altitude
     temp2 = ref.temp2; // temp2 is the indes of the plate it is a part of
     temp3 = ref.temp3; // temp3 is how quickly this plate spreads
   } 
