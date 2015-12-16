@@ -239,6 +239,8 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
       return Color.white;
     else if (alt < 0) // if altitude is deep, return a blue that gets blacker as oneg oes deeper
       return new Color(0, 0, alt+256);
+    else if (alt == 0) // if altitude is sea level
+      return new Color(0,63,127);
     else if (alt < 128) // if altitude is above sea level, return a green that gets brighter as one goes higher
       return new Color(0, alt+128, 0);
     else // if altitude is high, return a green that gets whiter as one goes higher

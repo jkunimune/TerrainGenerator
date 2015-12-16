@@ -2,14 +2,18 @@ import java.util.*;
 
 
 
-public class Galaxy extends Disc {
+public class Galaxy {
+  Surface map;
+  
+  
+  
   public Galaxy(int r) {
-    super(r);
+    map = new Disc(r);
   }
   
   
   public Galaxy(Disc g) {
-    super(g);
+    map = new Disc(g);
   }
   
   
@@ -70,55 +74,46 @@ public class Galaxy extends Disc {
   
   
   private final void buildCore() {
-    for (Tile[] row: map) {
-      for (Tile til: row) {
-        if (Math.pow(til.lat-map.length/2,2) + Math.pow(til.lon-map.length/2,2)
-              < Math.pow(map.length/64.0,2))
-          til.radioactive = true;
-        if (Math.pow(til.lat-map.length/2,2) + Math.pow(til.lon-map.length/2,2)
-              < Math.pow(map.length/16.0,2))
-          til.altitude = 32;
-        else
-          til.altitude = -8;
-      }
+    for (Tile til: map.list()) {
+      if (map.latByTil(til) < Math.PI/32.0)
+        til.radioactive = true;
+      if (map.latByTil(til) < Math.PI/8.0)
+        til.altitude = 24;
+      else
+        til.altitude = -8;
     }
   }
-
+  
   
   private final void formArms() {
-    buildArm(Math.PI/64.0, 0, 2.0, 1.0);
-    buildArm(Math.PI/64.0, Math.PI, 2.0, 1.0);
+    buildArm(Math.PI/64.0, 0, 3.0, 1.0);
+    buildArm(Math.PI/64.0, Math.PI, 3.0, 1.0);
   }
   
   
   private final void thickenArms() {
-    for (Tile[] row: map)
-      for (Tile til: row)
-        til.temp1 = 0;
+    for (Tile til: map.list())
+      til.temp1 = 0;
     
-    for (Tile[] row: map)
-      for (Tile til: row)
-        for (Tile adj: adjacentTo(til))
-          if (adj.altitude > 0)
-            if (randChance(adj.altitude/10-33))
-              til.temp1 ++;
+    for (Tile til: map.list())
+      for (Tile adj: map.adjacentTo(til))
+        if (adj.altitude > 0)
+          if (randChance(adj.altitude/10-33))
+            til.temp1 ++;
     
-    for (Tile[] row: map)
-      for (Tile til: row)
-        til.altitude += til.temp1;
+    for (Tile til: map.list())
+      til.altitude += til.temp1;
   }
   
   
   private final void randomize() {
-    for (Tile[] row: map)
-      for (Tile til: row)
-        til.altitude += 10*(Math.random()-.5);
+    for (Tile til: map.list())
+      til.altitude += 10*(Math.random()-.5);
   }
   
   
   private final void biomeAssign() {
-    for (Tile[] row: map) {
-      for (Tile til: row) {
+    for (Tile til: map.list()) {
         if (til.altitude < 0)
           til.biome = Tile.ocean;
         else if (randChance((til.altitude>>5)-40))
@@ -129,15 +124,14 @@ public class Galaxy extends Disc {
           til.biome = Tile.jungle;
       }
     }
-  }
   
   
   private final void buildArm(double lat, double lon, double slope, double thickness) { // continues an arm from the given polar coordinates
     if (lat >= Math.PI)
       return;
     
-    final Tile til = getTile(lat, lon);
-    ArrayList<Tile> list = adjacentTo(til);
+    final Tile til = map.getTile(lat, lon);
+    ArrayList<Tile> list = map.adjacentTo(til);
     list.add(til);
     for (Tile adj: list)
       if (Math.random() < thickness*(1-lat/Math.PI))
@@ -145,10 +139,20 @@ public class Galaxy extends Disc {
     
     if (randChance(30))
       buildArm(lat+.03, lon+slope*.03, slope, thickness);
-    else {
+    else { // arms have a chance to split
       double frac = Math.random();
-      buildArm(lat+.03, lon+slope*.03, slope+(1-frac)*1.0, thickness*frac);
-      buildArm(lat+.03, lon+slope*.03, slope-frac*1.0, thickness*(1-frac));
+      buildArm(lat+.02, lon+slope*.02, slope+(1-frac)*1.5, thickness*frac);
+      buildArm(lat+.02, lon+slope*.02, slope-frac*1.5, thickness*(1-frac));
     }
+  }
+  
+  
+  public Surface getSurface() {
+    return map; // returns a map of the surface for display purposes
+  }
+  
+  
+  public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
+    return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
   }
 }

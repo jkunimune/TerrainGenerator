@@ -53,8 +53,11 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
         map.display(ColS.altitude);
     
     System.out.println("Shifting continents...");
-    for (int i = 0; i < 50; i += 1) {
-      shiftPlates(0.1);
+    for (int i = 0; i < 1; i += 1) {
+      shiftPlates(0.15);
+      for (Plate p: crust)
+        p.changeCourse(.05);
+      smooth(.1);
       for (Map map: maps)
         map.display(ColS.altitude);
     }
@@ -63,6 +66,12 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     fillOceans();
     for (Map map: maps)
       map.display(ColS.altitude);
+    
+    System.out.println("Generating climate...");
+    acclimate(.1);
+    setBiomes();
+    for (Map map: maps)
+      map.display(ColS.biome);
     
     System.out.println("Done!\n");
   }
@@ -94,35 +103,45 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
           }
         }
         
-        if (tile.altitude < -256 && randChance(-135)) // seeds new plates occasionally
+        if (tile.altitude < -256 && randChance(-140)) // seeds new plates occasionally
           crust.add(new Plate(crust.size(),tile));
       }
     }
     
-    for (Tile til: map.list()) // copies the temporary variables to altitude
-      if (til.temp1 != 9001) // only copies those that have been set to something
+    for (Tile til: map.list()) { // copies the temporary variables to altitude
+      if (til.temp1 != 9001) { // only copies those that have been set to something
         til.altitude = til.temp1;
+      }
+    }
   }
   
   
   public final void shiftPlates(double delT) { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
     for (Tile til: map.list()) {
-      if (til.temp1 == 0) // if this tile is in the gap between two plates
-        til.altitude *= .7; // cut its original altitude
-      else
-        til.altitude = til.temp1;
       til.temp1 = 0;
     }
-    
-    for (Tile til: map.list()) {
+    for (Tile til: map.list()) { // takes each tile and pushes it somewhere else
       Vector w = crust.get(til.temp2).w;
       Vector r0 = new Vector (map.getRadius(), map.latByTil(til), map.lonByTil(til));
       Vector v = w.cross(r0);
       Vector r = r0.plus(v.times(delT));
       Tile dest = map.getTile(r.getA(),r.getB());
-      if (til.altitude > dest.temp1) // if this is the highest tile to land here
-        dest.temp2 = til.temp2; // it joins this plate
-      dest.temp1 += til.altitude;
+      if (dest.temp1 == 0 || dest.temp2 != til.temp2) { // will not push into a tile that has already been overridden by this plate
+        if (til.altitude > dest.temp1) // if this is the highest tile to land here
+          dest.temp2 = til.temp2; // it joins this plate
+        dest.temp1 += til.altitude;
+      }
+    }
+    for (Tile til: map.list()) {
+      if (til.temp1 == 0) { // if this tile is in the gap between two plates or got skipped over
+        int sum = 0;
+        final ArrayList<Tile> adjacentList = map.adjacentTo(til);
+        for (Tile adj: adjacentList)
+          sum += adj.temp1;
+        til.altitude = sum/adjacentList.size();
+      }
+      else
+        til.altitude = til.temp1;
     }
   }
   
@@ -146,6 +165,126 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     
     for (Tile til: map.list())
       til.altitude -= seaLevel; // fills in oceans
+  }
+  
+  
+  public void smooth(double amount) { // makes terrain more smooth-looking
+    for (Tile til: map.list()) {
+      ArrayList<Tile> adjacent = map.adjacentTo(til);
+      ArrayList<Tile> nearby = new ArrayList<Tile>(); // declares and initializes arraylists for adjacent tiles and tiles
+      for (Tile adj: adjacent)                        // that are adjacent to adjacent tiles
+      for (Tile nby: map.adjacentTo(adj))
+        if (!nby.equals(til))
+        nearby.add(nby);
+      for (Tile adj: adjacent)
+        nearby.remove(adj);
+      
+      double calcAlt = 0; // the altitude the program calculates the point should be at based on adjacent and nearby tiles
+      for (Tile adj: adjacent)
+        calcAlt += 1.5*adj.altitude/adjacent.size();
+      for (Tile nby: nearby)
+        calcAlt -= .5*nby.altitude/nearby.size();
+      til.temp1 = (int)(amount*calcAlt+(1-amount)*til.altitude); // averages calculated altitude with current altitude
+    }
+    
+    for (Tile til: map.list()) {
+      til.altitude = til.temp1;
+      til.temp1 = 0;
+    }
+  }
+  
+  
+  public void acclimate(double amount) { // defines and randomizes the climate a bit
+    for (Tile til: map.list()) {
+      til.temperature = (int)(255*Math.sin(map.latByTil(til))); // things are colder near poles
+      til.rainfall = (int)(255*Math.pow(Math.sin(map.latByTil(til)),2)); // things get wetter around equator
+      til.temperature += (int)(Math.random()*255*amount-til.temperature*amount);
+      til.rainfall += (int)(Math.random()*255*amount-til.rainfall*amount);
+    }
+  }
+  
+  
+  public void setBiomes() {
+    for (Tile til: map.list()) {
+      if (til.altitude < 0) { // if below sea level
+        if (til.temperature < 128) { // if cold
+          til.biome = Tile.ice;
+        }
+        else if (til.altitude < -128) { // if super deep
+          til.biome = Tile.trench;
+        }
+        else if (til.temperature < 250) { // if cool
+          til.biome = Tile.ocean;
+        }
+        else { // if hot
+          til.biome = Tile.reef;
+        }
+      }
+      else if (til.water >= 10) { // if has freshwater on it
+        til.biome = Tile.freshwater;
+      }
+      else if (til.altitude >= 128) { // if mountainous
+        if (til.temperature < 128) { // if cold
+          til.biome = Tile.snowcap;
+        }
+        else { // if warm
+          til.biome = Tile.mountain;
+        }
+      }
+      else if (randChance(-70)) { // if low altitude, it only has a chance to seed
+        if (til.temperature < 128) { // if cold
+          til.biome = Tile.tundra;
+        }
+        else if (til.temperature >= 181 && til.rainfall < 192) { // if hot and dry
+          til.biome = Tile.desert;
+        }
+        else if (til.temperature >= 180 && til.rainfall >= 192) { // if hot and wet
+          til.biome = Tile.jungle;
+        }
+        else { // if cold-ish
+          til.biome = Tile.plains;
+        }
+      }
+      til.temp1 = til.biome;
+    }
+    
+    for (int i = 0; i < 128 && weNeedMoreBiomes(); i ++) {
+      for (Tile til: map.list()) {
+        if (til.temp1 == 0) {
+          final ArrayList<Tile> adjacentList = map.adjacentTo(til);
+          for (Tile adj: adjacentList)
+            if (adj.biome == Tile.tundra || adj.biome == Tile.plains || adj.biome == Tile.desert || adj.biome == Tile.jungle)
+              if (randChance(0))
+                til.temp1 = adj.biome;
+        }
+      }
+      for (Tile til: map.list())
+        til.biome = til.temp1;
+    }
+    for (Tile til: map.list()) {
+      if (til.biome == 0) { // if it still does not have a biome, it will just pick a biome
+        if (til.temperature < 128) { // if cold
+          til.biome = Tile.tundra;
+        }
+        else if (til.temperature >= 181 && til.rainfall < 192) { // if hot and dry
+          til.biome = Tile.desert;
+        }
+        else if (til.temperature >= 180 && til.rainfall >= 192) { // if hot and wet
+          til.biome = Tile.jungle;
+        }
+        else { // if cold-ish
+          til.biome = Tile.plains;
+        }
+      }
+    }
+  }
+  
+  
+  public boolean weNeedMoreBiomes() {
+    for (Tile til: map.list())
+      if (til.biome == 0)
+        return true;
+    return false;
   }
   
   

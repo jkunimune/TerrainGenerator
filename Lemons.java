@@ -15,8 +15,7 @@ public final class Lemons extends Map { // a clich? "unfolding"-type lemon-y map
       return new java.awt.Point(0, -1);
     
     if (Math.abs(x%lemonWidth-lemonWidth/2.0) < Math.sin(Math.PI*y/height())*lemonWidth/2.0) // if it is inside a sin curve
-      return sfc.tilByAngles(y*Math.PI/height(),
-                             Math.PI * (x%lemonWidth-lemonWidth/2.0) / (Math.sin(Math.PI*y/height())*lemonWidth*6.0) + x/lemonWidth*Math.PI/6);
+      return sfc.tilByAngles(y*Math.PI/height(), Math.PI * (x%lemonWidth-lemonWidth/2.0) / (Math.sin(Math.PI*y/height())*lemonWidth*6.0) + x/lemonWidth*Math.PI/6);
     
     return new java.awt.Point(0, -1);
   }

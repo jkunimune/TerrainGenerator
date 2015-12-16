@@ -182,13 +182,13 @@ public class Civi {
           return false;
         
         ArrayList<Tile> adjacent = world.getSurface().adjacentTo(til); // counts all adjacent tiles
-        int waterAdjacency = 0; // if it is adjacent to water
+        int waterAdjacency = -5; // if it is adjacent to water
         int settledAdjacency = 0; // how much settlement it is adjacent to
         for (Tile adj: adjacent) {
           if (adj.development > 1 && adj.owners.equals(til.owners))
             settledAdjacency ++;
           if (adj.altitude < 0 || adj.biome == Tile.freshwater)
-            waterAdjacency = 50;
+            waterAdjacency = 45;
         }
       
         for (int i = 0; i < settledAdjacency; i ++)

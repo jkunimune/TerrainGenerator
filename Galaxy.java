@@ -86,8 +86,8 @@ public class Galaxy {
   
   
   private final void formArms() {
-    buildArm(Math.PI/64.0, 0, 3.0, 1.0);
-    buildArm(Math.PI/64.0, Math.PI, 3.0, 1.0);
+    buildArm(Math.PI/64.0, 0, 3.0, .8);
+    buildArm(Math.PI/64.0, Math.PI, 3.0, .8);
   }
   
   
@@ -130,6 +130,8 @@ public class Galaxy {
     if (lat >= Math.PI)
       return;
     
+    final double delX = .01;
+    
     final Tile til = map.getTile(lat, lon);
     ArrayList<Tile> list = map.adjacentTo(til);
     list.add(til);
@@ -137,12 +139,12 @@ public class Galaxy {
       if (Math.random() < thickness*(1-lat/Math.PI))
         adj.altitude += Math.random()*32;
     
-    if (randChance(30))
-      buildArm(lat+.03, lon+slope*.03, slope, thickness);
+    if (Math.random() >= delX*Math.PI)
+      buildArm(lat+delX, lon+slope*delX, slope, thickness);
     else { // arms have a chance to split
       double frac = Math.random();
-      buildArm(lat+.02, lon+slope*.02, slope+(1-frac)*1.5, thickness*frac);
-      buildArm(lat+.02, lon+slope*.02, slope-frac*1.5, thickness*(1-frac));
+      buildArm(lat+delX, lon+slope*delX, slope+(1-frac)*1.5, thickness*frac);
+      buildArm(lat+delX, lon+slope*delX, slope-frac*1.5, thickness*(1-frac));
     }
   }
   

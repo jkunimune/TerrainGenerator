@@ -202,6 +202,8 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
         return getColorByBiome(x, y);
       case altitude:
         return getColorByAlt(x, y);
+      case altitude2:
+        return getColorByAlt2(x, y);
       case rainfall:
         return getColorByRain(x, y);
       case temperature:
@@ -231,6 +233,23 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   public Color getColorByAlt(int x, int y) {
     int alt = sfc.getTileByIndex(lats[y][x], lons[y][x]).altitude;
+    if (alt < -256) // if altitude is below minimum, return black
+      return Color.black;
+    else if (alt >= 256) // if altitude is above maximum, return white
+      return Color.white;
+    else if (alt < 0) // if altitude is deep, return a blue that gets blacker as oneg oes deeper
+      return new Color(0, 0, alt+256);
+    else if (alt == 0) // if altitude is sea level
+      return new Color(0,128,256);
+    else if (alt < 128) // if altitude is above sea level, return a green that gets brighter as one goes higher
+      return new Color(0, alt+128, 0);
+    else // if altitude is high, return a green that gets whiter as one goes higher
+      return new Color(alt*2-256, 255, alt*2-256);
+  }
+  
+  
+  public Color getColorByAlt2(int x, int y) { // approximates altitude by shifting it down 255
+    int alt = sfc.getTileByIndex(lats[y][x], lons[y][x]).altitude-255;
     if (alt < -256) // if altitude is below minimum, return black
       return Color.black;
     else if (alt >= 256) // if altitude is above maximum, return white
