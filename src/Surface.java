@@ -20,4 +20,8 @@ public interface Surface {
   public abstract double lonByTil(Tile til);
   
   public abstract Tile[] list();
+  
+  public abstract Tile incomingMeteor();
+  
+  public abstract void meteor(Tile til);
 } 

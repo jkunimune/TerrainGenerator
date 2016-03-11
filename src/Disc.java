@@ -7,6 +7,7 @@ import org.apache.commons.lang3.ArrayUtils;
 public class Disc implements Surface { // a thin three-dimensional disc
   public Tile[][] map; // the irregular matrix of tiles representing the surface
   private int radius; // the radius of the disc
+  private Tile meteorTarget; // the next place to put a meteor (usually null)
   
   
   
@@ -17,6 +18,7 @@ public class Disc implements Surface { // a thin three-dimensional disc
     for (int lat = 0; lat < map.length; lat ++)
       for (int lon = 0; lon < map[lat].length; lon ++)
         map[lat][lon] = new Tile(lat, lon);
+    meteorTarget = null;
   }
   
   
@@ -27,6 +29,7 @@ public class Disc implements Surface { // a thin three-dimensional disc
     for (int lat = 0; lat < map.length; lat ++)
       for (int lon = 0; lon < map[lat].length; lon ++)
         map[lat][lon] = new Tile(source.getTileByIndex(lat,lon));
+    meteorTarget = null;
   }
   
   
@@ -128,5 +131,23 @@ public class Disc implements Surface { // a thin three-dimensional disc
   @Override
   public double lonByTil(Tile til) { // longitude angle of til
     return Math.atan2(til.lat-radius,til.lon-radius);
+  }
+  
+  
+  @Override
+  public Tile incomingMeteor() { // returns where to put a meteor, if any
+    if (meteorTarget != null) {
+      Tile temp = meteorTarget;
+      meteorTarget = null;
+      return temp;
+    }
+    else
+      return null;
+  }
+  
+  
+  @Override
+  public void meteor(Tile t) {
+	  meteorTarget = t;
   }
 }

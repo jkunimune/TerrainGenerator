@@ -32,9 +32,6 @@ public final class World { // a subclass of Globe to handle all political elemen
     while (civis.size() == 0) // skips ahead to the founding of the first civi
       for (Tile til: map.list())
         spread(til);
-//    for (int i = 0; i < 30; i ++) // for testing
-//      update();
-//    startPlague(civis.get(0).capital);
   }
   
   
@@ -61,7 +58,7 @@ public final class World { // a subclass of Globe to handle all political elemen
       startRevolution(til);
     }
     
-    for (Tile til: map.list()) { // asssigns all new values
+    for (Tile til: map.list()) { // assigns all new values
       if (til.temp1 >= 0)
         civis.get(til.temp1).takes(til);
       
@@ -78,6 +75,10 @@ public final class World { // a subclass of Globe to handle all political elemen
     endWar();
     
     cleanse();
+    
+    Tile target = map.incomingMeteor();
+    if (target != null)
+      meatyore(target);
     
     for (Civi c: civis)
       c.advance();
@@ -256,7 +257,7 @@ public final class World { // a subclass of Globe to handle all political elemen
   }
   
   
-  public final void naturallyDisast(Tile til) { // causes natural disasters
+  public final void naturallyDisast(Tile til) { // causes meteors and plagues
     if (randChance(-190))
       meatyore(til);
     updatePlague(til);

@@ -96,11 +96,12 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     img.getGraphics().setFont(monaco);
     setPreferredSize(new Dimension(w, h));
     frame.add(this);
-    //frame.addMouseListener(new GodInterface(this, (World)sfc)); // only Worlds get interfaces
+    frame.addMouseListener(new GodInterface(this, newWorld));
     frame.setResizable(false);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.pack();
     frame.setVisible(true);
+    System.out.println("*");
   }
   
   

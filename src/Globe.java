@@ -7,6 +7,7 @@ import org.apache.commons.lang3.ArrayUtils;
 public class Globe implements Surface{ // a spherical surface
   public Tile[][] map; // the irregular matrix of tiles representing the surface
   private int radius; // the radius of the sphere
+  private Tile meteorTarget; // the tile to be hit by a meteor
   
   
   
@@ -186,5 +187,23 @@ public class Globe implements Surface{ // a spherical surface
   
   public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
     return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
+  }
+  
+  
+  @Override
+  public Tile incomingMeteor() { // returns where to put a meteor, if any
+    if (meteorTarget != null) {
+      Tile temp = meteorTarget;
+      meteorTarget = null;
+      return temp;
+    }
+    else
+      return null;
+  }
+  
+  
+  @Override
+  public void meteor(Tile t) {
+	  meteorTarget = t;
   }
 }

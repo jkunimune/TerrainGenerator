@@ -53,10 +53,10 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
         map.display(ColS.altitude);
     
     System.out.println("Shifting continents...");
-    for (int i = 0; i < 1; i += 1) {
-      shiftPlates(0.15);
+    for (int i = 0; i < 8; i += 1) {
+      shiftPlates(0.125);
       for (Plate p: crust)
-        p.changeCourse(.05);
+        p.changeCourse(.125, .05);
       smooth(.1);
       for (Map map: maps)
         map.display(ColS.altitude);
@@ -118,30 +118,29 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   
   public final void shiftPlates(double delT) { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
     for (Tile til: map.list()) {
-      til.temp1 = 0;
+      til.temp1 = 0;         // temp1 is the new altitude
+      til.temp3 = til.temp2; // temp3 is the new plate index (temp2 is the old one)
     }
-    for (Tile til: map.list()) { // takes each tile and pushes it somewhere else
-      Vector w = crust.get(til.temp2).w;
-      Vector r0 = new Vector (map.getRadius(), map.latByTil(til), map.lonByTil(til));
-      Vector v = w.cross(r0);
-      Vector r = r0.plus(v.times(delT));
-      Tile dest = map.getTile(r.getA(),r.getB());
-      if (dest.temp1 == 0 || dest.temp2 != til.temp2) { // will not push into a tile that has already been overridden by this plate
-        if (til.altitude > dest.temp1) // if this is the highest tile to land here
-          dest.temp2 = til.temp2; // it joins this plate
-        dest.temp1 += til.altitude;
+    for (Tile til: map.list()) { // takes each tile and pushes things onto it
+      for (int i = crust.size()-1; i >= 0; i --) { // iterates through the crust
+        Plate plt = crust.get(i);
+        Vector w = plt.w;
+        Vector r = new Vector (map.getRadius(), map.latByTil(til), map.lonByTil(til));
+        Vector v = w.cross(r);
+        Vector r0 = r.minus(v.times(delT));
+        Tile origin = map.getTile(r0.getA(),r0.getB()); // the tile that would have landed here
+        if (origin.temp2 == i) { // if that tile was actually on that plate
+          til.temp1 += origin.altitude; // bring that altitude over here
+          til.temp3 = origin.temp2; // whichever plate was generated first takes dominance
+        }
       }
     }
     for (Tile til: map.list()) {
-      if (til.temp1 == 0) { // if this tile is in the gap between two plates or got skipped over
-        int sum = 0;
-        final ArrayList<Tile> adjacentList = map.adjacentTo(til);
-        for (Tile adj: adjacentList)
-          sum += adj.temp1;
-        til.altitude = sum/adjacentList.size();
-      }
+      if (til.temp1 == 0) // if no plate came here
+        til.altitude >>= 1;
       else
         til.altitude = til.temp1;
+      til.temp2 = til.temp3;
     }
   }
   

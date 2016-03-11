@@ -17,8 +17,8 @@ public final class GodInterface implements MouseListener {
   
   
   public final void mouseClicked(MouseEvent e) {	// yet to be reimplemented due to changes in program structure
-    //if (e.getButton() == MouseEvent.BUTTON3)
-      //place.meatyore(display.getTile(e.getX(), e.getY()-23));
+    if (e.getButton() == MouseEvent.BUTTON3)
+      place.meteor(display.getTile(e.getX(), e.getY()-23));
   }
   
   
