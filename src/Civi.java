@@ -463,25 +463,8 @@ public class Civi {
   private static final Color randColor() { // converts hue to color
     final double brightness = 1-Math.random()/5;
     final double saturation = 1-Math.random()/3;
-    final int hue = (int)(Math.random()*1530+1);
-    Color output;
-    
-    if (hue <= 255)
-      output = new Color(255, hue, 0); // orange
-    else if (hue <= 510)
-      output = new Color(510-hue, 255, 0); // chartreuse
-    else if (hue <= 765)
-      output = new Color(0, 255, hue-510); // teal
-    else if (hue <= 1020)
-      output = new Color(0, 1020-hue, 255); // aquamarine
-    else if (hue <= 1275)
-      output = new Color(hue-1020, 0, 255); // purple
-    else
-      output = new Color(255, 0, 1530-hue); // maroon
-    
-    return new Color((int)(brightness*(255 - saturation*(255 - output.getRed()))),
-                     (int)(brightness*(255 - saturation*(255 - output.getGreen()))),
-                     (int)(brightness*(255 - saturation*(255 - output.getBlue()))));
+    final double hue = Math.random();
+    return Color.getHSBColor((float)hue, (float)saturation, (float)brightness);
   }
   
   
@@ -492,27 +475,29 @@ public class Civi {
   }
   
   
-  public final String colorName() {
-    if (emblem.getRed() >= 128 && emblem.getBlue() < 128 && emblem.getGreen() < 64)
-      return "red";
-    else if (emblem.getRed() == 255 && emblem.getBlue() >= 128 && emblem.getGreen() < 128)
-      return "magenta";
-//    else if (emblem.getRed() == 150 && emblem.getBlue() == 255 && emblem.getGreen() == 0)
-//      return "purple";
-    else if (emblem.getRed() >= 128 && emblem.getBlue() >= 128 && emblem.getGreen() < 128)
-      return "violet";
-    else if (emblem.getRed() < 128 && emblem.getBlue() >= 128 && emblem.getGreen() < 196)
-      return "blue";
-    else if (emblem.getRed() < 128 && emblem.getBlue() >= 128 && emblem.getGreen() >= 196)
-      return "cyan";
-    else if (emblem.getRed() < 128 && emblem.getBlue() < 128 && emblem.getGreen() >= 128)
-      return "green";
-    else if (emblem.getRed() >= 128 && emblem.getBlue() < 128 && emblem.getGreen() >= 196)
-      return "yellow";
-    else if (emblem.getRed() >= 128 && emblem.getBlue() < 128 && emblem.getGreen() >= 64)
-      return "orange";
-    else
-      return "unaccounted color";
+  public String colorName() {
+    int hueScale = (int)(8*Color.RGBtoHSB(emblem.getRed(), emblem.getGreen(), emblem.getBlue(), null)[0]);
+    
+    switch (hueScale) {
+      case 0:
+        return "red";
+      case 1:
+        return "orange";
+      case 2:
+        return "yellow";
+      case 3:
+        return "green";
+      case 4:
+        return "cyan";
+      case 5:
+        return "blue";
+      case 6:
+        return "violet";
+      case 7:
+        return "magenta";
+      default:
+        return "... I don't even know what color that is";
+    }
   }
   
   

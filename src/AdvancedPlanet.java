@@ -56,7 +56,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     for (int i = 0; i < 8; i += 1) {
       shiftPlates(0.125);
       for (Plate p: crust)
-        p.changeCourse(.125, .05);
+        p.changeCourse(.125);
       smooth(.1);
       for (Map map: maps)
         map.display(ColS.altitude);
@@ -88,7 +88,9 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       til.temp1 = 9001; // initializes temp1
     
     crust = new ArrayList<Plate>(1);
-    crust.add(new Plate(0, map.getTile(Math.asin(Math.random()*2-1) + Math.PI/2, Math.random()*2*Math.PI))); // spawns a plate at a random tile
+    crust.add(new Plate(0,
+    					map.getTile(Math.acos(Math.random()*2-1), Math.random()*2*Math.PI),
+    					10.0/map.getRadius())); // spawns a plate at a random tile
   }
   
   
@@ -104,7 +106,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
         }
         
         if (tile.altitude < -256 && randChance(-140)) // seeds new plates occasionally
-          crust.add(new Plate(crust.size(),tile));
+          crust.add(new Plate(crust.size(),tile,62.8/map.getRadius()));
       }
     }
     

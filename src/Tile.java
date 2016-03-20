@@ -156,7 +156,7 @@ public final class Tile { // keeps track of a single point on a globe
   }
   
   
-  public final void kill() { // removes development due to disease
+  public final void killDueTo(int disease) { // removes development due to disease
     if (development > 0)
       development --;
     
@@ -165,6 +165,8 @@ public final class Tile { // keeps track of a single point on a globe
         civ.land.remove(this);
       owners.clear();
     }
+    
+    cure(disease);
   }
   
   

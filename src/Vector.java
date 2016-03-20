@@ -150,4 +150,9 @@ public final class Vector {
   public final String toStringPolar() {
     return "("+getR()+", "+getA()+", "+getB()+")";
   }
+  
+  
+  public static final Vector random(double avgMag) { // creates a vector in a random direction with a random magnitude
+    return new Vector(-avgMag*Math.log(Math.random()), Math.acos(Math.random()*2-1), Math.random()*2*Math.PI);
+  }
 }

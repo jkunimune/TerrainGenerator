@@ -7,6 +7,8 @@ public final class CiviHD { // the driver for my independent project
   static java.applet.AudioClip music;
   
   static long startTime = 0; // the time it was when we last checked
+  static final int invFrameRate = 2; // the number of simulations to run before showing a frame
+  static final int waitTime = 5; // the amount of time each simulation takes in ms
   
   
   
@@ -27,9 +29,10 @@ public final class CiviHD { // the driver for my independent project
     
     while (true) {
       setTimer(0);
-      earth.update();
+      for (int i = 0; i < invFrameRate; i ++)
+        earth.update();
       political.display(ColS.drawn);
-      waitFor(10);
+      waitFor(invFrameRate*waitTime);
     }
     
     /*World world = new World();

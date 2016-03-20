@@ -18,7 +18,13 @@ public class Purple extends Civi { // an easter-egg Civi based on a glitch in my
   
   @Override
   public String newName() {
-    return "Purple"; // this Civ's name is "Purple" names are random strings
+    return "The Mongolian Empire"; // this Civ's name is "The Mongolian Empire"
+  }
+  
+  
+  @Override
+  public String colorName() {
+    return "purple";
   }
   
   
@@ -28,7 +34,7 @@ public class Purple extends Civi { // an easter-egg Civi based on a glitch in my
   }
   
   
-  public String toString() { // says "Purple"
-    return "Purple";
+  public String toString() { // says "The Mongols"
+    return "The Mongols";
   }
 }

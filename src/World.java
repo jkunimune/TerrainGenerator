@@ -288,10 +288,10 @@ public final class World { // a subclass of Globe to handle all political elemen
                 til.infect(i);
           return;
         case infected: // and cure/kill infected ones
-          if (til.owners.size() == 1 && randChance((til.owners.get(0).sciLevel()>>8) - 65536))
+          if (til.owners.size() == 1 && randChance((til.owners.get(0).sciLevel()>>18) - 50))
             til.cure(i);
           else if (til.development < 4 && randChance(0))
-            til.kill();
+            til.killDueTo(i);
           return;
         case immune:
           return;
@@ -364,7 +364,7 @@ public final class World { // a subclass of Globe to handle all political elemen
   
   
   public final boolean settlersLike(Tile til) { // determines whether to found a civi
-    if (til.altitude < 0 || til.biome == Tile.freshwater || til.biome == Tile.tundra) // civis may not start on ocean or river or in tundra
+    if (til.altitude < 0 || til.biome == Tile.freshwater || til.biome == Tile.tundra || til.radioactive) // civis may not start on ocean or river or in tundra
       return false;
     
     ArrayList<Tile> adjacent =map.adjacentTo(til);
@@ -388,11 +388,13 @@ public final class World { // a subclass of Globe to handle all political elemen
   
   
   public final void nuke(Tile t) { // shoots a nuclear warhead at the specified Tile
-    boom.play(); // BOOM
+    //boom.play(); // BOOM
     t.getsNuked();
     final ArrayList<Tile> adjacentList =map.adjacentTo(t);
     for (Tile adj: adjacentList) // spews radiation onto this and all surrounding tiles
-      adj.getsNuked();
+      for (Tile ner: map.adjacentTo(adj))
+        if (randChance(0))
+          ner.getsNuked();
   }
   
   
