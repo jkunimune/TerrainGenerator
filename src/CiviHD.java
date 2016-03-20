@@ -16,14 +16,14 @@ public final class CiviHD { // the driver for my independent project
     loadSound();
     
     Planet protoEarth = new Planet(100);
-    Map topographical = new Gall(protoEarth.getSurface(), 600, 400);
+    Map topographical = new PierceQuincuncial(protoEarth.getSurface(), 500, 500);
     
     intro.play();
     protoEarth.generate(topographical);
     delay(3000);
     
     World earth = new World(protoEarth.getSurface());
-    Map political = new Gall(earth.getSurface(), 600, 400);
+    Map political = new Mollweide(earth.getSurface(), 700, 350);
     
     music.loop();
     

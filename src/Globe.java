@@ -99,18 +99,21 @@ public class Globe implements Surface{ // a spherical surface
   @Override
   public final Point tilByAngles(double lattitude, double longitude) { // converts a lattitude and longitude to indicies
     if (lattitude < 0 || lattitude > Math.PI) { // extraneous lattitudes will not do
-      System.out.println("Error accessing "+lattitude+","+longitude);
+      System.err.println("Error accessing "+lattitude+","+longitude);
       return new Point(-1, -1);
     }
     
-    while (longitude < 0) // puts longitudes into a usable range
+    longitude %= 2*Math.PI; // puts longitude into a usable range
+    if (longitude < 0)
       longitude += 2*Math.PI;
-    longitude %= 2*Math.PI;
     
     int y = (int)(lattitude*map.length/Math.PI);
     if (y == map.length) // forces pixels looking for pi to look at the southmost tile
       y --;
     int x = (int)(longitude*map[y].length/(2*Math.PI));
+    if (x >= map[y].length)
+      x = map[y].length-1; // in the event of unfortunate math screw-ups on java's part, look to the last tile
+    
     return new Point(x, y);
   }
   
