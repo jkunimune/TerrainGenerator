@@ -29,8 +29,9 @@ public final class Tile { // keeps track of a single point on a globe
   public static final int snowcap = 10;
   public static final int freshwater = 11;
   public static final int space = 12;
+  public static final int forest = 13;
   public static final String[] biomeNames = {"magma","ocean","ice","coral reef","trench","tundra","plains","desert","jungle","mountains","snowy mountains",
-    "freshwater","space"};
+    "freshwater","space","forest"};
   public static final String[] developmentNames = {"Some unclaimed ", "Some frontier", "Some settlement", "A city", "A utopia", "An error"};
   
   
@@ -111,8 +112,8 @@ public final class Tile { // keeps track of a single point on a globe
   
   
   public final void join(Tile ref) { // join the same Plate as ref
-    temp1 = ref.altitude + (int)(Math.random()*6-3); // temp 1 is altitude
-    temp2 = ref.temp2; // temp2 is the indes of the plate it is a part of
+    temp1 = ref.altitude + (int)(Math.random()*4-2); // temp 1 is altitude
+    temp2 = ref.temp2; // temp2 is the index of the plate it is a part of
     temp3 = ref.temp3; // temp3 is how quickly this plate spreads
   } 
   
@@ -170,6 +171,30 @@ public final class Tile { // keeps track of a single point on a globe
   }
   
   
+  public boolean isSuitableFor(int newBiome) { // randomly decides if a biome should spread to this tile
+    switch (newBiome) {
+      case ocean:
+        return altitude < 0 && randChance((temperature>>4) - 16);
+      case ice:
+        return altitude < 0 && randChance(-temperature>>4);
+      case reef:
+        return altitude < 0 && randChance((temperature>>3) - 50);
+      case tundra:
+        return altitude >=0 && randChance((-temperature>>4) - 5);
+      case forest:
+        return altitude >=0 && randChance(-temperature>>4);
+      case desert:
+        return altitude >=0 && randChance((temperature>>4)-(rainfall>>4));
+      case plains:
+        return altitude >=0 && randChance((temperature>>4) - 16);
+      case jungle:
+        return altitude >=0 && randChance((temperature>>4)+(rainfall>>4));
+      default:
+        return false;
+    }
+  }
+  
+  
   public final String[] getTip() { // returns the TileTip
     String[] output = new String[owners.size() + 1];
     output[0] = developmentNames[development]; // starts with the development level
@@ -202,5 +227,10 @@ public final class Tile { // keeps track of a single point on a globe
   
   public final String toString() {
     return "the "+biomeNames[biome]+" tile at "+lat+", "+lon;
+  }
+  
+  
+  public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
+    return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
   }
 }

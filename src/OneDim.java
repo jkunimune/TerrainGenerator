@@ -29,7 +29,7 @@ public class OneDim extends Map { // a one dimensional map that only sees the pr
         return super.getColorBy(c, x, y); // references the tile color itself
       
       else // the bottom
-        return new Color(15, 255, 7); // is a greyish green color
+        return new Color(0, 127, 127); // is a greyish green color
     }
     
     else { // for land tiles

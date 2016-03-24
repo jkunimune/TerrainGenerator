@@ -10,7 +10,7 @@ public class Mollweide extends Map { // an elliptical equal-area projection
   
   public final java.awt.Point getCoords(int x, int y) {
     if (Math.hypot((double)x/width()-.5, (double)y/height()-.5) >= .5 &&
-    	Math.hypot((double)x/width()-.5, (double)y/height()-.5) < .51) // the border is grey
+    	Math.hypot((double)x/width()-.5, (double)y/height()-.5) < .505) // the border is grey
       return new java.awt.Point(4144959, -1);
     
     final double tht = Math.asin(2*((double)y/height()-.5));
