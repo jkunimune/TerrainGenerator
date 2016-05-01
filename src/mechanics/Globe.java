@@ -196,13 +196,13 @@ public class Globe implements Surface{ // a spherical surface
   
   @Override
   public Tile incomingMeteor() { // returns where to put a meteor, if any
-    if (meteorTarget != null) {
-      Tile temp = meteorTarget;
+    if (meteorTarget != null) {		// if there is an incoming meteor
+      Tile temp = meteorTarget;		// return its target and reset meteorTarget
       meteorTarget = null;
       return temp;
     }
     else
-      return null;
+      return null;	// otherwise, just ignore it.
   }
   
   
