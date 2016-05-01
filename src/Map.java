@@ -311,14 +311,14 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   
   public Color getColorByWater(int x, int y) {
-    if (sfc.getTileByIndex(lats[y][x], lons[y][x]).altitude < 0)
-      return Color.red;
     int dryness = 255 - sfc.getTileByIndex(lats[y][x], lons[y][x]).water;
+    if (dryness == 255)
+      return Color.black;
     if (dryness >= 256)
       return new Color(255, 255, 255);
     if (dryness < 0)
       return new Color(0, 0, 255);
-    return new Color(dryness, dryness, 255); // return a blue that gets darker with temperature
+    return new Color(dryness, dryness, 255); // return a blue that gets darker with freshwater
   }
   
   
@@ -328,7 +328,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
       return Color.white;
     if (height < 0)
       return Color.black;
-    return new Color(height, height, height); // return a grey that gets brighter with temperature
+    return new Color(height, height, height); // return a grey that gets brighter with water level
   }
   
   

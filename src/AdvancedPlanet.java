@@ -67,6 +67,17 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     for (Map map: maps)
       map.display(ColS.altitude);
     
+    System.out.println("Evaporating oceans...");
+    evaporateSeas();
+    for (Map map: maps)
+      map.display(ColS.water);
+    
+    System.out.println("Raining...");
+    fillLakes();
+    runoff();
+    for (Map map: maps)
+      map.display(ColS.water);
+    
     System.out.println("Generating climate...");
     acclimate();
     setBiomes();
@@ -90,7 +101,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     crust = new ArrayList<Plate>(1);
     crust.add(new Plate(0,
     					map.getTile(Math.acos(Math.random()*2-1), Math.random()*2*Math.PI),
-    					30.0/map.getRadius())); // spawns a plate at a random tile
+    					50.0/map.getRadius())); // spawns a plate at a random tile
   }
   
   
@@ -106,7 +117,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
           }
         }
         
-        if (tile.altitude < -256 && randChance(-136)) // seeds new plates occasionally
+        if (tile.altitude < -256 && randChance(-133)) // seeds new plates occasionally
           crust.add(new Plate(crust.size(),tile,30.0/map.getRadius()));
       }
     }
@@ -149,7 +160,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   
   
   public final void fillOceans() { // fills in the oceans to about 70% of the surface
-    final int target = (int)(4*Math.PI*map.getRadius()*map.getRadius()*.7); // the approximate number of tiles we want underwater
+    final int target = (int)(4*Math.PI*map.getRadius()*map.getRadius()*.71); // the approximate number of tiles we want underwater
     int seaLevel = 0;
     int min = -256;
     int max = 255;
@@ -226,6 +237,57 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     else if (nxt.altitude < 0)
       moistureHere += 16-dist>>2;
     return moistureFrom(nxt, dir, dist+1) + moistureHere;
+  }
+  
+  
+  public void evaporateSeas() { // replaces small oceans with lakes
+    for (Tile til: map.list())
+      til.temp1 = 0; // temp1 is a flag for whether it has been checked yet
+    
+    for (Tile til: map.list()) {
+      if (til.temp1 == 0) {
+        if (til.waterLevel() >= 0) // land is ignored
+          til.temp1 = 1;
+        else { // oceans must either be salt-water or fresh-water
+          ArrayList<Tile> sea = searchOcean(til); // flags this sea
+          if (sea.size() < 100) // if it is too small
+            for (Tile wtr: sea)
+              wtr.water = -wtr.altitude; // put some fresh-water in it
+        }
+      }
+    }
+  }
+  
+  
+  public ArrayList<Tile> searchOcean(Tile start) { // flags all sub-sea level tiles connected to this and adds to this arraylist
+    ArrayList<Tile> sea = new ArrayList<Tile>();
+    ArrayList<Tile> que = new ArrayList<Tile>();
+    que.add(start);
+    start.temp1 = 1;
+    
+    while (!que.isEmpty()) { // BFSs all connected tiles (I would totally DFS here, but the stack overflow limit is too low
+      Tile til = que.remove(0);
+      final ArrayList<Tile> adjacentList = map.adjacentTo(til);
+      for (Tile adj: adjacentList) {
+        if (adj.temp1 == 0 && adj.waterLevel() < 0) {
+          adj.temp1 = 1;
+          sea.add(til);
+          que.add(adj);
+        }
+      }
+    }
+    
+    return sea;
+  }
+  
+  
+  public void fillLakes() { // places freshwater to eliminate sinks
+    
+  }
+  
+  
+  public void runoff() { // produces rivers
+    
   }
   
   

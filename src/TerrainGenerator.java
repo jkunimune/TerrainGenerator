@@ -1,6 +1,3 @@
-import java.util.Arrays;
-
-//import java.util.Scanner;
 
 
 
@@ -16,7 +13,7 @@ public final class TerrainGenerator{ // a class to generate and display terrain 
     while (true) {
       //Planet earth = new Planet(100, new Scanner(System.in));
       AdvancedPlanet earth = new AdvancedPlanet(100);
-      Map theMap = new Lambert(earth.getSurface(), 800, 400);
+      Map theMap = new Mollweide(earth.getSurface(), 600, 600);
       
       theMap.display(ColS.altitude);
       
