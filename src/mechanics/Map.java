@@ -289,9 +289,9 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   public Color getColorByRain(int x, int y) {
     int dryness = 255 - sfc.getTileByIndex(lats[y][x], lons[y][x]).rainfall;
     if (dryness < 0)
-      return new Color(0, 0, 255);
+      return new Color(100, 0, 255);
     if (dryness >= 256)
-      return new Color(255, 255, 255);
+      return new Color(255, 255, 100);
     return new Color(dryness, dryness, 255); // return a blue that gets darker with rainfall
   }
   
@@ -299,9 +299,9 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   public Color getColorByTemp(int x, int y) {
     int coldness = 255 - sfc.getTileByIndex(lats[y][x], lons[y][x]).temperature;
     if (coldness >= 256)
-      return new Color(255, 0, 0);
+      return new Color(0, 0, 100);
     if (coldness < 0)
-      return new Color(255, 255, 255);
+      return new Color(255, 100, 0);
     return new Color(255, coldness, coldness); // return a red that gets darker with temperature
   }
   

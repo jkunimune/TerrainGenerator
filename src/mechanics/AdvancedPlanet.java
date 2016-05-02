@@ -83,7 +83,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     acclimate();
     setBiomes();
     for (Map map: maps)
-      map.display(ColS.climate);
+      map.display(ColS.biome);
     
     System.out.println("Done!\n");
   }

@@ -32,16 +32,16 @@ public class Island {
 		for (Map map: maps)
 			map.display(ColS.altitude);
 		
+		System.out.println("Growing Plants...");
+		generateClimate();
+		adjustClimate();
+		for (Map map: maps)
+			map.display(ColS.climate);
+		
 		System.out.println("Eroding...");
 		rainAndErode();
 		for (Map map: maps)
-			map.display(ColS.water);
-		
-		System.out.println("Growing Plants...");
-		generateClimate();
-		selectBiomes();
-		for (Map map: maps)
-			map.display(ColS.altitude);
+			map.display(ColS.climate);
 		
 		System.out.println("Done!");
 	}
@@ -110,16 +110,42 @@ public class Island {
 
 
 
-	private void generateClimate() {
-		// TODO Auto-generated method stub
+	private void generateClimate() {	// picks rainfalls and temepratures for each tile
+		for (Tile til: sfc.list()) {
+			til.rainfall = 0;
+			til.temperature = 0;
+		}
 		
+		for (int gridSize = 32; gridSize > 1; gridSize >>= 1) {
+			double[][][][] nodes = buildPerlinArrays(gridSize);
+			for (int x = 0; x < sfc.getWidth(); x ++) {	// now calculate the values
+				for (int y = 0; y < sfc.getHeight(); y ++) {
+					sfc.getTileByIndex(y, x).rainfall += (int)(gridSize*calcPerlin(x,y,gridSize,nodes[0]));
+					sfc.getTileByIndex(y, x).temperature += (int)(gridSize*calcPerlin(x,y,gridSize,nodes[1]));
+				}	// these values range from 0 to 63
+			}
+		}
 	}
-
-
-
-	private void selectBiomes() {
-		// TODO Auto-generated method stub
+	
+	
+	public void adjustClimate() {
+		for (Tile til: sfc.list())	// high altitudes are colder
+			if (til.altitude >= 0)
+				til.temperature = 180 + til.temperature - til.altitude/2;
 		
+		for (int y = 0; y < sfc.getHeight(); y ++) {	// the orographic effect
+			int moisture = 1536;
+			for (int x = 0; x < sfc.getWidth(); x ++) {
+				Tile til = sfc.getTileByIndex(y, x);
+				if (til.altitude >= 0) {
+					int rain = (int)((til.altitude+64)*(1-Math.exp(-moisture/256.0))/4);
+					System.out.println(rain);
+					moisture -= rain;
+					til.rainfall += rain;
+				}
+				til.rainfall = (int)(255 - (255-til.rainfall)*0.3);	// normalizes for the tropical climate
+			}
+		}
 	}
 	
 	
@@ -127,6 +153,49 @@ public class Island {
 	public Surface getSurface() {
 		return sfc;
 	}
+	
+	
+	
+	public static double calcPerlin(int x, int y, int gridSize, double[][][] nodes) {	// does the perlin thing
+		int ny0 = y/gridSize;	// chooses nodes
+		int nx0 = x/gridSize;
+		double dy = (double)y/gridSize - ny0;
+		double dx = (double)x/gridSize - nx0;
+		int ny1, nx1;
+		if (dy==0)	ny1 = ny0;
+		else		ny1 = ny0+1;
+		if (dx==0)	nx1 = nx0;
+		else		nx1 = nx0+1;
+		
+		final double dtl = (dx-0)*nodes[ny0][nx0][0] + (dy-0)*nodes[ny0][nx0][1];	// computes dot products
+		final double dtr = (dx-1)*nodes[ny0][nx1][0] + (dy-0)*nodes[ny0][nx1][1];
+		final double dbl = (dx-0)*nodes[ny1][nx0][0] + (dy-1)*nodes[ny1][nx0][1];
+		final double dbr = (dx-1)*nodes[ny1][nx1][0] + (dy-1)*nodes[ny1][nx1][1];
+		
+		final double wy = Math.pow(Math.sin(dy*Math.PI/2), 2);	// determines weights
+		final double wx = Math.pow(Math.sin(dx*Math.PI/2), 2);
+		
+		return 0.5 + dtl*(1-wx)*(1-wy) + dtr*wx*(1-wy) + dbl*(1-wx)*wy + dbr*wx*wy;	// interpolates
+	}
+	
+	
+public double[][][][] buildPerlinArrays(int gridSize) {
+	double[][][][] nodes = new double[2][][][];	// the base climate is made from perlin noise
+	
+	for (int i = 0; i < nodes.length; i ++) {	// the first layer is rainfall/temperature
+		nodes[i] = new double[sfc.getHeight()/gridSize+1][][];
+		for (int j = 0; j < nodes[i].length; j ++) {	// the second layer is y
+			nodes[i][j] = new double[sfc.getWidth()/gridSize+1][];
+			for (int k = 0; k < nodes[i][j].length; k ++) {	// the third layer is x
+				nodes[i][j][k] = new double[2];
+				double theta = Math.random()*2*Math.PI;	// the final layer is the x and y components of the vector
+				nodes[i][j][k][0] = Math.cos(theta);
+				nodes[i][j][k][1] = Math.sin(theta);
+			}
+		}
+	}
+	return nodes;
+}
 	
 	
 	
