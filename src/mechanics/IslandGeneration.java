@@ -1,6 +1,6 @@
 package mechanics;
 
-import mapprojections.Equirectangular;
+import mapprojections.*;
 
 public final class IslandGeneration {
 
@@ -17,9 +17,9 @@ public final class IslandGeneration {
 		music.loop();
 		
 		while (true) {
-			Island atlantis = new Island(100,100);
+			Island atlantis = new Island(129);
 			
-			Map view = new Equirectangular(atlantis.getSurface(), 500,500);
+			Map view = new Basic(atlantis.getSurface(), 500,500);
 			
 			atlantis.generate(view);
 			

@@ -23,6 +23,17 @@ public class FinitePlane implements Surface {
 		meteorTarget = null;
 	}
 
+
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	
+	public int getHeight() {
+		return height;
+	}
+	
 	@Override
 	public ArrayList<Tile> adjacentTo(Tile t) {
 		ArrayList<Tile> output = new ArrayList<Tile>(8);
