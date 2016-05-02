@@ -1,6 +1,10 @@
 package mechanics;
 import java.awt.*;
 import java.awt.image.*;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 
@@ -80,6 +84,8 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
       { true,  true,  true,  true, false,  true }
     }
   };
+  
+  private BufferedImage whittaker;
       
   private int tipX, tipY, tipW, tipH; // TileTip coordinates and dimensions
   private BufferedImage img;
@@ -95,6 +101,13 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     tipW = -1;
     tipH = -1;
     sfc = newWorld;
+    
+    try {
+      whittaker = ImageIO.read(new File("Assets/whittaker.png"));
+    } catch (IOException e) {
+      System.out.println("Assets/whittaker.png not found; some display features may be affected as a result.");
+      whittaker = null;
+    }
     
     lats = new int[h][w];
     lons = new int[h][w];
@@ -293,18 +306,14 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   }
   
   
-  public Color getColorByClimate(int x, int y) { // returns a pastoral combination of cyan and magenta corresponding to humidity and temperature
-    int coldness = 255-sfc.getTileByIndex(lats[y][x], lons[y][x]).temperature;
-    int dryness = 255-sfc.getTileByIndex(lats[y][x], lons[y][x]).rainfall;
-    if (coldness < 0)
-      coldness = 0;
-    if (coldness >= 256)
-      coldness = 255;
-    if (dryness < 0)
-      dryness = 0;
-    if (dryness >= 256)
-      dryness = 255;
-    return new Color(coldness, dryness, 255);
+  public Color getColorByClimate(int x, int y) { // returns a color from a whittaker diagram
+    Tile til = sfc.getTileByIndex(lats[y][x], lons[y][x]);
+    if (til.altitude < 0)
+      return new Color(11,10,50);
+    
+    int temper = Math.min(Math.max(til.temperature, 0), 255);
+    int rainfl = Math.min(Math.max(til.rainfall, 0), 255);
+    return new Color(whittaker.getRGB(temper, rainfl));
   }
   
   

@@ -54,7 +54,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
         map.display(ColS.altitude);
     
     System.out.println("Shifting continents...");
-    for (int i = 0; i < 8; i += 1) {
+    for (int i = 0; i < 2; i += 1) {
       shiftPlates(0.125);
       for (Plate p: crust)
         p.changeCourse(.125);
@@ -83,7 +83,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     acclimate();
     setBiomes();
     for (Map map: maps)
-      map.display(ColS.biome);
+      map.display(ColS.climate);
     
     System.out.println("Done!\n");
   }
