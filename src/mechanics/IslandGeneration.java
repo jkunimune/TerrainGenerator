@@ -19,7 +19,7 @@ public final class IslandGeneration {
 		while (true) {
 			Island atlantis = new Island(129);
 			
-			Map view = new Basic(atlantis.getSurface(), 500,500);
+			Map view = new Isometric(atlantis.getSurface(), 500,500);
 			
 			atlantis.generate(view);
 			
