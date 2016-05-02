@@ -49,11 +49,11 @@ public class Island {
 
 
 	private void formIsland() {	// forms the first iteration of the island
-		for (int x = 0; x < sfc.getWidth(); x += sfc.getWidth()/2)
-			for (int y = 0; y < sfc.getHeight(); y += sfc.getHeight()/2) {
-				double alt = 255 - 256*Math.sqrt(2)*Math.hypot(2.0*x/sfc.getWidth()-1, 2.0*y/sfc.getHeight()-1);
-				sfc.getTileByIndex(x, y).altitude = (int)alt;	// sets some initial values
+		for (int x = 0; x < sfc.getWidth(); x += sfc.getWidth()-1)
+			for (int y = 0; y < sfc.getHeight(); y += sfc.getHeight()-1) {
+				sfc.getTileByIndex(x, y).altitude = -256;	// sets some initial values
 			}
+		sfc.getTileByIndex(sfc.getWidth()/2, sfc.getHeight()/2).altitude = 255;
 		
 		for (int d = sfc.getWidth()/2; d >= 1; d /= 2) {	// generates diamond-square noise
 			for (int x = d; x < sfc.getWidth(); x += 2*d) {	// diamond step
@@ -78,25 +78,23 @@ public class Island {
 				for (int y = 0; y < sfc.getHeight(); y += d) {
 					if (sfc.getTileByIndex(x,y).altitude < -256) {
 						int sum = 0;
-						int num = 0;
 						for (double tht = 0; tht < 6; tht += Math.PI/2) {
 							try {
 								sum += sfc.getTileByIndex(x+d*(int)Math.cos(tht),y+d*(int)Math.sin(tht)).altitude;
-								num ++;
 							} catch (IndexOutOfBoundsException e) {
-								continue;
+								sum -= 256;
 							}
 						}
-						int avg = sum/num;
+						int avg = sum/4;
 						int sqs = 0;
 						for (double tht = 0; tht < 6; tht += Math.PI/2) {
 							try {
 								sqs += Math.pow(sfc.getTileByIndex(x+d*(int)Math.cos(tht),y+d*(int)Math.sin(tht)).altitude-avg, 2);
 							} catch (IndexOutOfBoundsException e) {
-								continue;
+								sqs += Math.pow(-256-avg, 2);
 							}
 						}
-						double dev = Math.sqrt(sqs/num);
+						double dev = Math.sqrt(sqs/4);
 						sfc.getTileByIndex(x,y).altitude = random(avg, dev);
 					}
 				}

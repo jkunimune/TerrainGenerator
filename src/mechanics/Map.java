@@ -9,9 +9,6 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   private static final long serialVersionUID = 1L;
   
   public Font monaco;
-  /*public static final Color[] colors = {new Color(255,63,0), new Color(0,0,200), new Color(200,200,255), new Color(20, 70, 200), new Color(0,0,150),
-    new Color(255,255,255), new Color(79,191,39), new Color(200,200,50), new Color(0,100,0), new Color(200,100,50), new Color(200,150,255),
-    new Color(10,33,255), new Color(0,0,0), new Color(0,127,75)}; // colors of the biomes*/
   public static final Color[] colors = {new Color(255,0,0), new Color(0,0,200), new Color(200,200,255), new Color(0,100,200), new Color(0,0,100),
 		  new Color(255,255,255), new Color(100,255,0), new Color(255,220,0), new Color(0,100,0), new Color(150,100,0), new Color(200,100,255),
 		  new Color(0,50,255), new Color(0,0,0), new Color(0,200,100)}; // colors of the biomes
