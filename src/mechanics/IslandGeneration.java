@@ -17,7 +17,7 @@ public final class IslandGeneration {
 		music.loop();
 		
 		while (true) {
-			Island atlantis = new Island(129);
+			Island atlantis = new Island(257);
 			
 			Map view = new Isometric(atlantis.getSurface(), 500,500);
 			

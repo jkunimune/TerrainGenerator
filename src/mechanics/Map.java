@@ -245,8 +245,11 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
         return getColorByDrawn(x, y);
       case light:
         return getColorByLight(x, y);
+      case satellite:
+        return getColorBySatellite(x, y);
       default:
-        return new Color(150, 0, 255);
+        System.err.println("...? I think you created a new color scheme constant and forgot to assign it a method.");
+        return new Color(200,0,150);
     }
   }
   
@@ -355,8 +358,35 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
       t2 = t0;
     }
     final int intensity = Math.max(Math.min((2*t0.altitude-t1.altitude-t2.altitude+32)<<2, 255), 0);
-    if (t0.altitude > 0)	return new Color(intensity>>1,intensity,intensity>>1);
+    if (t0.altitude >= 0)	return new Color(intensity>>1,intensity,intensity>>1);
     else					return new Color(intensity>>2,intensity>>2,(intensity>>2)+128);
+  }
+  
+  
+  public Color getColorBySatellite(int x, int y) { // a combination of climate and light
+    Tile t0 = sfc.getTileByIndex(lats[y][x], lons[y][x]);
+    Tile t1,t2;
+    try {
+      t1 = sfc.getTileByIndex(lats[y][x]-1, lons[y][x]);
+    } catch (IndexOutOfBoundsException e) {
+      t1 = t0;
+    }
+    try {
+      t2 = sfc.getTileByIndex(lats[y][x], lons[y][x]-1);
+    } catch (IndexOutOfBoundsException e) {
+      t2 = t0;
+    }
+    final double s = Math.max(Math.min(t0.altitude/32.0-t1.altitude/64.0-t2.altitude/64.0+1/2.0, 1), 0.3);
+    // first calculate the sunlight intensity
+    if (t0.altitude >= 0) {
+      int temper = Math.min(Math.max(t0.temperature, 0), 255);
+      int rainfl = Math.min(Math.max(t0.rainfall, 0), 255); // then calculate the color
+      Color c = new Color(whittaker.getRGB(temper, rainfl));
+      
+      return new Color((int)(s*c.getRed()), (int)(s*c.getGreen()), (int)(s*c.getBlue()));
+    }
+    else
+      return new Color((int)(s*22), (int)(s*20), (int)(s*100));
   }
   
   

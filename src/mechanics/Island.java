@@ -41,7 +41,7 @@ public class Island {
 		System.out.println("Eroding...");
 		rainAndErode();
 		for (Map map: maps)
-			map.display(ColS.light);
+			map.display(ColS.satellite);
 		
 		System.out.println("Done!");
 	}
@@ -116,12 +116,12 @@ public class Island {
 			til.temperature = 0;
 		}
 		
-		for (int gridSize = 32; gridSize > 1; gridSize >>= 1) {
+		for (int gridSize = 64; gridSize > 1; gridSize >>= 1) {
 			double[][][][] nodes = buildPerlinArrays(gridSize);
 			for (int x = 0; x < sfc.getWidth(); x ++) {	// now calculate the values
 				for (int y = 0; y < sfc.getHeight(); y ++) {
-					sfc.getTileByIndex(y, x).rainfall += (int)(2*gridSize*calcPerlin(x,y,gridSize,nodes[0]));
-					sfc.getTileByIndex(y, x).temperature += (int)(2*gridSize*calcPerlin(x,y,gridSize,nodes[1]));
+					sfc.getTileByIndex(y, x).rainfall += (int)(gridSize*calcPerlin(x,y,gridSize,nodes[0]));
+					sfc.getTileByIndex(y, x).temperature += (int)(gridSize*calcPerlin(x,y,gridSize,nodes[1]));
 				}	// these values range from 0 to 127
 			}
 		}
@@ -142,7 +142,7 @@ public class Island {
 					moisture -= rain;
 					til.rainfall += rain;
 				}
-				til.rainfall = (int)(255 - (255-til.rainfall)*0.4);	// normalizes for the tropical climate
+				til.rainfall = (int)(255 - (255-til.rainfall)*0.35);	// normalizes for the tropical climate
 			}
 		}
 	}
