@@ -322,20 +322,23 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   }
   
   
-  public Color getColorByWater(int x, int y) {
-    int dryness = 255 - sfc.getTileByIndex(lats[y][x], lons[y][x]).water;
-    if (dryness == 255)
+  public Color getColorByWater(int x, int y) { // a blue that gets darker with more freshwater
+    int wtr = sfc.getTileByIndex(lats[y][x], lons[y][x]).water;
+    if (wtr < 0)
+      return Color.red;
+    else if (wtr == 0)
       return Color.black;
-    if (dryness >= 256)
-      return new Color(255, 255, 255);
-    if (dryness < 0)
-      return new Color(0, 0, 255);
-    return new Color(dryness, dryness, 255); // return a blue that gets darker with freshwater
+    else if (wtr <= 255)
+      return new Color(255-wtr,255-wtr,255);
+    else if (wtr <= 1020)
+      return new Color(0,0,319-wtr/4);
+    else
+      return new Color(100,0,255);
   }
   
   
   public Color getColorByWaterLevel(int x, int y) {
-    int height = sfc.getTileByIndex(lats[y][x], lons[y][x]).waterLevel();
+    int height = sfc.getTileByIndex(lats[y][x], lons[y][x]).waterLevel()/4;
     if (height >= 256)
       return Color.white;
     if (height < 0)
@@ -376,7 +379,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     } catch (IndexOutOfBoundsException e) {
       t2 = t0;
     }
-    final double s = Math.max(Math.min(t0.altitude/32.0-t1.altitude/64.0-t2.altitude/64.0+1/2.0, 1), 0.3);
+    final double s = Math.max(Math.min(t0.altitude/16.0-t1.altitude/32.0-t2.altitude/32.0+1/2.0, 1), 0.2);
     // first calculate the sunlight intensity
     if (t0.altitude >= 0) {
       int temper = Math.min(Math.max(t0.temperature, 0), 255);

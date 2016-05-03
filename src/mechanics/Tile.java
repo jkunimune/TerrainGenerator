@@ -120,7 +120,7 @@ public final class Tile { // keeps track of a single point on a globe
   
   
   public final int waterLevel() {
-    return altitude+water;
+    return (altitude<<2)+water;
   }
   
   

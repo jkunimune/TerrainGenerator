@@ -39,7 +39,14 @@ public class Island {
 			map.display(ColS.climate);
 		
 		System.out.println("Eroding...");
-		rainAndErode();
+		setUpWater();
+		for (Map map: maps)
+			map.display(ColS.water);
+		for (int i = 0; i < 100; i ++) {
+			rainAndErode();
+			for (Map map: maps)
+				map.display(ColS.water);
+		}
 		for (Map map: maps)
 			map.display(ColS.satellite);
 		
@@ -101,9 +108,100 @@ public class Island {
 			}
 		}
 	}
+	
+	
+	private void setUpWater() {	// set all the oceans to be filled with water to save some time
+		for (Tile til: sfc.list()) {
+			if (til.altitude < 0)	til.water = -4*til.altitude;
+			else					til.water = 0;
+			til.temp1 = til.water;	// temp1 is the new value of water
+			til.temp2 = 0;			// temp2 is the out-flow to the left  (-x)
+			til.temp3 = 0;			// temp3 is the out-flow to the north (-y)
+		}
+	}
 
 
 	private void rainAndErode() {
+		rain();
+		flow();
+		landslide();
+		erode();
+		carry();
+		evaporate();
+	}
+
+
+
+	private void rain() {	// increments water on all tiles
+		for (Tile til: sfc.list()) {
+			if (Math.random() < .01)
+				til.water ++;
+			til.temp1 = til.water;	// temp1 is the new value of the water level
+		}
+	}
+
+
+
+	private void flow() {
+		for (int x = 1; x < sfc.getWidth()-1; x ++) {
+			for (int y = 1; y < sfc.getHeight()-1; y ++) {
+				Tile til = sfc.getTileByIndex(y, x);
+				int maxDrop = 0; // the maximum drop of the neighbors, this determines how much water will be moved
+				int totDrop = 0; // this is for dividing excess water up proportinally
+				for (Tile adj: sfc.adjacentTo(til)) {
+					if (adj.waterLevel() < til.waterLevel()) {
+						final int drop = til.waterLevel()-adj.waterLevel();
+						totDrop += drop;
+						if (drop > maxDrop)
+							maxDrop = drop;
+					}
+				}
+				final int totWtr = Math.min(maxDrop, til.water); // this is how much water will move
+				boolean alreadyCeiled = false; // you can only ceil once (all the others are floors, lest you get negative water)
+				for (Tile adj: sfc.adjacentTo(til)) { // now we actually move water
+					if (adj.waterLevel() < til.waterLevel()) {
+						final int drop = til.waterLevel()-adj.waterLevel();
+						double share = totWtr/2.0*drop/totDrop;
+						if (drop == maxDrop && !alreadyCeiled) {
+							share = Math.ceil(share); // the biggest drop gets the extra if it doesn't divide evenly
+							alreadyCeiled = true;
+						}
+						else
+							share = Math.floor(share);
+						adj.temp1 += share;
+						til.temp1 -= share;
+					}
+				}
+			}
+		}
+		for (Tile til: sfc.list())	// update water
+			til.water = til.temp1;
+	}
+
+
+
+	private void landslide() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	private void erode() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	private void carry() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	private void evaporate() {
 		// TODO Auto-generated method stub
 		
 	}
@@ -178,23 +276,23 @@ public class Island {
 	}
 	
 	
-public double[][][][] buildPerlinArrays(int gridSize) {
-	double[][][][] nodes = new double[2][][][];	// the base climate is made from perlin noise
-	
-	for (int i = 0; i < nodes.length; i ++) {	// the first layer is rainfall/temperature
-		nodes[i] = new double[sfc.getHeight()/gridSize+1][][];
-		for (int j = 0; j < nodes[i].length; j ++) {	// the second layer is y
-			nodes[i][j] = new double[sfc.getWidth()/gridSize+1][];
-			for (int k = 0; k < nodes[i][j].length; k ++) {	// the third layer is x
-				nodes[i][j][k] = new double[2];
-				double theta = Math.random()*2*Math.PI;	// the final layer is the x and y components of the vector
-				nodes[i][j][k][0] = Math.cos(theta);
-				nodes[i][j][k][1] = Math.sin(theta);
+	public double[][][][] buildPerlinArrays(int gridSize) {
+		double[][][][] nodes = new double[2][][][];	// the base climate is made from perlin noise
+		
+		for (int i = 0; i < nodes.length; i ++) {	// the first layer is rainfall/temperature
+			nodes[i] = new double[sfc.getHeight()/gridSize+1][][];
+			for (int j = 0; j < nodes[i].length; j ++) {	// the second layer is y
+				nodes[i][j] = new double[sfc.getWidth()/gridSize+1][];
+				for (int k = 0; k < nodes[i][j].length; k ++) {	// the third layer is x
+					nodes[i][j][k] = new double[2];
+					double theta = Math.random()*2*Math.PI;	// the final layer is the x and y components of the vector
+					nodes[i][j][k][0] = Math.cos(theta);
+					nodes[i][j][k][1] = Math.sin(theta);
+				}
 			}
 		}
+		return nodes;
 	}
-	return nodes;
-}
 	
 	
 	
