@@ -243,6 +243,8 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
         return getColorByHybrid(x, y);
       case drawn:
         return getColorByDrawn(x, y);
+      case light:
+        return getColorByLight(x, y);
       default:
         return new Color(150, 0, 255);
     }
@@ -336,6 +338,25 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     if (height < 0)
       return Color.black;
     return new Color(height, height, height); // return a grey that gets brighter with water level
+  }
+  
+  
+  public Color getColorByLight(int x, int y) {	// return a color that mimics sunlight hitting the terrain
+    Tile t0 = sfc.getTileByIndex(lats[y][x], lons[y][x]);
+    Tile t1,t2;
+    try {
+      t1 = sfc.getTileByIndex(lats[y][x]-1, lons[y][x]);
+    } catch (IndexOutOfBoundsException e) {
+      t1 = t0;
+    }
+    try {
+      t2 = sfc.getTileByIndex(lats[y][x], lons[y][x]-1);
+    } catch (IndexOutOfBoundsException e) {
+      t2 = t0;
+    }
+    final int intensity = Math.max(Math.min((2*t0.altitude-t1.altitude-t2.altitude+32)<<2, 255), 0);
+    if (t0.altitude > 0)	return new Color(intensity>>1,intensity,intensity>>1);
+    else					return new Color(intensity>>2,intensity>>2,(intensity>>2)+128);
   }
   
   
