@@ -21,7 +21,7 @@ public class Hemispherical extends Map { // a realistic globe projection that mi
   public final java.awt.Point getCoords(int x, int y) {
     if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius) // if in the left circle
       return sfc.tilByAngles(Math.acos(1-(double)y/radius),
-                             Math.asin((x-radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))));
+                             Math.asin((x-radius) / Math.sqrt(radius*radius - (y-radius)*(y-radius))) + Math.PI/2);
     
     else if ((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < radius*radius) // if in the right
       return sfc.tilByAngles(Math.acos(1-(double)y/radius),

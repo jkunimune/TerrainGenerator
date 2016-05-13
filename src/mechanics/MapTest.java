@@ -17,10 +17,11 @@ public final class MapTest{ // a class to experiment with and compare different 
     
     while (true) {
       Planet earth = new Planet(100);
-      Map[] maps = new Map[3];
+      Map[] maps = new Map[4];
       maps[0] = new Equirectangular(earth.getSurface(), 600, 300);
       maps[1] = new PierceQuincuncial(earth.getSurface(), 400, 400);
       maps[2] = new Mollweide(earth.getSurface(), 600, 300);
+      maps[3] = new Hemispherical(earth.getSurface(), 600, 300);
       
       for (Map theMap: maps)
         theMap.display(ColS.altitude);
