@@ -134,9 +134,11 @@ public class Island {
 
 	private void rain() {	// increments water on all tiles
 		for (Tile til: sfc.list()) {
-			if (Math.random() < .01)
-				til.water ++;
+			if (Math.random() < 1.0)
+				til.water += 2;
 			til.temp1 = til.water;	// temp1 is the new value of the water level
+			til.temp2 = 0;			// temp2 is the out-flow to the north
+			til.temp3 = 0;			// temp3 is the out-flow to the west
 		}
 	}
 
@@ -156,7 +158,7 @@ public class Island {
 							maxDrop = drop;
 					}
 				}
-				final int totWtr = Math.min(maxDrop, til.water); // this is how much water will move
+				final int totWtr = Math.min(maxDrop/4, til.water); // this is how much water will move
 				boolean alreadyCeiled = false; // you can only ceil once (all the others are floors, lest you get negative water)
 				for (Tile adj: sfc.adjacentTo(til)) { // now we actually move water
 					if (adj.waterLevel() < til.waterLevel()) {
@@ -167,15 +169,33 @@ public class Island {
 							alreadyCeiled = true;
 						}
 						else
-							share = Math.floor(share);
-						adj.temp1 += share;
-						til.temp1 -= share;
+							share = Math.floor(share); // share will now be appropriated to the appropriate flow variable
+						
+						if (adj.lat < til.lat)		// water is flowing north
+							til.temp2 += share;
+						else if (adj.lat > til.lat)	// water is flowing south
+							adj.temp2 -= share;
+						else if (adj.lon < til.lon)	// water is flowing west
+							til.temp3 += share;
+						else if (adj.lon > til.lon)	// water is flowing east
+							adj.temp3 -= share;
+						else
+							System.err.print("What is going on?!");
 					}
 				}
 			}
 		}
-		for (Tile til: sfc.list())	// update water
-			til.water = til.temp1;
+		for (int x = 1; x < sfc.getWidth(); x ++) {			// update the water levels
+			for (int y = 1; y < sfc.getHeight(); y ++) {	// using the flow variables
+				Tile t0 = sfc.getTileByIndex(y, x);
+				Tile tN = sfc.getTileByIndex(y-1, x);
+				Tile tW = sfc.getTileByIndex(y, x-1);
+				t0.water -= t0.temp2;
+				tN.water += t0.temp2;
+				t0.water -= t0.temp3;
+				tW.water += t0.temp3;
+			}
+		}
 	}
 
 
@@ -202,8 +222,8 @@ public class Island {
 
 
 	private void evaporate() {
-		// TODO Auto-generated method stub
-		
+		for (Tile til: sfc.list())
+			til.water = Math.max(0, til.water-2);
 	}
 
 

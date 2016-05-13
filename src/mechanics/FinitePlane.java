@@ -36,8 +36,8 @@ public class FinitePlane implements Surface {
 	
 	@Override
 	public ArrayList<Tile> adjacentTo(Tile t) {
-		ArrayList<Tile> output = new ArrayList<Tile>(8);
-		for (int dx = -1; dx <= 1; dx ++) {
+		ArrayList<Tile> output = new ArrayList<Tile>(4);
+		/*for (int dx = -1; dx <= 1; dx ++) {
 			for (int dy = -1; dy <= 1; dy ++) {
 				if (dx != 0 || dy != 0) {
 					try {
@@ -45,7 +45,19 @@ public class FinitePlane implements Surface {
 					} catch (IndexOutOfBoundsException e) {}
 				}
 			}
-		}
+		}*/
+		try {
+			output.add(matrix[t.lat+1][t.lon]);
+		} catch (IndexOutOfBoundsException e) {}
+		try {
+			output.add(matrix[t.lat-1][t.lon]);
+		} catch (IndexOutOfBoundsException e) {}
+		try {
+			output.add(matrix[t.lat][t.lon+1]);
+		} catch (IndexOutOfBoundsException e) {}
+		try {
+			output.add(matrix[t.lat][t.lon-1]);
+		} catch (IndexOutOfBoundsException e) {}
 		return output;
 	}
 
