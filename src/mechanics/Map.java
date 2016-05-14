@@ -85,7 +85,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     }
   };
   
-  private BufferedImage whittaker;
+  private BufferedImage whittaker1, whittaker2;
       
   private int tipX, tipY, tipW, tipH; // TileTip coordinates and dimensions
   private BufferedImage img;
@@ -103,10 +103,12 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     sfc = newWorld;
     
     try {
-      whittaker = ImageIO.read(new File("Assets/whittaker.png"));
+      whittaker1 = ImageIO.read(new File("Assets/whittaker1.png"));
+      whittaker2 = ImageIO.read(new File("Assets/whittaker2.png"));
     } catch (IOException e) {
-      System.out.println("Assets/whittaker.png not found; some display features may be affected as a result.");
-      whittaker = null;
+      System.out.println("Assets/whittaker1.png or Assets/whittaker2.png not found; some display features may be affected as a result.");
+      whittaker1 = null;
+      whittaker2 = null;
     }
     
     lats = new int[h][w];
@@ -313,12 +315,14 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   public Color getColorByClimate(int x, int y) { // returns a color from a whittaker diagram
     Tile til = sfc.getTileByIndex(lats[y][x], lons[y][x]);
-    if (til.altitude < 0)
-      return new Color(11,10,50);
     
-    int temper = Math.min(Math.max(til.temperature, 0), 255);
-    int rainfl = Math.min(Math.max(til.rainfall, 0), 255);
-    return new Color(whittaker.getRGB(temper, rainfl));
+    final int temper = Math.min(Math.max(til.temperature, 0), 255);
+    final int rainfl = Math.min(Math.max(til.rainfall, 0), 255);
+    final int waterl = Math.min(Math.max(til.water, 0), 255);
+    if (til.altitude < 0 || til.water >= 32)
+      return new Color(whittaker2.getRGB(temper, waterl));
+    else
+      return new Color(whittaker1.getRGB(temper, rainfl));
   }
   
   
@@ -381,15 +385,17 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     }
     final double s = Math.max(Math.min(t0.altitude/16.0-t1.altitude/32.0-t2.altitude/32.0+1/2.0, 1), 0.2);
     // first calculate the sunlight intensity
-    if (t0.altitude >= 0) {
-      int temper = Math.min(Math.max(t0.temperature, 0), 255);
-      int rainfl = Math.min(Math.max(t0.rainfall, 0), 255); // then calculate the color
-      Color c = new Color(whittaker.getRGB(temper, rainfl));
+    final int temper = Math.min(Math.max(t0.temperature, 0), 255);
+    final int rainfl = Math.min(Math.max(t0.rainfall, 0), 255); // then calculate the color
+    final int waterl = Math.min(Math.max(t0.water, 0), 255);
+    
+    Color c;
+    if (t0.altitude >= 0 && t0.water < 32)	// land takes from whittaker1
+      c = new Color(whittaker1.getRGB(temper, rainfl));
+    else									// water takes from whittaker2
+      c = new Color(whittaker2.getRGB(temper, waterl));
       
-      return new Color((int)(s*c.getRed()), (int)(s*c.getGreen()), (int)(s*c.getBlue()));
-    }
-    else
-      return new Color((int)(s*22), (int)(s*20), (int)(s*100));
+    return new Color((int)(s*c.getRed()), (int)(s*c.getGreen()), (int)(s*c.getBlue()));
   }
   
   

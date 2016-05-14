@@ -114,9 +114,10 @@ public class Island {
 		for (Tile til: sfc.list()) {
 			if (til.altitude < 0)	til.water = -4*til.altitude;
 			else					til.water = 0;
-			til.temp1 = til.water;	// temp1 is the new value of water
-			til.temp2 = 0;			// temp2 is the out-flow to the left  (-x)
-			til.temp3 = 0;			// temp3 is the out-flow to the north (-y)
+			til.biome = 0;	// biome is the stand-in variable for amount of dissolved sediment in water
+			til.temp1 = 0;	// temp1 is the updated amount of dissolved sediment in the water
+			til.temp2 = 0;	// temp2 is the out-flow to the north  (-y)
+			til.temp3 = 0;	// temp3 is the out-flow to the west (-x)
 		}
 	}
 
@@ -136,7 +137,6 @@ public class Island {
 		for (Tile til: sfc.list()) {
 			if (Math.random() < 1.0)
 				til.water += 2;
-			til.temp1 = til.water;	// temp1 is the new value of the water level
 			til.temp2 = 0;			// temp2 is the out-flow to the north
 			til.temp3 = 0;			// temp3 is the out-flow to the west
 		}
@@ -187,9 +187,9 @@ public class Island {
 		}
 		for (int x = 1; x < sfc.getWidth(); x ++) {			// update the water levels
 			for (int y = 1; y < sfc.getHeight(); y ++) {	// using the flow variables
-				Tile t0 = sfc.getTileByIndex(y, x);
-				Tile tN = sfc.getTileByIndex(y-1, x);
-				Tile tW = sfc.getTileByIndex(y, x-1);
+				final Tile t0 = sfc.getTileByIndex(y, x);
+				final Tile tN = sfc.getTileByIndex(y-1, x);
+				final Tile tW = sfc.getTileByIndex(y, x-1);
 				t0.water -= t0.temp2;
 				tN.water += t0.temp2;
 				t0.water -= t0.temp3;
@@ -208,15 +208,36 @@ public class Island {
 
 
 	private void erode() {
-		// TODO Auto-generated method stub
-		
+		for (int x = 1; x < sfc.getWidth()-1; x ++) {
+			for (int y = 1; y < sfc.getHeight()-1; y ++) {
+				final Tile t0 = sfc.getTileByIndex(y, x);
+				final Tile tS = sfc.getTileByIndex(y+1, x);
+				final Tile tE = sfc.getTileByIndex(y, x+1);
+				
+				final double vx = (double)(-tE.temp3-t0.temp3)/t0.water;	// calculate the
+				final double vy = (double)(-tS.temp2-t0.temp2)/t0.water;	// velocity vector
+				final int cs = (int)(2*Math.hypot(vx, vy));		// calculate the soil carrying capacity
+				t0.altitude += t0.biome-cs;	// deposit however much extra soil is in the water (could be negative)
+				
+				final double xf = x+vx/2;	// calculate the destination of the sediment
+				final double yf = y+vy/2;
+				try {
+					sfc.getTileByIndex((int)yf, (int)xf).temp1 += cs*(xf%1)*(yf%1);	// now distribute all the
+					sfc.getTileByIndex((int)yf, (int)xf+1).temp1 += cs*(1-xf%1)*(yf%1);	// dissolved sediment
+					sfc.getTileByIndex((int)yf+1, (int)xf).temp1 += cs*(xf%1)*(1-yf%1);	// proportionally among
+					sfc.getTileByIndex((int)yf+1, (int)xf+1).temp1 += cs*(1-xf%1)*(1-yf%1);	// these four tiles
+				} catch (ArrayIndexOutOfBoundsException e) {}
+			}
+		}
 	}
 
 
 
 	private void carry() {
-		// TODO Auto-generated method stub
-		
+		for (Tile til: sfc.list()) {	// update the biome value
+			til.biome = til.temp1;
+			til.temp1 = 0;
+		}
 	}
 
 
@@ -248,8 +269,7 @@ public class Island {
 	
 	public void adjustClimate() {
 		for (Tile til: sfc.list())	// high altitudes are colder
-			if (til.altitude >= 0)
-				til.temperature = 128 + til.temperature - til.altitude/2;
+			til.temperature = 128 + til.temperature - Math.max(til.altitude,0)/2;
 		
 		for (int y = 0; y < sfc.getHeight(); y ++) {	// the orographic effect
 			int moisture = 2048;
