@@ -319,7 +319,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     final int temper = Math.min(Math.max(til.temperature, 0), 255);
     final int rainfl = Math.min(Math.max(til.rainfall, 0), 255);
     final int waterl = Math.min(Math.max(til.water, 0), 255);
-    if (til.altitude < 0 || til.water >= 32)
+    if (til.altitude < 0 || til.water >= 1)
       return new Color(whittaker2.getRGB(temper, waterl));
     else
       return new Color(whittaker1.getRGB(temper, rainfl));
@@ -390,7 +390,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     final int waterl = Math.min(Math.max(t0.water, 0), 255);
     
     Color c;
-    if (t0.altitude >= 0 && t0.water < 32)	// land takes from whittaker1
+    if (t0.altitude >= 0 && t0.water < 1)	// land takes from whittaker1
       c = new Color(whittaker1.getRGB(temper, rainfl));
     else									// water takes from whittaker2
       c = new Color(whittaker2.getRGB(temper, waterl));

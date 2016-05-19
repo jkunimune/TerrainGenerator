@@ -42,11 +42,17 @@ public class Island {
 		setUpWater();
 		for (Map map: maps)
 			map.display(ColS.water);
-		for (int i = 0; i < 100; i ++) {
-			rainAndErode();
+		for (int i = 0; i < 128; i ++) {
+			rainAndErode(true);
 			for (Map map: maps)
 				map.display(ColS.water);
 		}
+		for (int i = 0; i < 16; i ++) {
+			rainAndErode(false);
+			for (Map map: maps)
+				map.display(ColS.water);
+		}
+		
 		for (Map map: maps)
 			map.display(ColS.satellite);
 		
@@ -122,8 +128,11 @@ public class Island {
 	}
 
 
-	private void rainAndErode() {
-		rain();
+	private void rainAndErode(boolean raining) {
+		if (raining)
+			rain(2);
+		else
+			rain(0);
 		flow();
 		landslide();
 		erode();
@@ -133,10 +142,9 @@ public class Island {
 
 
 
-	private void rain() {	// increments water on all tiles
+	private void rain(int amount) {	// increments water on all tiles
 		for (Tile til: sfc.list()) {
-			if (Math.random() < 1.0)
-				til.water += 2;
+			til.water += amount;
 			til.temp2 = 0;			// temp2 is the out-flow to the north
 			til.temp3 = 0;			// temp3 is the out-flow to the west
 		}
@@ -201,8 +209,57 @@ public class Island {
 
 
 	private void landslide() {
-		// TODO Auto-generated method stub
-		
+		for (Tile til: sfc.list()) {
+			til.temp1 = til.altitude;
+		}
+		for (int x = 1; x < sfc.getWidth()-1; x ++) {
+			for (int y = 1; y < sfc.getHeight()-1; y ++) {
+				Tile til = sfc.getTileByIndex(y, x);
+				int maxDrop = 0; // the maximum drop of the neighbors, this determines how much land will be moved
+				int totDrop = 0; // this is for dividing excess altitude up proportionally
+				for (int dx = -1; dx <= 1; dx ++) {
+					for (int dy = -1; dy <= 1; dy ++) {
+						if (dx != 0 || dy != 0) {
+							Tile adj = sfc.getTileByIndex(y+dy, x+dx);
+							if (adj.altitude-til.altitude < -4*sfc.distance(til, adj)) {
+								final int drop = til.altitude-adj.altitude;
+								totDrop += drop;
+								if (drop > maxDrop)
+									maxDrop = drop;
+							}
+						}
+					}
+				}
+				if (maxDrop >= 8) {
+					final int totLnd = maxDrop/4; // this is how much land will move
+					boolean alreadyCeiled = false; // you can only ceil once (all the others are floors, lest you get negative water)
+					for (int dx = -1; dx <= 1; dx ++) { // now we actually move land around
+						for (int dy = -1; dy <= 1; dy ++) {
+							if (dx != 0 || dy != 0) {
+								Tile adj = sfc.getTileByIndex(y+dy, x+dx);
+								if (adj.altitude-til.altitude < -4*sfc.distance(til, adj)) {
+									final int drop = til.altitude-adj.altitude;
+									double share = totLnd/2.0*drop/totDrop;
+									if (drop == maxDrop && !alreadyCeiled) {
+										share = Math.ceil(share); // the biggest drop gets the extra if it doesn't divide evenly
+										alreadyCeiled = true;
+									}
+									else
+										share = Math.floor(share); // share will now be appropriated to the appropriate flow variable
+									
+									adj.temp1 += share;
+									til.temp1 -= share;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		for (Tile til: sfc.list()) {
+			til.altitude = til.temp1;
+			til.temp1 = 0;
+		}
 	}
 
 
@@ -216,7 +273,7 @@ public class Island {
 				
 				final double vx = (double)(-tE.temp3-t0.temp3)/t0.water;	// calculate the
 				final double vy = (double)(-tS.temp2-t0.temp2)/t0.water;	// velocity vector
-				final int cs = (int)(2*Math.hypot(vx, vy));		// calculate the soil carrying capacity
+				final int cs = (int)(4*Math.hypot(vx, vy)*(1-Math.exp(-t0.water/8.0)));		// calculate the soil carrying capacity
 				t0.altitude += t0.biome-cs;	// deposit however much extra soil is in the water (could be negative)
 				
 				final double xf = x+vx/2;	// calculate the destination of the sediment
@@ -236,7 +293,6 @@ public class Island {
 	private void carry() {
 		for (Tile til: sfc.list()) {	// update the biome value
 			til.biome = til.temp1;
-			til.temp1 = 0;
 		}
 	}
 
