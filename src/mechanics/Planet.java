@@ -308,18 +308,21 @@ public final class Planet { // a subclass of Globe that handles all geological e
   public void rain() { // forms, rivers, lakes, valleys, and deltas
      // initializes temps to -1
     for (Tile til: map.list()) {
+      if (til.altitude < 0)
+        til.biome = Tile.ocean;	// use biome to detect ocean, not altitude
       til.temp1 = -1;
       til.temp2 = -1;
     }
     
-    for (int i = 0; i < map.list().length; i ++) { // fills all lakes and routes all water
-      Tile til = map.list()[i];
-      if (til.altitude >= 0) { // if land
+    Tile[] allTiles = map.list();
+    for (int i = 0; i < allTiles.length; i ++) { // fills all lakes and routes all water
+      Tile til = allTiles[i];
+      if (til.biome != Tile.ocean) { // if land
         ArrayList<Tile> destinations = map.adjacentTo(til);
         Tile lowest = destinations.get(0); // lowest tile to which water can flow
         
         for (Tile adj: destinations) {
-          if (adj.altitude < 0 || adj.waterLevel() < lowest.waterLevel()) { // if this is the new lowest
+          if (adj.biome == Tile.ocean || adj.waterLevel() < lowest.waterLevel()) { // if this is the new lowest
             lowest = adj;
           }
         }
@@ -366,8 +369,14 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  /* PRECONDITION: all Tiles in lake are at the same height (altitude+water) */
+  /* PRECONDITION: all Tiles in lake are at the same water height (altitude+water) */
   private void fillLake(ArrayList<Tile> lake) {
+    if (lake.size() >= 16) {
+      for (Tile til: lake)
+        til.biome = Tile.ocean;
+      return;
+    }
+    
     int height = lake.get(0).waterLevel();
     ArrayList<Tile> shore = new ArrayList<Tile>();
     for (Tile til: lake) // defines the shore as all tiles adjacent to and not in the lake
@@ -380,7 +389,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
       if (til.waterLevel() < low.waterLevel()) // cycles through shore to find lowest point
         low = til;
     
-    if (low.waterLevel() < height || low.altitude < 0) { // if it is an outlet or the ocean
+    if (low.waterLevel() < height || low.biome == Tile.ocean) { // if it is an outlet or the ocean
       for (Tile til: lake)
         til.temp1 = -1;
       
@@ -398,7 +407,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
         for (Tile til: lake) { // for every tile in the lake
           if (til.temp1 == -1) { // if it does not have its runoff point set
             tilesNeedRouting = true;
-            if (randChance(20))  continue; // this line makes the rivers more random
+            if (randChance(20))  continue; // this line makes the rivers slightly more random
             final List<Tile> adjacentList =map.adjacentTo(til);
             for (Tile adj: adjacentList) { // look at all the adjacent tiles IN THE LAKE
               if (lake.contains(adj)) {
@@ -432,7 +441,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
   
   
   private void runoffFrom(Tile start) {
-    if (start.altitude < 0) // do not bother with ocean
+    if (start.biome == Tile.ocean) // do not bother with ocean
       return;
     
     start.water += 1;

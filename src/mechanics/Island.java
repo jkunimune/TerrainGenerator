@@ -221,7 +221,7 @@ public class Island {
 					for (int dy = -1; dy <= 1; dy ++) {
 						if (dx != 0 || dy != 0) {
 							Tile adj = sfc.getTileByIndex(y+dy, x+dx);
-							if (adj.altitude-til.altitude < -4*sfc.distance(til, adj)) {
+							if (adj.altitude-til.altitude < -5*sfc.distance(til, adj)) {
 								final int drop = til.altitude-adj.altitude;
 								totDrop += drop;
 								if (drop > maxDrop)
@@ -230,14 +230,14 @@ public class Island {
 						}
 					}
 				}
-				if (maxDrop >= 8) {
+				if (maxDrop >= 10) {
 					final int totLnd = maxDrop/4; // this is how much land will move
 					boolean alreadyCeiled = false; // you can only ceil once (all the others are floors, lest you get negative water)
 					for (int dx = -1; dx <= 1; dx ++) { // now we actually move land around
 						for (int dy = -1; dy <= 1; dy ++) {
 							if (dx != 0 || dy != 0) {
 								Tile adj = sfc.getTileByIndex(y+dy, x+dx);
-								if (adj.altitude-til.altitude < -4*sfc.distance(til, adj)) {
+								if (adj.altitude-til.altitude < -5*sfc.distance(til, adj)) {
 									final int drop = til.altitude-adj.altitude;
 									double share = totLnd/2.0*drop/totDrop;
 									if (drop == maxDrop && !alreadyCeiled) {

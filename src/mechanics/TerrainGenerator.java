@@ -13,7 +13,7 @@ public final class TerrainGenerator{ // a class to generate and display terrain 
   
   
   public static final void main(String args[]) {
-    startMusic();
+    //startMusic();
     
     while (true) {
       //Planet earth = new Planet(100, new Scanner(System.in));

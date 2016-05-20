@@ -179,7 +179,7 @@ public final class Tile { // keeps track of a single point on a globe
       case ice:
         return altitude < 0 && randChance(-temperature>>4);
       case reef:
-        return altitude < 0 && randChance((temperature>>3) - 50);
+        return altitude < 0 && randChance((temperature>>3) - 55);
       case tundra:
         return altitude >=0 && randChance((-temperature>>4) - 5);
       case forest:

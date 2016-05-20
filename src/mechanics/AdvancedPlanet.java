@@ -54,7 +54,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
         map.display(ColS.altitude);
     
     System.out.println("Shifting continents...");
-    for (int i = 0; i < 8; i += 1) {
+    for (int i = 0; i < 1; i += 1) {
       shiftPlates(0.125);
       for (Plate p: crust)
         p.changeCourse(.125);
@@ -68,19 +68,24 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     for (Map map: maps)
       map.display(ColS.altitude);
     
-    System.out.println("Evaporating oceans...");
+    /*System.out.println("Evaporating oceans...");
     evaporateSeas();
     for (Map map: maps)
-      map.display(ColS.water);
-    
-    System.out.println("Raining...");
-    fillLakes();
-    runoff();
-    for (Map map: maps)
-      map.display(ColS.water);
+      map.display(ColS.water);*/
     
     System.out.println("Generating climate...");
     acclimate();
+    for (Map map: maps)
+      map.display(ColS.climate);
+    
+    System.out.println("Raining...");
+    for (int i = 0; i < 128; i ++) {
+      rain();
+      for (Map map: maps)
+        map.display(ColS.water);
+    }
+    
+    System.out.println("Finalizing climate...");
     setBiomes();
     for (Map map: maps)
       map.display(ColS.biome);
@@ -223,7 +228,6 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     for (Tile til: map.list()) {
       til.temperature = (int)(255*Math.sin(map.latByTil(til)) - ((int)Math.abs(til.altitude)>>3)); // things are colder near poles and at extreme altitudes
       til.rainfall = (int)(255*Math.pow(Math.sin(map.latByTil(til)),2)); // things get wetter around equator
-      til.rainfall += moistureFrom(til,-1,0) + moistureFrom(til,1,0); // the orographic effect
     }
   }
   
@@ -282,17 +286,37 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public void fillLakes() { // places freshwater to eliminate sinks
-    
-  }
-  
-  
-  public void runoff() { // produces rivers
-    
-  }
+  public void rain() { // simulate rainfall and erosion
+    final Tile[] allTiles = map.list();
+    for (Tile til: allTiles) {
+      til.water += 1;
+      if (til.rainfall >= 230)		// if it's wet, you get lots of rain
+        til.water ++;
+      if (til.temperature < 180)	// if it's cold, you get snowmelt
+        til.water ++;
+      if (til.temperature < 120)		// if it's really cold, you get glaciers!
+        til.water ++;
+    }
+    // TODO: flow();
+    // TODO: erode();
+    // TODO: carry();
+    for (Tile til: allTiles) {
+      til.water -= 1;
+      if (til.rainfall >= 230)		// if it's wet, you get lots of rain
+        til.water --;
+      if (til.temperature < 180)	// if it's cold, you get snowmelt
+        til.water --;
+      if (til.temperature < 120)		// if it's really cold, you get glaciers!
+        til.water --;
+      til.water = Math.max(til.water, 0);
+    }
+}
   
   
   public void setBiomes() {
+    for (Tile til: map.list())
+      til.rainfall += moistureFrom(til,-1,0) + moistureFrom(til,1,0); // apply the orographic effect
+    
     for (Tile til: map.list()) {
       if (til.altitude < 0) { // if below sea level
         if (til.temperature < 128) { // if cold
@@ -341,7 +365,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       til.temp1 = til.biome;
     }
     
-    for (int i = 0; i < 128 && weNeedMoreBiomes(); i ++) {
+    for (int i = 0; i < 64 && weNeedMoreBiomes(); i ++) {
       for (Tile til: map.list()) {
         if (til.temp1 == 0) {
           final ArrayList<Tile> adjacentList = map.adjacentTo(til);
