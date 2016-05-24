@@ -54,7 +54,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
         map.display(ColS.altitude);
     
     System.out.println("Shifting continents...");
-    for (int i = 0; i < 1; i += 1) {
+    for (int i = 0; i < 8; i += 1) {
       shiftPlates(0.125);
       for (Plate p: crust)
         p.changeCourse(.125);
@@ -182,8 +182,13 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       }
     }
     
-    for (Tile til: map.list())
+    for (Tile til: map.list()) {
       til.altitude -= seaLevel; // fills in oceans
+      if (til.altitude < 0)
+        til.water = -til.altitude;	// prepares for some hydraulic algorithms later on
+      else
+        til.water = 0;
+    }
   }
   
   
@@ -289,28 +294,62 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   public void rain() { // simulate rainfall and erosion
     final Tile[] allTiles = map.list();
     for (Tile til: allTiles) {
-      til.water += 1;
-      if (til.rainfall >= 230)		// if it's wet, you get lots of rain
-        til.water ++;
-      if (til.temperature < 180)	// if it's cold, you get snowmelt
-        til.water ++;
-      if (til.temperature < 120)		// if it's really cold, you get glaciers!
-        til.water ++;
+      if (Math.random() < 0.0001) {
+	      til.water += 1;
+	      /*if (til.rainfall >= 230)		// if it's wet, you get lots of rain
+	        til.water ++;
+	      if (til.temperature < 180)	// if it's cold, you get snowmelt
+	        til.water ++;
+	      if (til.temperature < 120)		// if it's really cold, you get glaciers!
+	        til.water ++;*/
+      }
+      til.temp1 = til.water;
+      til.temp2 = til.altitude;
     }
-    // TODO: flow();
-    // TODO: erode();
+    for (Tile til: allTiles) {
+      int maxDrop = 0;	// determines how much water will flow
+      int totDrop = 0;	// determines how that water will be divided
+      for (Tile adj: map.adjacentTo(til)) {
+        final int drop = til.waterLevel()-adj.waterLevel();	// the difference in height
+        if (drop > 0)
+          totDrop += drop;	// only count downhill drops
+        if (drop > maxDrop)
+          maxDrop = drop;	// and remember the biggest one
+      }
+      boolean alreadyCeiled = false;
+      final int totWater = Math.min(maxDrop/2, til.water);
+      for (Tile adj: map.adjacentTo(til)) {
+        final int drop = til.waterLevel()-adj.waterLevel();
+        if (drop > 0) {
+          double share = (double)totWater*drop/totDrop;
+          if (drop == maxDrop && !alreadyCeiled) {
+            alreadyCeiled = true;
+            share = Math.ceil(share);	// it always ceils once
+          }
+          else
+            share = Math.floor(share);	// and floors all the other times to prevent negative water
+          til.temp1 -= share;
+          adj.temp1 += share;
+        }
+      }
+      //til.temp2 -= (int)(1.2*totWater/til.water);
+    }
+    for (Tile til: allTiles) {
+      til.water = til.temp1;
+      til.altitude = til.temp2;
+    }
     // TODO: carry();
     for (Tile til: allTiles) {
-      til.water -= 1;
-      if (til.rainfall >= 230)		// if it's wet, you get lots of rain
+      //til.water -= 1;
+      /*if (til.rainfall >= 230)		// if it's wet, you get lots of rain
         til.water --;
       if (til.temperature < 180)	// if it's cold, you get snowmelt
         til.water --;
       if (til.temperature < 120)		// if it's really cold, you get glaciers!
-        til.water --;
+        til.water --;*/
       til.water = Math.max(til.water, 0);
     }
-}
+  }
   
   
   public void setBiomes() {
