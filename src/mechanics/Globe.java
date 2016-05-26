@@ -84,10 +84,17 @@ public class Globe implements Surface{ // a spherical surface
     lon %= 2*Math.PI;
     if (lon < 0)
       lon += 2*Math.PI;
+    if (lon == 2*Math.PI)
+      lon = 0;
     
     int y = (int)(lat*map.length/Math.PI);
     int x = (int)(lon*map[y].length/(2*Math.PI));
-    return map[y][x];
+    try {
+      return map[y][x];
+    } catch (ArrayIndexOutOfBoundsException e) {
+      System.err.println("Error in Globe.getTile: tried to access map["+y+"]["+x+"] due to coordinates ("+lat+","+lon+")!");
+      throw(e);
+    }
   }
   
   

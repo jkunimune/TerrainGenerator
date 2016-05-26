@@ -1,3 +1,4 @@
+
 package mechanics;
 import java.util.*;
 
@@ -113,14 +114,19 @@ public final class Tile { // keeps track of a single point on a globe
   
   
   public final void join(Tile ref) { // join the same Plate as ref
-    temp1 = ref.altitude + (int)(Math.random()*8-4); // temp 1 is altitude
+    temp1 = ref.altitude + (int)(Math.random()*5-2.5 - ref.altitude/64.0); // temp 1 is altitude
     temp2 = ref.temp2; // temp2 is the index of the plate it is a part of
     temp3 = ref.temp3; // temp3 is how quickly this plate spreads
-  } 
+  }
   
   
   public final int waterLevel() {
     return (altitude<<2)+water;
+  }
+  
+  
+  public final int waterLevel2() {
+    return (altitude<<8)+water;
   }
   
   

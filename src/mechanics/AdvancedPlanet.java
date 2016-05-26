@@ -65,13 +65,9 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     
     System.out.println("Filling in oceans...");
     fillOceans();
+    for (int i = 0; i < 100; i ++)
     for (Map map: maps)
       map.display(ColS.altitude);
-    
-    /*System.out.println("Evaporating oceans...");
-    evaporateSeas();
-    for (Map map: maps)
-      map.display(ColS.water);*/
     
     System.out.println("Generating climate...");
     acclimate();
@@ -80,7 +76,12 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     
     System.out.println("Raining...");
     for (int i = 0; i < 128; i ++) {
-      rain();
+      rain(true);
+      for (Map map: maps)
+        map.display(ColS.water);
+    }
+    for (int i = 0; i < 64; i ++) {
+      rain(false);
       for (Map map: maps)
         map.display(ColS.water);
     }
@@ -185,7 +186,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     for (Tile til: map.list()) {
       til.altitude -= seaLevel; // fills in oceans
       if (til.altitude < 0)
-        til.water = -til.altitude;	// prepares for some hydraulic algorithms later on
+        til.water = -256*til.altitude;	// prepares for some hydraulic algorithms later on
       else
         til.water = 0;
     }
@@ -250,25 +251,6 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public void evaporateSeas() { // replaces small oceans with lakes
-    for (Tile til: map.list())
-      til.temp1 = 0; // temp1 is a flag for whether it has been checked yet
-    
-    for (Tile til: map.list()) {
-      if (til.temp1 == 0) {
-        if (til.waterLevel() >= 0) // land is ignored
-          til.temp1 = 1;
-        else { // oceans must either be salt-water or fresh-water
-          ArrayList<Tile> sea = searchOcean(til); // flags this sea
-          if (sea.size() < 100) // if it is too small
-            for (Tile wtr: sea)
-              wtr.water = -wtr.altitude; // put some fresh-water in it
-        }
-      }
-    }
-  }
-  
-  
   public ArrayList<Tile> searchOcean(Tile start) { // flags all sub-sea level tiles connected to this and adds to this arraylist
     ArrayList<Tile> sea = new ArrayList<Tile>();
     ArrayList<Tile> que = new ArrayList<Tile>();
@@ -279,7 +261,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       Tile til = que.remove(0);
       final ArrayList<Tile> adjacentList = map.adjacentTo(til);
       for (Tile adj: adjacentList) {
-        if (adj.temp1 == 0 && adj.waterLevel() < 0) {
+        if (adj.temp1 == 0 && adj.waterLevel2() < 0) {
           adj.temp1 = 1;
           sea.add(til);
           que.add(adj);
@@ -291,11 +273,11 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public void rain() { // simulate rainfall and erosion
+  public void rain(boolean raining) { // simulate rainfall and erosion (may or may not be raining)
     final Tile[] allTiles = map.list();
     for (Tile til: allTiles) {
-      if (Math.random() < 0.0001) {
-	      til.water += 1;
+      if (raining && Math.random() < 1) {
+	      til.water += 16;
 	      /*if (til.rainfall >= 230)		// if it's wet, you get lots of rain
 	        til.water ++;
 	      if (til.temperature < 180)	// if it's cold, you get snowmelt
@@ -310,16 +292,16 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       int maxDrop = 0;	// determines how much water will flow
       int totDrop = 0;	// determines how that water will be divided
       for (Tile adj: map.adjacentTo(til)) {
-        final int drop = til.waterLevel()-adj.waterLevel();	// the difference in height
+        final int drop = til.waterLevel2()-adj.waterLevel2();	// the difference in height
         if (drop > 0)
-          totDrop += drop;	// only count downhill drops
+          totDrop += drop;	// only count down-hill drops
         if (drop > maxDrop)
           maxDrop = drop;	// and remember the biggest one
       }
       boolean alreadyCeiled = false;
       final int totWater = Math.min(maxDrop/2, til.water);
       for (Tile adj: map.adjacentTo(til)) {
-        final int drop = til.waterLevel()-adj.waterLevel();
+        final int drop = til.waterLevel2()-adj.waterLevel2();
         if (drop > 0) {
           double share = (double)totWater*drop/totDrop;
           if (drop == maxDrop && !alreadyCeiled) {
@@ -330,24 +312,31 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
             share = Math.floor(share);	// and floors all the other times to prevent negative water
           til.temp1 -= share;
           adj.temp1 += share;
+          
+          if (Math.random() < share/32.0) {
+            Vector v1 = new Vector(1.0, map.latByTil(til), map.lonByTil(til));
+            Vector v2 = new Vector(1.0, map.latByTil(adj), map.lonByTil(adj));
+            Vector v3 = v2.times(2).minus(v1);
+            map.getTile(v3.getA(), v3.getB()).altitude --;
+          }
         }
       }
-      //til.temp2 -= (int)(1.2*totWater/til.water);
     }
     for (Tile til: allTiles) {
       til.water = til.temp1;
       til.altitude = til.temp2;
     }
-    // TODO: carry();
     for (Tile til: allTiles) {
-      //til.water -= 1;
-      /*if (til.rainfall >= 230)		// if it's wet, you get lots of rain
-        til.water --;
-      if (til.temperature < 180)	// if it's cold, you get snowmelt
-        til.water --;
-      if (til.temperature < 120)		// if it's really cold, you get glaciers!
-        til.water --;*/
-      til.water = Math.max(til.water, 0);
+      if (raining) {
+        til.water -= 16;
+        /*if (til.rainfall >= 230)		// if it's wet, you get lots of rain
+          til.water --;
+        if (til.temperature < 180)	// if it's cold, you get snowmelt
+          til.water --;
+        if (til.temperature < 120)		// if it's really cold, you get glaciers!
+          til.water --;*/
+        til.water = Math.max(til.water, 0);
+      }
     }
   }
   
