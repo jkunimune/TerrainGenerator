@@ -65,7 +65,6 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     
     System.out.println("Filling in oceans...");
     fillOceans();
-    for (int i = 0; i < 100; i ++)
     for (Map map: maps)
       map.display(ColS.altitude);
     
@@ -75,16 +74,9 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       map.display(ColS.climate);
     
     System.out.println("Raining...");
-    for (int i = 0; i < 128; i ++) {
-      rain(true);
-      for (Map map: maps)
-        map.display(ColS.water);
-    }
-    for (int i = 0; i < 64; i ++) {
-      rain(false);
-      for (Map map: maps)
-        map.display(ColS.water);
-    }
+    rain();
+    for (Map map: maps)
+      map.display(ColS.water);
     
     System.out.println("Finalizing climate...");
     setBiomes();
@@ -273,71 +265,58 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public void rain(boolean raining) { // simulate rainfall and erosion (may or may not be raining)
+  public void rain() { // forms, rivers, lakes, valleys, and deltas
     final Tile[] allTiles = map.list();
-    for (Tile til: allTiles) {
-      if (raining && Math.random() < 1) {
-	      til.water += 16;
-	      /*if (til.rainfall >= 230)		// if it's wet, you get lots of rain
-	        til.water ++;
-	      if (til.temperature < 180)	// if it's cold, you get snowmelt
-	        til.water ++;
-	      if (til.temperature < 120)		// if it's really cold, you get glaciers!
-	        til.water ++;*/
-      }
-      til.temp1 = til.water;
-      til.temp2 = til.altitude;
+    final Tile[] shfTiles = map.list();
+    Collections.shuffle(Arrays.asList(shfTiles));
+    
+    for (Tile t: allTiles) {	// start by initializing some values
+      t.temp1 = 0;	// a boolean value for whether it has been checked this iteration
+      t.temp2 = -1;	// temp2 and temp3 are the indices for the tile this one flows into
+      t.temp3 = -1;
     }
-    for (Tile til: allTiles) {
-      int maxDrop = 0;	// determines how much water will flow
-      int totDrop = 0;	// determines how that water will be divided
-      for (Tile adj: map.adjacentTo(til)) {
-        final int drop = til.waterLevel2()-adj.waterLevel2();	// the difference in height
-        if (drop > 0)
-          totDrop += drop;	// only count down-hill drops
-        if (drop > maxDrop)
-          maxDrop = drop;	// and remember the biggest one
-      }
-      boolean alreadyCeiled = false;
-      final int totWater = Math.min(maxDrop/2, til.water);
-      for (Tile adj: map.adjacentTo(til)) {
-        final int drop = til.waterLevel2()-adj.waterLevel2();
-        if (drop > 0) {
-          double share = (double)totWater*drop/totDrop;
-          if (drop == maxDrop && !alreadyCeiled) {
-            alreadyCeiled = true;
-            share = Math.ceil(share);	// it always ceils once
-          }
-          else
-            share = Math.floor(share);	// and floors all the other times to prevent negative water
-          til.temp1 -= share;
-          adj.temp1 += share;
-          
-          if (Math.random() < share/32.0) {
-            Vector v1 = new Vector(1.0, map.latByTil(til), map.lonByTil(til));
-            Vector v2 = new Vector(1.0, map.latByTil(adj), map.lonByTil(adj));
-            Vector v3 = v2.times(2).minus(v1);
-            map.getTile(v3.getA(), v3.getB()).altitude --;
+    
+    for (int i = 0; i < shfTiles.length/2; i ++) {	// it does some of the tiles in a random order
+      Tile til = shfTiles[i];	// start with a source
+      if (til.altitude < 0 || til.temp2 >= 0)	// skip it if it is ocean or already routed
+        continue;
+      
+      do {	// now iterate over all the tiles downriver of this one
+        int lowestAltitude = Integer.MAX_VALUE;
+        Tile lowestNeighbor = null;
+        for (Tile adj: map.adjacentTo(til)) {
+          if (adj.temp1 == 0 && adj.altitude < lowestAltitude) {	// find the lowest neighbor that is also unmarked
+            lowestAltitude = adj.altitude;							// this may be uphill
+            lowestNeighbor = adj;
           }
         }
-      }
+        if (lowestAltitude == Integer.MAX_VALUE) {	// if there is nowhere for it to flow, then it routes to itself
+          til.temp1 = 1;
+          til.temp2 = til.lat;
+          til.temp3 = til.lon;
+        }
+        else {
+          til.temp1 = 1;					// mark this tile
+          til.temp2 = lowestNeighbor.lat;	// set its destination to the lowest neighbor
+          til.temp3 = lowestNeighbor.lon;
+          til = lowestNeighbor;				// and move to that tile
+        }
+      } while (til.altitude >= 0 && til.temp2 == -1);	// stop when you hit another river or ocean
+      for (Tile t: allTiles)	// now reset the temp1s for the next river
+        t.temp1 = 0;
     }
-    for (Tile til: allTiles) {
-      til.water = til.temp1;
-      til.altitude = til.temp2;
+    
+    for (Tile til: allTiles) {	// now that we've marked out the rivers,
+      runoff(til);	// let's actually build them.
     }
-    for (Tile til: allTiles) {
-      if (raining) {
-        til.water -= 16;
-        /*if (til.rainfall >= 230)		// if it's wet, you get lots of rain
-          til.water --;
-        if (til.temperature < 180)	// if it's cold, you get snowmelt
-          til.water --;
-        if (til.temperature < 120)		// if it's really cold, you get glaciers!
-          til.water --;*/
-        til.water = Math.max(til.water, 0);
-      }
-    }
+  }
+  
+  
+  public void runoff(Tile t) {	// creates the rivers that rain() sets up
+    t.water ++;			// rain on it
+    if (t.temp2 >= 0)	// if it has a destination set
+      if (t.temp2 != t.lat || t.temp3 != t.lon)	// and that destination is not itself
+        runoff(map.getTileByIndex(t.temp2, t.temp3));
   }
   
   
@@ -362,7 +341,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
           til.biome = Tile.reef;
         }
       }
-      else if (til.water >= 10) { // if has freshwater on it
+      else if (til.water >= 128) { // if has freshwater on it
         til.biome = Tile.freshwater;
       }
       else if (til.altitude >= 120) { // if mountainous
