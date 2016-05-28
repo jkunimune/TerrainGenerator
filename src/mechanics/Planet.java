@@ -21,7 +21,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
 
   private double[] values     = {-127,               -141,               40.0,               1.0,                1.0,                .72,                .02,
              .5,                 64,                 2,                  0.4,                1.2,                12,                 16,                 3,
-             100,                140,                -100,               237,                5,                  480,                229,                64,
+             100,                140,                -100,               237,                5,                  300,                229,                64,
              180,                2800,               8,                  0.1};
     
   //                             0                   1                   2                  3                   4                   5                    6
@@ -124,11 +124,9 @@ public final class Planet { // a subclass of Globe that handles all geological e
     }
     
     System.out.println("Raining...");
-    //rain();
-    System.out.println("Eroding...");
-    //runoff();
+    rain();
     for (Map map: maps)
-      map.display(ColS.altitude);
+      map.display(ColS.water);
     
     System.out.println("Generating climate...");
     acclimate(values[26]);
@@ -306,154 +304,57 @@ public final class Planet { // a subclass of Globe that handles all geological e
   
   
   public void rain() { // forms, rivers, lakes, valleys, and deltas
-     // initializes temps to -1
-    for (Tile til: map.list()) {
-      if (til.altitude < 0)
-        til.biome = Tile.ocean;	// use biome to detect ocean, not altitude
-      til.temp1 = -1;
-      til.temp2 = -1;
+    final Tile[] allTiles = map.list();
+    final Tile[] shfTiles = map.list();
+    Collections.shuffle(Arrays.asList(shfTiles));
+    
+    for (Tile t: allTiles) {	// start by initializing some values
+      t.temp1 = 0;	// a boolean value for whether it has been checked this iteration
+      t.temp2 = -1;	// temp2 and temp3 are the indices for the tile this one flows into
+      t.temp3 = -1;
     }
     
-    Tile[] allTiles = map.list();
-    for (int i = 0; i < allTiles.length; i ++) { // fills all lakes and routes all water
-      Tile til = allTiles[i];
-      if (til.biome != Tile.ocean) { // if land
-        ArrayList<Tile> destinations = map.adjacentTo(til);
-        Tile lowest = destinations.get(0); // lowest tile to which water can flow
-        
-        for (Tile adj: destinations) {
-          if (adj.biome == Tile.ocean || adj.waterLevel() < lowest.waterLevel()) { // if this is the new lowest
-            lowest = adj;
+    for (int i = 0; i < shfTiles.length/2; i ++) {	// it does some of the tiles in a random order
+      Tile til = shfTiles[i];	// start with a source
+      if (til.altitude < 0 || til.temp2 >= 0)	// skip it if it is ocean or already routed
+        continue;
+      
+      do {	// now iterate over all the tiles downriver of this one
+        int lowestAltitude = Integer.MAX_VALUE;
+        Tile lowestNeighbor = null;
+        for (Tile adj: map.adjacentTo(til)) {
+          if (adj.temp1 == 0 && adj.altitude < lowestAltitude) {	// find the lowest neighbor that is also unmarked
+            lowestAltitude = adj.altitude;							// this may be uphill
+            lowestNeighbor = adj;
           }
         }
-        
-        if (lowest.waterLevel() < til.waterLevel()) { // if water can flow
-          til.temp1 = lowest.lat; // set the water path from here to there
-          til.temp2 = lowest.lon;
+        if (lowestAltitude == Integer.MAX_VALUE) {	// if there is nowhere for it to flow, then it routes to itself
+          til.temp1 = 1;
+          til.temp2 = til.lat;
+          til.temp3 = til.lon;
         }
-        else if (lowest.waterLevel() == til.waterLevel()) { // if it is flat
-          if (til.temp1 == -1) { // if temp 1 has not been set
-            fillLake(til, lowest); // set it
-            i = 0; // start over
-          }
+        else {
+          til.temp1 = 1;					// mark this tile
+          til.temp2 = lowestNeighbor.lat;	// set its destination to the lowest neighbor
+          til.temp3 = lowestNeighbor.lon;
+          til = lowestNeighbor;				// and move to that tile
         }
-        else { // if water can't flow
-          til.water = lowest.waterLevel() - til.altitude;
-          fillLake(til, lowest); // fill in the area so it can
-          i = 0; // start over
-        }
-      }
+      } while (til.altitude >= 0 && til.temp2 == -1);	// stop when you hit another river or ocean
+      for (Tile t: allTiles)	// now reset the temp1s for the next river
+        t.temp1 = 0;
+    }
+    
+    for (Tile til: allTiles) {	// now that we've marked out the rivers,
+      runoff(til);	// let's actually build them.
     }
   }
   
   
-  public void runoff() {
-    for (Tile til: map.list()) {
-      til.temp3 = 0;
-      til.water <<= (int)values[19];
-      til.altitude += til.water>>(int)values[25]; // accounts for erosion later on
-    }
-    
-    for (Tile til: map.list())
-      runoffFrom(til); // fills rivers
-    for (Tile til: map.list())
-      til.altitude -= til.water>>(int)values[25]; // erodes
-  }
-  
-  
-  private void fillLake(Tile seed, Tile adj) {
-    ArrayList<Tile> lake = new ArrayList<Tile>();
-    lake.add(seed);
-    lake.add(adj);
-    fillLake(lake);
-  }
-  
-  
-  /* PRECONDITION: all Tiles in lake are at the same water height (altitude+water) */
-  private void fillLake(ArrayList<Tile> lake) {
-    if (lake.size() >= 16) {
-      for (Tile til: lake)
-        til.biome = Tile.ocean;
-      return;
-    }
-    
-    int height = lake.get(0).waterLevel();
-    ArrayList<Tile> shore = new ArrayList<Tile>();
-    for (Tile til: lake) // defines the shore as all tiles adjacent to and not in the lake
-      for (Tile adj: map.adjacentTo(til))
-        if (!lake.contains(adj) && !shore.contains(adj))
-          shore.add(adj);
-    
-    Tile low = shore.get(0);
-    for (Tile til: shore)
-      if (til.waterLevel() < low.waterLevel()) // cycles through shore to find lowest point
-        low = til;
-    
-    if (low.waterLevel() < height || low.biome == Tile.ocean) { // if it is an outlet or the ocean
-      for (Tile til: lake)
-        til.temp1 = -1;
-      
-      final List<Tile> drainage = map.adjacentTo(low);
-      for (Tile til: drainage) {
-        if (lake.contains(til)) { // set all the paths in the lake to lead back to low
-          til.temp1 = low.lat;
-          til.temp2 = low.lon;
-        }
-      }
-      
-      boolean tilesNeedRouting;
-      do {
-        tilesNeedRouting = false;
-        for (Tile til: lake) { // for every tile in the lake
-          if (til.temp1 == -1) { // if it does not have its runoff point set
-            tilesNeedRouting = true;
-            if (randChance(20))  continue; // this line makes the rivers slightly more random
-            final List<Tile> adjacentList =map.adjacentTo(til);
-            for (Tile adj: adjacentList) { // look at all the adjacent tiles IN THE LAKE
-              if (lake.contains(adj)) {
-                if (adj.temp1 != -1) { // if any of them do have their runoff point set
-                  til.temp1 = adj.lat; // this point runs off to that adjacent tile
-                  til.temp2 = adj.lon;
-                  break;
-                }
-              }
-            }
-          }
-        }
-      } while (tilesNeedRouting); // repeat until all the tiles in the lake have their runoff points set
-      
-      return; // this lake is done
-    }
-    if (low.altitude+low.water > height) { // if the lowest is above this lake
-      //System.out.println("Raising the lake level to "+low.waterLevel()+" to match "+low);
-      for (Tile til: lake) { // fill the lake some more and try again
-        til.water = low.waterLevel() - til.altitude;
-      }
-      lake.add(low);
-      fillLake(lake);
-    }
-    else { // if the lowest is on the same level
-      //System.out.println("Incorporating "+low);
-      lake.add(low); // join the club and try again
-      fillLake(lake);
-    }
-  }
-  
-  
-  private void runoffFrom(Tile start) {
-    if (start.biome == Tile.ocean) // do not bother with ocean
-      return;
-    
-    start.water += 1;
-    start.temp3 = 1; // indicate start is checked
-    
-    if (start.temp1 < 0) // if temp1 is not set
-      System.err.println("Warning: a river flowed into the void"); // throw error message
-    else if (map.getTileByIndex(start.temp1,start.temp2).temp3 == 0) // if the next one is not checked
-      runoffFrom(map.getTileByIndex(start.temp1,start.temp2));
-    else  System.err.println("JOOWEE! JOOWEE! Rivers are flowing into themselves! FillLake() is not doing its job!");
-    
-    start.temp3 = 0;
+  public void runoff(Tile t) {	// creates the rivers that rain() sets up
+    t.water ++;			// rain on it
+    if (t.temp2 >= 0)	// if it has a destination set
+      if (t.temp2 != t.lat || t.temp3 != t.lon)	// and that destination is not itself
+        runoff(map.getTileByIndex(t.temp2, t.temp3));
   }
   
   
