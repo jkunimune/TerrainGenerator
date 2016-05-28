@@ -6,7 +6,7 @@ import java.util.*;
 public final class Planet { // a subclass of Globe that handles all geological elements
   private String[] valueNames = {"Ocean Frequency ", "Land Frequency  ", "Plate Speed     ", "Trench Depth    ", "Mountain Height ", "Island Size     ", "Rift Height     ",
              "Valley Depth    ", "Coastal Blur    ", "Roughness Factor", "Crust Stiffness ", "Randomness      ", "Biome Size      ", "Wind Speed      ", "Air Density     ",
-             "Freeze Point SW ", "Freeze Point FW ", "Water Opacity   ", "Water Toxicity  ", "Lake Size       ", "River Length    ", "Net Humidity    ", "Surface Gravity ",
+             "Freeze Point SW ", "Freeze Point FW ", "Water Opacity   ", "Water Toxicity  ", "River Length    ", "River Depth     ", "Net Humidity    ", "Surface Gravity ",
              "GreenhouseEffect", "World Age       ", "Gound Softness  ", "Biome Roughness "};
     
   private String[] valueAbbvs = {"OF    ",           "LF    ",           "PS    ",           "TD    ",           "MH    ",           "IS    ",           "RH    ",
@@ -21,7 +21,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
 
   private double[] values     = {-127,               -141,               40.0,               1.0,                1.0,                .72,                .02,
              .5,                 64,                 2,                  0.4,                1.2,                12,                 16,                 3,
-             100,                140,                -100,               237,                5,                  300,                229,                64,
+             100,                140,                -100,               237,                7,                  200,                229,                64,
              180,                2800,               8,                  0.1};
     
   //                             0                   1                   2                  3                   4                   5                    6
@@ -124,6 +124,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
     }
     
     System.out.println("Raining...");
+    evaporateSeas();
     rain();
     for (Map map: maps)
       map.display(ColS.water);
@@ -303,48 +304,90 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  public void rain() { // forms, rivers, lakes, valleys, and deltas
-    final Tile[] allTiles = map.list();
-    final Tile[] shfTiles = map.list();
-    Collections.shuffle(Arrays.asList(shfTiles));
+  public void evaporateSeas() { // replaces small oceans with lakes
+    for (Tile til: map.list())
+      til.temp1 = 0; // temp1 is a flag for whether it has been checked yet
     
-    for (Tile t: allTiles) {	// start by initializing some values
-      t.temp1 = 0;	// a boolean value for whether it has been checked this iteration
-      t.temp2 = -1;	// temp2 and temp3 are the indices for the tile this one flows into
-      t.temp3 = -1;
+    for (Tile til: map.list()) {
+      if (til.temp1 == 0) {
+        if (til.waterLevel() >= 0) // land is ignored
+          til.temp1 = 1;
+        else { // oceans must either be salt-water or fresh-water
+          ArrayList<Tile> sea = searchOcean(til); // flags this sea
+          if (sea.size() < 100) // if it is too small
+            for (Tile wtr: sea)
+              wtr.water = -wtr.altitude<<2; // put some fresh-water in it
+          else					// if it is big enough
+            for (Tile wtr: sea)
+              wtr.biome = Tile.ocean;	// flag it as saltwater
+        }
+      }
+    }
+  }
+  
+  
+  public ArrayList<Tile> searchOcean(Tile start) { // flags all sub-sea level tiles connected to this and adds to this arraylist
+    ArrayList<Tile> sea = new ArrayList<Tile>();
+    ArrayList<Tile> que = new ArrayList<Tile>();
+    que.add(start);
+    start.temp1 = 1;
+    
+    while (!que.isEmpty()) { // BFSs all connected tiles (I would totally DFS here, but the stack overflow limit is too low
+      Tile til = que.remove(0);
+      final ArrayList<Tile> adjacentList = map.adjacentTo(til);
+      for (Tile adj: adjacentList) {
+        if (adj.temp1 == 0 && adj.waterLevel2() < 0) {
+          adj.temp1 = 1;
+          sea.add(til);
+          que.add(adj);
+        }
+      }
     }
     
-    for (int i = 0; i < shfTiles.length/2; i ++) {	// it does some of the tiles in a random order
-      Tile til = shfTiles[i];	// start with a source
-      if (til.altitude < 0 || til.temp2 >= 0)	// skip it if it is ocean or already routed
-        continue;
-      
-      do {	// now iterate over all the tiles downriver of this one
-        int lowestAltitude = Integer.MAX_VALUE;
-        Tile lowestNeighbor = null;
-        for (Tile adj: map.adjacentTo(til)) {
-          if (adj.temp1 == 0 && adj.altitude < lowestAltitude) {	// find the lowest neighbor that is also unmarked
-            lowestAltitude = adj.altitude;							// this may be uphill
-            lowestNeighbor = adj;
+    return sea;
+  }
+  
+  
+  public void rain() { // forms, rivers, lakes, valleys, and deltas
+    for (Tile til: map.list()) {		// start by assigning initial values
+      if (til.biome == Tile.ocean)	til.temp1 = 1;
+      else							til.temp1 = 0;	// temp1: whether this tile is 'wet'
+      til.temp2 = -1;	// temp2, temp3: the indices of the tile into which this one flows
+      til.temp3 = -1;
+    }
+    ArrayList<Tile> coasts = new ArrayList<Tile>();	// then build coasts,
+    for (Tile til: map.list()) {					// a randomly-ordered
+      if (til.temp1 == 1) {							// running list of all
+        for (Tile adj: map.adjacentTo(til)) {		// wet tiles that are
+          if (adj.temp1 == 0) {						// adjacent to dry ones
+            coasts.add((int)(Math.random()*(coasts.size()+1)),til);
+            break;
           }
         }
-        if (lowestAltitude == Integer.MAX_VALUE) {	// if there is nowhere for it to flow, then it routes to itself
-          til.temp1 = 1;
-          til.temp2 = til.lat;
-          til.temp3 = til.lon;
+      }
+    }
+    while (!coasts.isEmpty()) {	// now keep iterating until there is no coast left
+      Tile til = coasts.remove(coasts.size()-1-(int)(Math.pow(Math.random(), values[19])*coasts.size()));	// pick some random coast
+      int highestAltitude = Integer.MIN_VALUE;
+      Tile highestNeighbor = null;
+      for (Tile adj: map.adjacentTo(til)) {	// look for the highest dry adjacent Tile
+        if (adj.temp1 == 0 && adj.waterLevel() > highestAltitude) {
+          highestAltitude = adj.altitude;
+          highestNeighbor = adj;
         }
-        else {
-          til.temp1 = 1;					// mark this tile
-          til.temp2 = lowestNeighbor.lat;	// set its destination to the lowest neighbor
-          til.temp3 = lowestNeighbor.lon;
-          til = lowestNeighbor;				// and move to that tile
-        }
-      } while (til.altitude >= 0 && til.temp2 == -1);	// stop when you hit another river or ocean
-      for (Tile t: allTiles)	// now reset the temp1s for the next river
-        t.temp1 = 0;
+      }
+      if (highestAltitude == Integer.MIN_VALUE)	// if you didn't find any dry adjacent tiles,
+        continue;								// skip it
+      else {
+        highestNeighbor.temp1 = 1;
+        highestNeighbor.temp2 = til.lat;	// otherwise route highest neighbor to us
+        highestNeighbor.temp3 = til.lon;
+        coasts.add(til);					// add til back to the coasts list
+        coasts.add(highestNeighbor);		// as well as the tile that was just made wet
+      }
     }
     
-    for (Tile til: allTiles) {	// now that we've marked out the rivers,
+    for (Tile til: map.list()) {	// now that we've marked out the rivers,
       runoff(til);	// let's actually build them.
     }
   }
