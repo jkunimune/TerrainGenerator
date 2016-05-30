@@ -75,8 +75,6 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     
     System.out.println("Raining...");
     rain();
-    for (Map map: maps)
-      map.display(ColS.water);
     
     System.out.println("Finalizing climate...");
     setBiomes();
@@ -87,13 +85,13 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public final void setAllAlt(int alt) {
+  private final void setAllAlt(int alt) {
     for (Tile t: map.list())
       t.altitude = alt;
   }
   
   
-  public final void spawnFirstContinent() { // initializes a single tectonic plate
+  private final void spawnFirstContinent() { // initializes a single tectonic plate
     for (Tile til: map.list())
       til.temp1 = 9001; // initializes temp1
     
@@ -104,7 +102,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public final void spawnContinents() { // sets all tiles to a random altitude arranged in plates
+  private final void spawnContinents() { // sets all tiles to a random altitude arranged in plates
     for (Tile tile: map.list()) {
       if (tile.altitude < -256) {
         ArrayList<Tile> adjacent = map.adjacentTo(tile);
@@ -129,7 +127,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public final void shiftPlates(double delT) { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
+  private final void shiftPlates(double delT) { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
     for (Tile til: map.list()) {
       til.temp1 = 0;         // temp1 is the new altitude
       til.temp3 = til.temp2; // temp3 is the new plate index (temp2 is the old one)
@@ -158,7 +156,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public final void fillOceans() { // fills in the oceans to about 70% of the surface
+  private final void fillOceans() { // fills in the oceans to about 70% of the surface
     final int target = (int)(4*Math.PI*map.getRadius()*map.getRadius()*.71); // the approximate number of tiles we want underwater
     int seaLevel = 0;
     int min = -256;
@@ -185,7 +183,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public void erode(double a) { // erodes extreme altitudes
+  private void erode(double a) { // erodes extreme altitudes
     for (Tile til: map.list()) {
       double x = Math.abs(til.altitude);
       if (x >= 128) {
@@ -196,41 +194,16 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public void smooth(double amount) { // makes terrain more smooth-looking
-    for (Tile til: map.list()) {
-      ArrayList<Tile> adjacent = map.adjacentTo(til);
-      ArrayList<Tile> nearby = new ArrayList<Tile>(); // declares and initializes arraylists for adjacent tiles and tiles
-      for (Tile adj: adjacent)                        // that are adjacent to adjacent tiles
-      for (Tile nby: map.adjacentTo(adj))
-        if (!nby.equals(til))
-        nearby.add(nby);
-      for (Tile adj: adjacent)
-        nearby.remove(adj);
-      
-      double calcAlt = 0; // the altitude the program calculates the point should be at based on adjacent and nearby tiles
-      for (Tile adj: adjacent)
-        calcAlt += 1.5*adj.altitude/adjacent.size();
-      for (Tile nby: nearby)
-        calcAlt -= .5*nby.altitude/nearby.size();
-      til.temp1 = (int)(amount*calcAlt+(1-amount)*til.altitude); // averages calculated altitude with current altitude
-    }
-    
-    for (Tile til: map.list()) {
-      til.altitude = til.temp1;
-      til.temp1 = 0;
-    }
-  }
-  
-  
-  public void acclimate() { // defines and randomizes the climate a bit
+  private void acclimate() { // defines and randomizes the climate a bit
     for (Tile til: map.list()) {
       til.temperature = (int)(255*Math.sin(map.latByTil(til)) - ((int)Math.abs(til.altitude)>>3)); // things are colder near poles and at extreme altitudes
       til.rainfall = (int)(255*Math.pow(Math.sin(map.latByTil(til)),2)); // things get wetter around equator
+      til.temp3 = 0;
     }
   }
   
   
-  public int moistureFrom(Tile til, int dir, int dist) { // collects moisture from oceans and rivers and blows it
+  private int moistureFrom(Tile til, int dir, int dist) { // collects moisture from oceans and rivers and blows it
     if (dist > 16 || til.altitude > 64)
       return 0;
     Tile nxt = map.getTileByIndex(til.lat, til.lon+dir);
@@ -243,7 +216,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public ArrayList<Tile> searchOcean(Tile start) { // flags all sub-sea level tiles connected to this and adds to this arraylist
+  private ArrayList<Tile> searchOcean(Tile start) { // flags all sub-sea level tiles connected to this and adds to this arraylist
     ArrayList<Tile> sea = new ArrayList<Tile>();
     ArrayList<Tile> que = new ArrayList<Tile>();
     que.add(start);
@@ -265,50 +238,49 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public void rain() { // forms, rivers, lakes, valleys, and deltas
+  private void rain() {
     final Tile[] allTiles = map.list();
-    final Tile[] shfTiles = map.list();
-    Collections.shuffle(Arrays.asList(shfTiles));
-    
-    for (Tile t: allTiles) {	// start by initializing some values
-      t.temp1 = 0;	// a boolean value for whether it has been checked this iteration
-      t.temp2 = -1;	// temp2 and temp3 are the indices for the tile this one flows into
-      t.temp3 = -1;
+    for (int i = 0; i < allTiles.length; i ++) {	// look at all tiles
+      Tile til = allTiles[i];
+      if (!waterCanFlowFrom(til)) {	// if this tile would prevent rivers from flowing
+        ArrayList<Tile> lake = new ArrayList<Tile>();
+        lake.add(til);
+        fillLake(lake);			// pour water on it until it won't
+        i = 0;						// then go back to the beginning
+      }
     }
     
-    for (int i = 0; i < shfTiles.length/2; i ++) {	// it does some of the tiles in a random order
-      Tile til = shfTiles[i];	// start with a source
-      if (til.altitude < 0 || til.temp2 >= 0)	// skip it if it is ocean or already routed
-        continue;
-      
-      do {	// now iterate over all the tiles downriver of this one
-        int lowestAltitude = Integer.MAX_VALUE;
-        Tile lowestNeighbor = null;
-        for (Tile adj: map.adjacentTo(til)) {
-          if (adj.temp1 == 0 && adj.altitude < lowestAltitude) {	// find the lowest neighbor that is also unmarked
-            lowestAltitude = adj.altitude;							// this may be uphill
-            lowestNeighbor = adj;
-          }
+    for (Tile til: allTiles)
+      runoff(til);
+  }
+  
+  
+  private void fillLake(List<Tile> lake) {
+    final int lakeHeight = lake.get(0).waterLevel();
+    int lowestHeight = Integer.MIN_VALUE;	// the altitude that this lake will rise to
+    Tile lowestShore = null;				// the lowest adjacent tile that this lake will rise to
+    for (Tile til: lake) {
+      for (Tile adj: map.adjacentTo(til)) {
+        if (adj.waterLevel() < lakeHeight) {	// if this is lower than the lake
+          setDestination(lake, adj);	// route all tiles in the lake to the destination
+          return;						// and we're done here
         }
-        if (lowestAltitude == Integer.MAX_VALUE) {	// if there is nowhere for it to flow, then it routes to itself
-          til.temp1 = 1;
-          til.temp2 = til.lat;
-          til.temp3 = til.lon;
+        else if (adj.waterLevel() < lowestHeight) {
+          lowestHeight = adj.waterLevel();
+          lowestShore = adj;
         }
-        else {
-          til.temp1 = 1;					// mark this tile
-          til.temp2 = lowestNeighbor.lat;	// set its destination to the lowest neighbor
-          til.temp3 = lowestNeighbor.lon;
-          til = lowestNeighbor;				// and move to that tile
-        }
-      } while (til.altitude >= 0 && til.temp2 == -1);	// stop when you hit another river or ocean
-      for (Tile t: allTiles)	// now reset the temp1s for the next river
-        t.temp1 = 0;
+      }
     }
     
-    for (Tile til: allTiles) {	// now that we've marked out the rivers,
-      runoff(til);	// let's actually build them.
-    }
+    for (Tile til: lake)	// if you check all adjacent tiles and none of them triggered the return
+      til.water = (lowestShore.altitude-til.altitude)<<2;
+    lake.add(lowestShore);	// then lowestShore should become part of the lake and the lake should rise
+  }
+  
+  
+  private void setDestination(List<Tile> lake, Tile adj) {
+    // TODO Auto-generated method stub
+    
   }
   
   
@@ -320,7 +292,17 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public void setBiomes() {
+  private boolean waterCanFlowFrom(Tile til) {
+    if (til.temp2 >= 0)
+      return true;
+    for (Tile adj: map.adjacentTo(til))
+      if (adj.altitude < til.altitude)
+        return true;
+    return false;
+  }
+  
+  
+  private void setBiomes() {
     for (Tile til: map.list())
       til.rainfall += moistureFrom(til,-1,0) + moistureFrom(til,1,0); // apply the orographic effect
     
@@ -416,7 +398,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public boolean weNeedMoreBiomes() {
+  private boolean weNeedMoreBiomes() {
     for (Tile til: map.list())
       if (til.biome == 0)
         return true;
@@ -429,7 +411,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
+  private final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
     return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
   }
 }
