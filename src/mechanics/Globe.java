@@ -101,7 +101,7 @@ public class Globe implements Surface{ // a spherical surface
   
   
   @Override
-  public final Tile getTileByIndex(int lat, int lon) {
+  public final Tile getTileByIndex(int lat, int lon) { 
     return map[lat][(lon+map[lat].length)%map[lat].length];
   }
   

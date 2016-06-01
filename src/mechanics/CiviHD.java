@@ -27,7 +27,7 @@ public final class CiviHD { // the driver for my independent project
     delay(3000);
     
     World earth = new World(protoEarth.getSurface());
-    Map political = new Mollweide(earth.getSurface(), 700, 350);
+    Map political = new Mollweide(earth.getSurface(), 800, 400);
     
     music.loop();
     

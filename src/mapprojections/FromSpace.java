@@ -56,7 +56,7 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
     
     for (int x = 0; x < width(); x ++) {
       for (int y = 0; y < height(); y ++) {
-        if (lats[y][x] != -1) {
+        if (lons[y][x] != -1) {
           lons[y][x] = getCoords(x,y).lon;
           drawPx(x, y, getColorBy(theme, x, y));
         }
@@ -96,6 +96,7 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
   }
   
   
+  @Override
   public final Tile getCoords(int x, int y) {
     if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius)
       return sfc.getTile(Math.acos(1-(double)y/radius),

@@ -17,7 +17,7 @@ public final class TerrainGenerator{ // a class to generate and display terrain 
     
     while (true) {
       AdvancedPlanet earth = new AdvancedPlanet(100);
-      Map theMap = new Mollweide(earth.getSurface(), 800, 400);
+      Map theMap = new Mollweide(earth.getSurface(), 1000, 500);
       
       theMap.display(ColS.altitude);
       

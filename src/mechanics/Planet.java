@@ -21,7 +21,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
 
   private double[] values     = {-127,               -141,               20.0,               1.0,                1.0,                .72,                .02,
              .5,                 64,                 2,                  0.4,                1.2,                12,                 16,                 3,
-             100,                140,                -100,               237,                7,                  200,                229,                64,
+             100,                140,                -100,               237,                8,                  200,                229,                64,
              180,                2800,               8,                  0.1};
     
   //                             0                   1                   2                  3                   4                   5                    6
