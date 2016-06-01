@@ -90,7 +90,7 @@ public class Globe implements Surface{ // a spherical surface
       lon = 0;
     
     int y = (int)(lat*map.length/Math.PI);
-    int x = (int)(lon*map[y].length/(2*Math.PI));
+    int x = (int)(lon*map[y].length/(2*Math.PI) - (y%2)/2.0);
     try {
       return map[y][x];
     } catch (ArrayIndexOutOfBoundsException e) {

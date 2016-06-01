@@ -44,14 +44,13 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     int t = 0;
     while (map.count(-256) > 0) {
       spawnContinents();
-      if (t%30 == 0)
+      if (t%24 == 0)
         for (Map map: maps)
           map.display(ColS.altitude);
       t ++;
     }
-    if (t%30 != 1)
-      for (Map map: maps)
-        map.display(ColS.altitude);
+    for (Map map: maps)
+      map.display(ColS.altitude);
     
     System.out.println("Shifting continents...");
     for (int i = 0; i < 8; i += 1) {
@@ -74,10 +73,15 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       map.display(ColS.climate);
     
     System.out.println("Raining...");
-    setUpWater();
-    while (rain())
-      for (Map map: maps)
-        map.display(ColS.water);
+    rain();
+    int i = 0;
+    for (Tile til: map.list()) {
+      runoff(til);
+      if (i%1000 == 0)
+        for (Map map: maps)
+          map.display(ColS.water);
+      i ++;
+    }
     
     System.out.println("Finalizing climate...");
     setBiomes();
@@ -169,12 +173,10 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       }
     }
     
-    for (Tile til: map.list()) {
-      til.altitude -= seaLevel; // fills in oceans
+    for (Tile til: map.list()) {	// sets ocean values
+      til.altitude -= seaLevel;
       if (til.altitude < 0)
-        til.water = -256*til.altitude;	// prepares for some hydraulic algorithms later on
-      else
-        til.water = 0;
+        til.biome = Tile.ocean;
     }
   }
   
@@ -212,120 +214,70 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   }
   
   
-  private void setUpWater() {	// initialize some variables for rain
-    for (Tile til: map.list()) {
-      til.temp2 = -1;	// temp2, temp3: The indices of the tile into which til will flow
+  private void rain() { // forms, rivers, lakes, valleys, and deltas
+    for (Tile til: map.list()) {		// start by assigning initial values
+      if (til.biome == Tile.ocean)	til.temp1 = 1;
+      else							til.temp1 = 0;	// temp1: whether this tile is 'wet'
+      til.temp2 = -1;	// temp2, temp3: the indices of the tile into which this one flows
       til.temp3 = -1;
-      if (til.waterLevel() < 0)
-        til.biome = Tile.ocean;
     }
-  }
-  
-  
-  private boolean rain() {	// generates rivers; returns whether it needs to run again or not
-    final Tile[] allTiles = map.list();
-    
-    for (Tile til: allTiles) {	// look at all tiles
-      if (!waterCanFlowFrom(til)) {	// if this tile would prevent rivers from flowing
-        ArrayList<Tile> lake = new ArrayList<Tile>();
-        lake.add(til);
-        fillLake(lake);			// pour water on it until it won't
-        return true;			// then go back to the beginning
-      }
-    }
-    
-    for (Tile til: allTiles) {
-      if (til.temp2 == -1) {	// if a tile still hasn't been routed
-        int lowestHeight = Integer.MAX_VALUE;	// route it to the lowest adjacent tile
-        Tile lowestNeighbor = null;
-        for (Tile adj: til.adjacent) {
-          if (adj.waterLevel() < lowestHeight) {
-            lowestHeight = adj.waterLevel();
-            lowestNeighbor = adj;
-          }
-        }
-        assert lowestHeight<til.waterLevel(): "fillLake didn't do it's job; "+til+" doesn't have anywhere to flow";
-        til.temp2 = lowestNeighbor.lat;
-        til.temp3 = lowestNeighbor.lon;
-      }
-    }
-    
-    for (Tile til: allTiles)	// finally, build the rivers
-      runoff(til);
-    return false;
-  }
-  
-  
-  private void fillLake(List<Tile> lake) {
-    do {
-      if (lake.size() >= 128) {	// if the lake is big enough
-        for (Tile til: lake) {	// it becomes a sea
-          til.biome = Tile.ocean;	// so all tiles in it just become ocean tiles
-          return;					// and we are done with this lake
-        }
-      }
-      final int lakeHeight = lake.get(0).waterLevel();
-      int lowestHeight = Integer.MAX_VALUE;	// the altitude that this lake will rise to
-      Tile lowestShore = null;				// the lowest adjacent tile that this lake will rise to
-      for (Tile til: lake) {
-        for (Tile adj: til.adjacent) {
-          if (!lake.contains(adj)) {
-            if (adj.waterLevel() < lakeHeight || adj.biome == Tile.ocean) {	// if this is a potential outlet
-              setDestination(lake, adj);	// route all tiles in the lake to the destination
-              return;						// and we're done here
-            }
-            else if (adj.waterLevel() < lowestHeight) {
-              lowestHeight = adj.waterLevel();
-              lowestShore = adj;
-            }
+    ArrayList<Tile> coasts = new ArrayList<Tile>();	// then build coasts,
+    for (Tile til: map.list()) {					// a randomly-ordered
+      if (til.temp1 == 1) {							// running list of all
+        for (Tile adj: til.adjacent) {		// wet tiles that are
+          if (adj.temp1 == 0) {						// adjacent to dry ones
+            coasts.add((int)(Math.random()*(coasts.size()+1)),til);
+            break;
           }
         }
       }
+    }
+    while (!coasts.isEmpty()) {	// now keep iterating until there is no coast left
+      int biggestDrop = Integer.MIN_VALUE;
+      List<Tile> t0candidates = new ArrayList<Tile>();
+      List<Tile> t1candidates = new ArrayList<Tile>();
       
-      for (Tile til: lake)	// if you check all adjacent tiles and none of them triggered the return
-        til.water = lowestShore.waterLevel()-(til.altitude<<2);
-      lake.add(lowestShore);	// then lowestShore should become part of the lake and the lake should rise
-    } while (true);	// repeat
-  }
-  
-  
-  private void setDestination(List<Tile> lake, Tile out) {	// routes all tiles in a list randomly to one point
-    //Collections.shuffle(lake);
-    List<Tile> done = new ArrayList<Tile>();
-    done.add(out);
-    while (!lake.isEmpty()) {
-      for (int i = 0; i < done.size(); i ++) {
-        final Tile wet = done.get(i);
+      for (int i = coasts.size()-1; i >= 0; i --) {	// look at all coasts
+        Tile wet = coasts.get(i);
+        boolean seaLocked = true;
         for (Tile dry: wet.adjacent) {
-          if (lake.contains(dry)) {
-            dry.temp2 = wet.lat;
-            dry.temp3 = wet.lon;
-            lake.remove(dry);
-            done.add(dry);
+          if (dry.temp1 == 0) {
+            seaLocked = false;
+            if (dry.waterLevel() - wet.waterLevel() > biggestDrop) {	// find the potential connection
+              biggestDrop = dry.waterLevel()-wet.waterLevel();		// with the biggest potential flow
+              t0candidates.clear();		// make it the only thing on the list if it breaks the record
+              t0candidates.add(dry);
+              t1candidates.clear();
+              t1candidates.add(wet);
+            }
+            else if (dry.waterLevel()-wet.waterLevel() == biggestDrop) {	// if it matches the record
+              t0candidates.add(dry);	// just throw it on the list
+              t1candidates.add(wet);
+            }
           }
         }
+        if (seaLocked)	// if there were no dry tiles near this wet one
+          coasts.remove(i);
       }
+      if (biggestDrop == Integer.MIN_VALUE)	// if there were no actual coasts Tiles
+        break;	// then the whole world must be done!
+      
+      int r = (int)(Math.random()*t0candidates.size());
+      Tile t0 = t0candidates.get(r);
+      Tile t1 = t1candidates.get(r);
+      t0.temp1 = 1;
+      t0.temp2 = t1.lat;
+      t0.temp3 = t1.lon;
+      coasts.add(t0);
     }
   }
   
   
-  public void runoff(Tile t) {	// creates the rivers based on temp2 and temp3
+  private void runoff(Tile t) {	// creates the rivers based on temp2 and temp3
     t.water ++;			// rain on it
     if (t.temp2 >= 0)	// if it has a destination set
       if (t.temp2 != t.lat || t.temp3 != t.lon)	// and that destination is not itself
         runoff(map.getTileByIndex(t.temp2, t.temp3));
-  }
-  
-  
-  private boolean waterCanFlowFrom(Tile til) {
-    if (til.temp2 >= 0)
-      return true;
-    if (til.biome == Tile.ocean)
-      return true;
-    for (Tile adj: til.adjacent)
-      if (adj.waterLevel() < til.waterLevel() || adj.biome == Tile.ocean)
-        return true;
-    return false;
   }
   
   
@@ -350,7 +302,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
           til.biome = Tile.reef;
         }
       }
-      else if (til.water >= 128) { // if has freshwater on it
+      else if (til.water >= 300) { // if has freshwater on it
         til.biome = Tile.freshwater;
       }
       else if (til.altitude >= 120) { // if mountainous

@@ -467,17 +467,6 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  private Tile[] scrambled(Tile[] a) {	// randomizes the order of a and also returns it
-    for (int i = a.length; i > 0; i --) {	// for a bunch of is
-      int j = (int)(Math.random()*i);			// pick a random j
-      Tile temp = a[i-1];					// swap values at i-1 and j
-      a[i-1] = a[j];
-      a[j] = temp;
-    }
-    return a;
-  }
-  
-  
   public Surface getSurface() {
     return map; // returns the map of the surface for display purposes
   }
