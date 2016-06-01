@@ -14,7 +14,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   public Font monaco;
   public static final Color[] colors = {new Color(255,0,0), new Color(0,0,200), new Color(200,200,255), new Color(0,100,200), new Color(0,0,100),
-		  new Color(255,255,255), new Color(100,255,0), new Color(255,220,0), new Color(0,100,0), new Color(150,100,0), new Color(200,100,255),
+		  new Color(255,255,255), new Color(100,255,0), new Color(255,220,0), new Color(0,100,0), new Color(150,100,0), new Color(190,180,165),
 		  new Color(0,50,255), new Color(0,0,0), new Color(0,200,100)}; // colors of the biomes
   
   public static final boolean[][][] key = {

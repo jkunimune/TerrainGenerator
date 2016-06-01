@@ -21,15 +21,12 @@ public final class MapTest{ // a class to experiment with and compare different 
       maps[0] = new Equirectangular(earth.getSurface(), 600, 300);
       maps[1] = new PierceQuincuncial(earth.getSurface(), 400, 400);
       maps[2] = new Mollweide(earth.getSurface(), 600, 300);
-      maps[3] = new Hemispherical(earth.getSurface(), 600, 300);
-      
-      for (Map theMap: maps)
-        theMap.display(ColS.altitude);
+      FromSpace fs = new FromSpace(earth.getSurface(), 600, 300);
+      maps[3] = fs;
       
       earth.generate(maps);
       
-      System.out.println("end");
-      delay(30000);
+      //fs.exhibit(ColS.satellite,30000);
     }
   }
   

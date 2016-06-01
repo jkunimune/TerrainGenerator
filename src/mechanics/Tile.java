@@ -198,7 +198,7 @@ public final class Tile { // keeps track of a single point on a globe
       case desert:
         return altitude >=0 && randChance((temperature>>4)-(rainfall>>4));
       case plains:
-        return altitude >=0 && randChance((temperature>>4) - 16);
+        return altitude >=0 && randChance((temperature>>4) - 20);
       case jungle:
         return altitude >=0 && randChance((temperature>>4)+(rainfall>>4));
       default:

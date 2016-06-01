@@ -77,11 +77,13 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
     int i = 0;
     for (Tile til: map.list()) {
       runoff(til);
-      if (i%1000 == 0)
+      if (i%1200 == 0)
         for (Map map: maps)
           map.display(ColS.water);
       i ++;
     }
+    for (Map map: maps)
+      map.display(ColS.water);
     
     System.out.println("Finalizing climate...");
     setBiomes();
@@ -172,12 +174,34 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
         seaLevel = (seaLevel+min)>>1; // assume it will never be exactly equal
       }
     }
-    
-    for (Tile til: map.list()) {	// sets ocean values
+    for (Tile til: map.list())
       til.altitude -= seaLevel;
-      if (til.altitude < 0)
-        til.biome = Tile.ocean;
+    for (Tile til: map.list()) {	// sets ocean values
+      if (til.biome != Tile.ocean && til.water == 0 && til.altitude < 0) {
+        ArrayList<Tile> sea = searchOcean(til);
+        if (sea.size() >= 128)	// if it is big enough
+          for (Tile salty: sea)
+            salty.biome = Tile.ocean;	// make it an ocean or a sea
+        else	// otherwise
+          for (Tile fresh: sea)
+            fresh.water = -fresh.altitude<<8;
+      }
     }
+  }
+  
+  
+  private ArrayList<Tile> searchOcean(Tile start) {	// flood-fill-searches out a set of adjacent underwater tiles
+    ArrayList<Tile> sea = new ArrayList<Tile>();
+    ArrayList<Tile> queue = new ArrayList<Tile>();
+    queue.add(start);
+    while (!queue.isEmpty()) {
+      Tile t = queue.remove(queue.size()-1);
+      for (Tile adj: t.adjacent)
+        if (adj.altitude < 0 && !queue.contains(adj) && !sea.contains(adj))
+          queue.add(adj);
+      sea.add(t);
+    }
+    return sea;
   }
   
   
@@ -194,7 +218,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   
   private void acclimate() { // defines and randomizes the climate a bit
     for (Tile til: map.list()) {
-      til.temperature = (int)(255*Math.sin(map.latByTil(til)) - ((int)Math.abs(til.altitude)>>3)); // things are colder near poles and at extreme altitudes
+      til.temperature = (int)(255*Math.sin(map.latByTil(til)) - ((int)Math.abs(til.altitude)>>2)); // things are colder near poles and at extreme altitudes
       til.rainfall = (int)(255*Math.pow(Math.sin(map.latByTil(til)),2)); // things get wetter around equator
       til.temp3 = 0;
     }
@@ -206,7 +230,7 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       return 0;
     Tile nxt = map.getTileByIndex(til.lat, til.lon+dir);
     int moistureHere = 0;
-    if (nxt.water > 0)
+    if (nxt.water > 1000)
       moistureHere += 16-dist>>3;
     else if (nxt.altitude < 0)
       moistureHere += 16-dist>>2;
@@ -243,14 +267,14 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
         for (Tile dry: wet.adjacent) {
           if (dry.temp1 == 0) {
             seaLocked = false;
-            if (dry.waterLevel() - wet.waterLevel() > biggestDrop) {	// find the potential connection
-              biggestDrop = dry.waterLevel()-wet.waterLevel();		// with the biggest potential flow
+            if (dry.waterLevel2() - wet.waterLevel2() > biggestDrop) {	// find the potential connection
+              biggestDrop = dry.waterLevel2()-wet.waterLevel2();		// with the biggest potential flow
               t0candidates.clear();		// make it the only thing on the list if it breaks the record
               t0candidates.add(dry);
               t1candidates.clear();
               t1candidates.add(wet);
             }
-            else if (dry.waterLevel()-wet.waterLevel() == biggestDrop) {	// if it matches the record
+            else if (dry.waterLevel2()-wet.waterLevel2() == biggestDrop) {	// if it matches the record
               t0candidates.add(dry);	// just throw it on the list
               t1candidates.add(wet);
             }
@@ -274,7 +298,9 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
   
   
   private void runoff(Tile t) {	// creates the rivers based on temp2 and temp3
-    t.water ++;			// rain on it
+    t.water += 4;			// rain on it
+    if (randChance(-46))
+      t.altitude --;	// possibly erode it
     if (t.temp2 >= 0)	// if it has a destination set
       if (t.temp2 != t.lat || t.temp3 != t.lon)	// and that destination is not itself
         runoff(map.getTileByIndex(t.temp2, t.temp3));
@@ -286,24 +312,24 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
       til.rainfall += moistureFrom(til,-1,0) + moistureFrom(til,1,0); // apply the orographic effect
     
     for (Tile til: map.list()) {
-      if (til.altitude < 0) { // if below sea level
+      til.biome = Tile.magma;
+      if (til.altitude < 0 && til.water <= 4) { // if below sea level (and not freshwater
         if (til.temperature < 128) { // if cold
-          if (randChance(-60))
+          if (randChance(-60)) {
             til.biome = Tile.ice;
+          }
         }
         else if (til.altitude < -192) { // if super deep
           til.biome = Tile.trench;
         }
-        else if (til.temperature < 252) { // if cool
-          if (randChance(-60))
+        else if (til.temperature < 250) { // if cool
+          if (randChance(-60)) {
             til.biome = Tile.ocean;
+          }
         }
-        else if (randChance(-50)) { // if hot
+        else if (randChance(-60)) { // if hot
           til.biome = Tile.reef;
         }
-      }
-      else if (til.water >= 300) { // if has freshwater on it
-        til.biome = Tile.freshwater;
       }
       else if (til.altitude >= 120) { // if mountainous
         if (til.temperature < 150) { // if cold
@@ -313,18 +339,18 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
           til.biome = Tile.mountain;
         }
       }
-      else if (randChance(-64)) { // if low altitude, it only has a chance to seed
+      else if (randChance(-64)) {
         if (til.temperature < 150) { // if cold
           til.biome = Tile.tundra;
         }
         else if (til.temperature >= 196 && til.rainfall < 215) { // if hot and dry
           til.biome = Tile.desert;
         }
-        else if (til.temperature >= 245 && til.rainfall >= 245) { // if hot and wet
+        else if (til.temperature >= 230 && til.rainfall >= 245) { // if hot and wet
           til.biome = Tile.jungle;
         }
-        else if (til.rainfall-256 < 2.0*(til.temperature-245)) { // if hot-ish and dry-ish
-        	til.biome = Tile.plains;
+        else if (til.rainfall-256 < 2.5*(til.temperature-230)) { // if hot-ish and dry-ish
+          til.biome = Tile.plains;
         }
         else { // if cold-ish and wet-ish
           til.biome = Tile.forest;
@@ -345,6 +371,8 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
         til.biome = til.temp1;
     }
     for (Tile til: map.list()) {
+      if (til.water >= 1200)	// make rivers and lakes
+        til.biome = Tile.freshwater;
       if (til.biome == 0) { // if it still does not have a biome, it will just pick a biome
         if (til.altitude < 0) {
           if (til.temperature < 128) { // if freezing
@@ -361,10 +389,10 @@ public final class AdvancedPlanet { // a subclass of Globe that handles all geol
           else if (til.temperature >= 196 && til.rainfall < 215) { // if hot and dry
             til.biome = Tile.desert;
           }
-          else if (til.temperature >= 245 && til.rainfall >= 245) { // if hot and wet
+          else if (til.temperature >= 230 && til.rainfall >= 245) { // if hot and wet
             til.biome = Tile.jungle;
           }
-          else if (til.rainfall-256 < 2.0*(til.temperature-245)) { // if hot-ish and dry-ish
+          else if (til.rainfall-256 < 2.5*(til.temperature-230)) { // if hot-ish and dry-ish
             til.biome = Tile.plains;
           }
           else { // if cold-ish and wet-ish
