@@ -1,10 +1,8 @@
 package mechanics;
-import java.util.*;
-import java.awt.*;
 
 
 public interface Surface {
-  public abstract ArrayList<Tile> adjacentTo(Tile t);
+  public abstract Tile[] adjacentTo(Tile t);
   
   public abstract int count(int i);
   
@@ -13,8 +11,6 @@ public interface Surface {
   public abstract Tile getTile(double lat, double lon);
   
   public abstract Tile getTileByIndex(int lat, int lon);
-  
-  public abstract Point tilByAngles(double lat, double lon);
   
   public abstract double latByTil(Tile til);
   

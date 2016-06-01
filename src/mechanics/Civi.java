@@ -202,10 +202,9 @@ public class Civi {
         if ((til.altitude < 0 || til.biome == Tile.freshwater) && scienceLevel < space) // water biomes may not be settled prior to the space era
           return false;
         
-        ArrayList<Tile> adjacent = world.getSurface().adjacentTo(til); // counts all adjacent tiles
         int waterAdjacency = -5; // if it is adjacent to water
         int settledAdjacency = 0; // how much settlement it is adjacent to
-        for (Tile adj: adjacent) {
+        for (Tile adj: til.adjacent) {
           if (adj.development > 1 && adj.owners.equals(til.owners))
             settledAdjacency ++;
           if (adj.altitude < 0 || adj.biome == Tile.freshwater)
@@ -224,11 +223,10 @@ public class Civi {
         if (scienceLevel < industrial) // urbanization may not happen prior to industrial era
           return false;
         
-        adjacent = world.getSurface().adjacentTo(til); // counts all adjacent tiles
         waterAdjacency = -20; // if it is adjacent to water
         int urbanAdjacency = 0; // how much urbanization it is adjacent to
         
-        for (Tile adj: adjacent) {
+        for (Tile adj: til.adjacent) {
           if (adj.development > 2) // cities can spread from civi to civi
             urbanAdjacency ++;
           if (adj.altitude < 0 || adj.biome == Tile.freshwater)
@@ -247,10 +245,9 @@ public class Civi {
         if (scienceLevel < prosperity) // utopianization is not possible before prosperity age
           return false;
         
-        ArrayList<Tile> adjacento = world.getSurface().adjacentTo(til); // counts all adjacent tiles
         int utopiaAdjacency = 0; // how much utopia it is adjacent to
         
-        for (Tile adj: adjacento)
+        for (Tile adj: til.adjacent)
           if (adj.development > 3 && adj.owners.equals(til.owners))
             utopiaAdjacency ++;
        
@@ -273,8 +270,7 @@ public class Civi {
     if (deathTimer >= 0)
       return false;
     
-    ArrayList<Tile> adjacent = world.getSurface().adjacentTo(til); // counts all adjacent tiles
-    for (Tile adj: adjacent) {
+    for (Tile adj: til.adjacent) {
       if (!adj.owners.equals(til.owners) && randChance(-(deathTimer>>8) - 30)) { // causes lands to be undeveloped during apocalypse
         if (!til.isCapital || randChance(-20)) // captials are less likely to be lost
           return true;
@@ -371,8 +367,7 @@ public class Civi {
     if (randChance(120 - (warChance>>5) + (militaryLevel>>6) - (land.size()>>14) + (deathTimer>>13))) // big old weak warmongers are more likely to have revolutions in cities
       return false;
     
-    final ArrayList<Tile> adjacentList = world.getSurface().adjacentTo(til);
-    for (Tile adj: adjacentList)
+    for (Tile adj: til.adjacent)
       if (!adj.owners.equals(til.owners) || adj.altitude < 0) // revolutions must happen on borders
         return true;
     return false;

@@ -1,8 +1,6 @@
 package mapprojections;
 
 import java.awt.Color;
-import java.awt.Point;
-
 import mechanics.ColS;
 import mechanics.Map;
 import mechanics.Surface;
@@ -21,8 +19,8 @@ public class Isometric extends Map {	// a class that makes the terrain appear 3D
 	}
 
 	@Override
-	public Point getCoords(int x, int y) {
-		return sfc.tilByAngles(0, x*2*Math.PI/width());
+	public Tile getCoords(int x, int y) {
+		return sfc.getTile(0, x*2*Math.PI/width());
 	}
 	
 	

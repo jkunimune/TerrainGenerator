@@ -18,6 +18,8 @@ public final class Tile { // keeps track of a single point on a globe
   public ArrayList<Plague> diseases; // this tile's status with regard to different plagues
   public int temp1, temp2, temp3; // to store various values only necessary during generation
   
+  public Tile[] adjacent;
+  
   public static final int magma = 0; // biome values
   public static final int ocean = 1;
   public static final int ice = 2;
@@ -51,6 +53,7 @@ public final class Tile { // keeps track of a single point on a globe
     isCapital = false;
     radioactive = false;
     diseases = new ArrayList<Plague>(0);
+    adjacent = null;
   }
   
   
@@ -67,6 +70,7 @@ public final class Tile { // keeps track of a single point on a globe
     isCapital = false;
     radioactive = false;
     diseases = new ArrayList<Plague>(0);
+    adjacent = null;
   }
   
   
@@ -86,6 +90,7 @@ public final class Tile { // keeps track of a single point on a globe
     isCapital = source.isCapital;
     radioactive = source.radioactive;
     diseases = source.diseases;
+    adjacent = null;
   }
   
   

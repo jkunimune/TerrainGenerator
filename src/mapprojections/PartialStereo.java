@@ -2,6 +2,7 @@ package mapprojections;
 
 import mechanics.Map;
 import mechanics.Surface;
+import mechanics.Tile;
 
 public class PartialStereo extends Map { // a stereographic map that utilizes the entire space but only displays the south portion of the globe
   private static final long serialVersionUID = 1L;
@@ -17,8 +18,8 @@ public class PartialStereo extends Map { // a stereographic map that utilizes th
   }
   
   
-  public final java.awt.Point getCoords(int x, int y) {
-    return sfc.tilByAngles(2*Math.atan(Math.hypot(x-width()/2, y-height()/2) / radius),
+  public final Tile getCoords(int x, int y) {
+    return sfc.getTile(2*Math.atan(Math.hypot(x-width()/2, y-height()/2) / radius),
                            Math.atan2(y-height()/2, x-width()/2));
   }
 }

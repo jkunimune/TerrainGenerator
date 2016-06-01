@@ -19,7 +19,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
              "0 - 256         ", "0 - 256         ", "-256 - 0        ", "0 - 256         ", "0 - 10          ", "0 - 1000        ", "0 - 256         ", "0 - 256         ",
              "0 - 256         ", "0 - 65536       ", "0 - 31          ", "0 - 1           "};
 
-  private double[] values     = {-127,               -141,               40.0,               1.0,                1.0,                .72,                .02,
+  private double[] values     = {-127,               -141,               20.0,               1.0,                1.0,                .72,                .02,
              .5,                 64,                 2,                  0.4,                1.2,                12,                 16,                 3,
              100,                140,                -100,               237,                7,                  200,                229,                64,
              180,                2800,               8,                  0.1};
@@ -148,13 +148,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  public final void setAllAlt(int alt) {
-    for (Tile t: map.list())
-      t.altitude = alt;
-  }
-  
-  
-  public final void spawnFirstContinent() { // initializes a single techtonic plate
+  private final void spawnFirstContinent() { // initializes a single techtonic plate
     for (Tile til: map.list())
       til.temp1 = 9001; // initializes temp1
     
@@ -162,11 +156,10 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  public final void spawnContinents() { // sets some tiles to a continent or an ocean
+  private final void spawnContinents() { // sets some tiles to a continent or an ocean
     for (Tile tile: map.list()) {
       if (tile.altitude == -257) {
-        ArrayList<Tile> adjacent = map.adjacentTo(tile);
-        for (Tile ref: adjacent) // reads all adjacent tiles to look for land or sea
+        for (Tile ref: tile.adjacent) // reads all adjacent tiles to look for land or sea
           if (ref.altitude >= -256 && randChance(-55 + ((int)Math.pow(ref.altitude,2)>>7))) // deeper/higher continents spread faster
           tile.spreadFrom(ref);
         
@@ -183,14 +176,12 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  public final void plateTechtonics() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
+  private final void plateTechtonics() { // creates mountain ranges, island chains, ocean trenches, and rifts along fault lines
     for (Tile thisTil: map.list()) {
       thisTil.temp1 = thisTil.altitude;
       double totalChange = 0; // keeps track of how much to change the altitude
-      final List<Tile> adjacentList = map.adjacentTo(thisTil);
-      for (Tile adj: adjacentList) {
-        final List<Tile> nearbyList = map.adjacentTo(adj);
-        for (Tile thatTil: nearbyList) {
+      for (Tile adj: thisTil.adjacent) {
+        for (Tile thatTil: adj.adjacent) {
           if (thisTil.temp2 == thatTil.temp2 && thisTil.temp3 == thatTil.temp3) // if they are on the same plate
             continue; // skip this pair
           
@@ -243,7 +234,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  public void acclimate(double amount) { // defines and randomizes the climate a bit
+  private void acclimate(double amount) { // defines and randomizes the climate a bit
     for (Tile til: map.list()) {
       til.temperature = (int)(255*Math.sin(map.latByTil(til))); // things are colder near poles
       til.rainfall = (int)(255*Math.pow(Math.sin(map.latByTil(til)),2)); // things get wetter around equator
@@ -253,27 +244,26 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  public void rough(double amount) { // randomizes the terrain a bit
+  private void rough(double amount) { // randomizes the terrain a bit
     for (Tile t: map.list()) {
       t.altitude += (int)((Math.random()-.5)*amount*(t.altitude*t.altitude/65536.0+1));
     }
   }
   
   
-  public void smooth(double amount) { // makes terrain more smooth-looking
+  private void smooth(double amount) { // makes terrain more smooth-looking
     for (Tile til: map.list()) {
-      ArrayList<Tile> adjacent = map.adjacentTo(til);
       ArrayList<Tile> nearby = new ArrayList<Tile>(); // declares and initializes arraylists for adjacent tiles and tiles
-      for (Tile adj: adjacent)                        // that are adjacent to adjacent tiles
-      for (Tile nby: map.adjacentTo(adj))
+      for (Tile adj: til.adjacent)                        // that are adjacent to adjacent tiles
+      for (Tile nby: adj.adjacent)
         if (!nby.equals(til))
         nearby.add(nby);
-      for (Tile adj: adjacent)
+      for (Tile adj: til.adjacent)
         nearby.remove(adj);
       
       double calcAlt = 0; // the altitude the program calculates the point should be at based on adjacent and nearby tiles
-      for (Tile adj: adjacent)
-        calcAlt += 1.5*adj.altitude/adjacent.size();
+      for (Tile adj: til.adjacent)
+        calcAlt += 1.5*adj.altitude/til.adjacent.length;
       for (Tile nby: nearby)
         calcAlt -= .5*nby.altitude/nearby.size();
       til.temp1 = (int)(amount*calcAlt+(1-amount)*til.altitude); // averages calculated altitude with current altitude
@@ -285,7 +275,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  public int moisture(Tile til, double dir, double dist) { // determines how much moisture blows in from a given direction
+  private int moisture(Tile til, int dir, double dist) { // determines how much moisture blows in from a given direction
     if (dist <= 0)
       return 0;
     
@@ -295,7 +285,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
     else if (til.altitude < values[22])  here = (int)Math.sqrt(dist)>>3; // if low altitude, draw a little bit of moisture from it
     else here = 0; // if it is a mountain, no moisture
     
-    final Tile next = map.getTile(map.latByTil(til), map.lonByTil(til)+dir/map.getRadius());
+    final Tile next = map.getTileByIndex(til.lat, (til.lon+dir));
     
     if (next.altitude >= values[22]) // if there is a mountain range coming up
       return here;
@@ -304,7 +294,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  public void evaporateSeas() { // replaces small oceans with lakes
+  private void evaporateSeas() { // replaces small oceans with lakes
     for (Tile til: map.list())
       til.temp1 = 0; // temp1 is a flag for whether it has been checked yet
     
@@ -326,7 +316,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  public ArrayList<Tile> searchOcean(Tile start) { // flags all sub-sea level tiles connected to this and adds to this arraylist
+  private ArrayList<Tile> searchOcean(Tile start) { // flags all sub-sea level tiles connected to this and adds to this arraylist
     ArrayList<Tile> sea = new ArrayList<Tile>();
     ArrayList<Tile> que = new ArrayList<Tile>();
     que.add(start);
@@ -334,8 +324,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
     
     while (!que.isEmpty()) { // BFSs all connected tiles (I would totally DFS here, but the stack overflow limit is too low
       Tile til = que.remove(0);
-      final ArrayList<Tile> adjacentList = map.adjacentTo(til);
-      for (Tile adj: adjacentList) {
+      for (Tile adj: til.adjacent) {
         if (adj.temp1 == 0 && adj.waterLevel2() < 0) {
           adj.temp1 = 1;
           sea.add(til);
@@ -348,7 +337,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  public void rain() { // forms, rivers, lakes, valleys, and deltas
+  private void rain() { // forms, rivers, lakes, valleys, and deltas
     for (Tile til: map.list()) {		// start by assigning initial values
       if (til.biome == Tile.ocean)	til.temp1 = 1;
       else							til.temp1 = 0;	// temp1: whether this tile is 'wet'
@@ -358,7 +347,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
     ArrayList<Tile> coasts = new ArrayList<Tile>();	// then build coasts,
     for (Tile til: map.list()) {					// a randomly-ordered
       if (til.temp1 == 1) {							// running list of all
-        for (Tile adj: map.adjacentTo(til)) {		// wet tiles that are
+        for (Tile adj: til.adjacent) {		// wet tiles that are
           if (adj.temp1 == 0) {						// adjacent to dry ones
             coasts.add((int)(Math.random()*(coasts.size()+1)),til);
             break;
@@ -369,21 +358,27 @@ public final class Planet { // a subclass of Globe that handles all geological e
     while (!coasts.isEmpty()) {	// now keep iterating until there is no coast left
       Tile til = coasts.remove(coasts.size()-1-(int)(Math.pow(Math.random(), values[19])*coasts.size()));	// pick some random coast
       int highestAltitude = Integer.MIN_VALUE;
-      Tile highestNeighbor = null;
-      for (Tile adj: map.adjacentTo(til)) {	// look for the highest dry adjacent Tile
+      List<Tile> highestNeighbors = new ArrayList<Tile>();
+      
+      for (Tile adj: til.adjacent) {	// look for the highest dry adjacent Tile
         if (adj.temp1 == 0 && adj.waterLevel() > highestAltitude) {
-          highestAltitude = adj.altitude;
-          highestNeighbor = adj;
+          highestAltitude = adj.waterLevel();	// if this is a new record
+          highestNeighbors.clear();			// save it
+          highestNeighbors.add(adj);
+        }
+        else if (adj.temp1 == 0 && adj.waterLevel() == highestAltitude) {	// if this matches the record
+          highestNeighbors.add(adj);	// save it, too
         }
       }
       if (highestAltitude == Integer.MIN_VALUE)	// if you didn't find any dry adjacent tiles,
         continue;								// skip it
       else {
-        highestNeighbor.temp1 = 1;
-        highestNeighbor.temp2 = til.lat;	// otherwise route highest neighbor to us
-        highestNeighbor.temp3 = til.lon;
+        Tile watershed = highestNeighbors.get((int)(Math.random()*highestNeighbors.size()));
+        watershed.temp1 = 1;
+        watershed.temp2 = til.lat;	// otherwise route a random one of the highest neighbors to us
+        watershed.temp3 = til.lon;
         coasts.add(til);					// add til back to the coasts list
-        coasts.add(highestNeighbor);		// as well as the tile that was just made wet
+        coasts.add(watershed);		// as well as the tile that was just made wet
       }
     }
     
@@ -393,7 +388,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  public void runoff(Tile t) {	// creates the rivers that rain() sets up
+  private void runoff(Tile t) {	// creates the rivers that rain() sets up
     t.water ++;			// rain on it
     if (t.temp2 >= 0)	// if it has a destination set
       if (t.temp2 != t.lat || t.temp3 != t.lon)	// and that destination is not itself
@@ -401,18 +396,17 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  public void climateEnhance() {
+  private void climateEnhance() {
     for (int i = 0; i < values[12]; i ++) { // smooths out the climate
       for (Tile til: map.list()) {
-        ArrayList<Tile> set =map.adjacentTo(til);
         int rain = 0;
         int temp = 0;
-        for (Tile adj: set) {
+        for (Tile adj: til.adjacent) {
           rain += adj.rainfall;
           temp += adj.temperature;
         }
-        til.rainfall = (int)(.9*til.rainfall + .1*rain/set.size());
-        til.temperature = (int)(.9*til.temperature + .1*temp/set.size());
+        til.rainfall = (int)(.9*til.rainfall + .1*rain/til.adjacent.length);
+        til.temperature = (int)(.9*til.temperature + .1*temp/til.adjacent.length);
       }
     }
     
@@ -428,7 +422,7 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
-  public void biomeAssign() { // assigns each tile a biome based on rainfall, altitude, and temperature
+  private void biomeAssign() { // assigns each tile a biome based on rainfall, altitude, and temperature
     for (Tile til: map.list()) {
       if (til.altitude < 0) { // if below sea level
         if (til.temperature + 8*Math.sin(til.rainfall) < values[15]) { // if cold
@@ -473,12 +467,23 @@ public final class Planet { // a subclass of Globe that handles all geological e
   }
   
   
+  private Tile[] scrambled(Tile[] a) {	// randomizes the order of a and also returns it
+    for (int i = a.length; i > 0; i --) {	// for a bunch of is
+      int j = (int)(Math.random()*i);			// pick a random j
+      Tile temp = a[i-1];					// swap values at i-1 and j
+      a[i-1] = a[j];
+      a[j] = temp;
+    }
+    return a;
+  }
+  
+  
   public Surface getSurface() {
     return map; // returns the map of the surface for display purposes
   }
   
   
-  public final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
+  private final boolean randChance(int p) { // scales an int to a probability and returns true that probability of the time
     return Math.random() < 1 / (1+Math.pow(Math.E, -.1*p));
   }
 }

@@ -18,8 +18,8 @@ public class OneDim extends Map { // a one dimensional map that only sees the pr
   }
   
   
-  public java.awt.Point getCoords(int x, int y) { // updates the matrices
-    return sfc.tilByAngles(x*Math.PI/width(), 0);
+  public Tile getCoords(int x, int y) { // updates the matrices
+    return sfc.getTile(x*Math.PI/width(), 0);
   }
   
   

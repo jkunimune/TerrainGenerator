@@ -112,9 +112,7 @@ public final class World { // a subclass of Globe to handle all political elemen
     if (til.development > 0) // only run for unclaimed tiles
       return;
     
-    final ArrayList<Tile> adjacent =map.adjacentTo(til);
-    
-    for (Tile adj: adjacent) // for all adjacent tiles
+    for (Tile adj: til.adjacent) // for all adjacent tiles
       if (adj.owners.size() == 1 && adj.temp3 != -1) // if that one is settled and this is not and that one is not succumbing to the apocalypse
         if (adj.owners.get(0).wants(til)) // if they want this tile
           til.temp1 = civis.indexOf(adj.owners.get(0));
@@ -143,8 +141,6 @@ public final class World { // a subclass of Globe to handle all political elemen
     if (til.development == 0 || til.owners.get(0).adversaries.size() == 0) // only run for tiles in civis at war
       return;
     
-    final ArrayList<Tile> adjacentList =map.adjacentTo(til);
-    
     if (til.owners.size() == 1) { // if it is not disputed
       for (Civi enemy: til.owners.get(0).adversaries)
         if (enemy.canNuke(til)) { // it might get nuked
@@ -153,7 +149,7 @@ public final class World { // a subclass of Globe to handle all political elemen
         }
       
       if (til.temp1 > -2) { // -2 means it has already resolved another tile
-        for (Tile adj: adjacentList) {
+        for (Tile adj: til.adjacent) {
           if (adj.owners.size() > 1 && adj.owners.contains(til.owners.get(0))) { // if it is adjacent to a disputed tile
             for (Civi civ: adj.owners) {
               if (!civ.equals(til.owners.get(0))) {
@@ -170,7 +166,7 @@ public final class World { // a subclass of Globe to handle all political elemen
     }
     else { // if it is disputed
       if (til.temp2 > -2) {
-        for (Tile adj: adjacentList) {
+        for (Tile adj: til.adjacent) {
           if (adj.owners.size() == 1 && til.owners.contains(adj.owners.get(0))) {
             for (Civi civ: til.owners) {
               if (!civ.equals(adj.owners.get(0))) {
@@ -215,7 +211,7 @@ public final class World { // a subclass of Globe to handle all political elemen
       for (int i = 0; i < 64; i ++) { // gives rebels a head start
         for (int j = 0; j < rebels.land.size(); j ++) {
           final Tile til = rebels.land.get(j);
-          for (Tile adj:map.adjacentTo(til))
+          for (Tile adj: til.adjacent)
             if (adj.owners.size() == 1 && adj.owners.get(0).equals(empire)) // imperial land can be invaded by rebel land
               if (rebels.canInvade(adj))
                 rebels.takes(adj);
@@ -232,7 +228,7 @@ public final class World { // a subclass of Globe to handle all political elemen
         for (int i = 0; i < 128; i ++) { // give rebels more disputed territory if they have not won yet
           for (int j = 0; j < rebels.land.size(); j ++) {
             final Tile til = rebels.land.get(j);
-            for (Tile adj:map.adjacentTo(til))
+            for (Tile adj: til.adjacent)
               if (adj.owners.size() == 1 && adj.owners.get(0).equals(empire)) // imperial land can be invaded by rebel land
                 if (rebels.canInvade(adj))
                   rebels.takes(adj);
@@ -282,8 +278,7 @@ public final class World { // a subclass of Globe to handle all political elemen
     for (int i = 0; i < til.diseases.size(); i ++) {
       switch (til.diseases.get(i)) {
         case sterile: // infect sterile tiles
-          final ArrayList<Tile> adjacentList =map.adjacentTo(til);
-          for (Tile adj: adjacentList)
+          for (Tile adj: til.adjacent)
             if (adj.diseases.get(i) != Plague.sterile)
               if (randChance((til.development<<3)-40))
                 til.infect(i);
@@ -315,7 +310,7 @@ public final class World { // a subclass of Globe to handle all political elemen
     for (int i = 0; i < 64; i ++) { // calls a random region between the empires into dispute
       for (int j = 0; j < agg.land.size(); j ++) {
         final Tile til = agg.land.get(j);
-        for (Tile adj:map.adjacentTo(til))
+        for (Tile adj:til.adjacent)
           if (adj.owners.size() == 1 && adj.owners.get(0).equals(vic)) // land owned only by the victim can be disputed by the aggressor
             if ((adj.isWet() && randChance(-10)) || agg.canInvade(adj)) // naval territory is disputed very quickly
               agg.takes(adj);
@@ -356,8 +351,7 @@ public final class World { // a subclass of Globe to handle all political elemen
   
   
   public final Tile borderAt(Tile til) { // decides if there is a international border here
-    final ArrayList<Tile> adjacentList =map.adjacentTo(til);
-    for (Tile adj: adjacentList)
+    for (Tile adj: til.adjacent)
       if (adj.owners.size() == 1 && !adj.owners.equals(til.owners))
         return adj;
     return new Tile(-1, -1);
@@ -368,8 +362,7 @@ public final class World { // a subclass of Globe to handle all political elemen
     if (til.altitude < 0 || til.biome == Tile.freshwater || til.biome == Tile.tundra || til.radioactive) // civis may not start on ocean or river or in tundra
       return false;
     
-    ArrayList<Tile> adjacent =map.adjacentTo(til);
-    for (Tile adj: adjacent)
+    for (Tile adj: til.adjacent)
       if (adj.altitude < 0 || adj.biome == Tile.freshwater) // civis spawn a lot near rivers and oceans
         return randChance(-115);
     
@@ -391,9 +384,8 @@ public final class World { // a subclass of Globe to handle all political elemen
   public final void nuke(Tile t) { // shoots a nuclear warhead at the specified Tile
     //boom.play(); // BOOM
     t.getsNuked();
-    final ArrayList<Tile> adjacentList =map.adjacentTo(t);
-    for (Tile adj: adjacentList) // spews radiation onto this and all surrounding tiles
-      for (Tile ner: map.adjacentTo(adj))
+    for (Tile adj: t.adjacent) // spews radiation onto this and all surrounding tiles
+      for (Tile ner: adj.adjacent)
         if (randChance(0))
           ner.getsNuked();
   }

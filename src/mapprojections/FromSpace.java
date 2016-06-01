@@ -57,7 +57,7 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
     for (int x = 0; x < width(); x ++) {
       for (int y = 0; y < height(); y ++) {
         if (lats[y][x] != -1) {
-          lons[y][x] = getCoords(x,y).x;
+          lons[y][x] = getCoords(x,y).lon;
           drawPx(x, y, getColorBy(theme, x, y));
         }
       }
@@ -96,20 +96,20 @@ public class FromSpace extends Map { // like hemispherical, but it spins!
   }
   
   
-  public final java.awt.Point getCoords(int x, int y) {
+  public final Tile getCoords(int x, int y) {
     if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < radius*radius)
-      return sfc.tilByAngles(Math.acos(1-(double)y/radius),
+      return sfc.getTile(Math.acos(1-(double)y/radius),
                              longitudes[y][x] + camAngle);
     
     else if ((x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < radius*radius)
-      return sfc.tilByAngles(Math.acos(1-(double)y/radius),
+      return sfc.getTile(Math.acos(1-(double)y/radius),
                           longitudes[y][x] + camAngle);
     
     else if ((x-radius)*(x-radius) + (y-radius)*(y-radius) < (3+radius)*(3+radius) ||
              (x-3*radius)*(x-3*radius) + (y-radius)*(y-radius) < (3+radius)*(3+radius)) // if it is on the edge of a circle
-      return new java.awt.Point(8355839, -1);
+      return new Tile(8355839, -1);
     
     else
-      return new java.awt.Point(0, -1);
+      return new Tile(0, -1);
   }
 }

@@ -90,7 +90,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   private int tipX, tipY, tipW, tipH; // TileTip coordinates and dimensions
   private BufferedImage img;
   public int[][] lats, lons; // remembers which tile goes to which pixels (remember to initialize in subclass constructor)
-  public Surface sfc;        // if a lat is -1, the lon is the rgb value of the color to put there
+  public Surface sfc;        // if a lon is -1, the lat is the rgb value of the color to put there
   
   
   
@@ -129,15 +129,15 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   
   
-  public abstract Point getCoords(int x, int y); // the tile coordinates for any given pixel
+  public abstract Tile getCoords(int x, int y); // the tile for any given pixel
   
   
   public final void finishSuper() { // a method stupid Java forces me to put in because super must be the first thing in the constructor because the stupid constructor says so and I can't just put this dang thing in the constructor.
     for (int x = 0; x < lats[0].length; x ++) { // and i cant use w or h or g because, again, stupid Java
       for (int y = 0; y < lats.length; y ++) {
-        final Point pt = getCoords(x,y);
-        lats[y][x] = pt.y;
-        lons[y][x] = pt.x;
+        final Tile tl = getCoords(x,y);
+        lats[y][x] = tl.lat;
+        lons[y][x] = tl.lon;
       }
     }
     
@@ -154,7 +154,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   
   
   public void showTileTip(int x, int y) { // displays the "TileTip" for a point on the screen
-    if (lats[y][x] == -1) // if no tile here
+    if (lons[y][x] == -1) // if no tile here
       return; // do nothing
     
     final String[] tip = sfc.getTileByIndex(lats[y][x], lons[y][x]).getTip();
@@ -168,7 +168,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     for (int i = -3; i < tipW + 3 && tipX+i < width(); i ++) { // draw a black rectangle around the words
       for (int j = -3; j < tipH + 3 && tipY-j >= 0; j ++) {
         drawPx(tipX+i, tipY-j, Color.black);
-        lats[tipY-j][tipX+i] = -1;
+        lons[tipY-j][tipX+i] = -1;
       }
     }
     
@@ -186,9 +186,9 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
     
     for (int i = -3; i < tipW + 3 && tipX+i < width(); i ++) { // draw a colorful rectangle around the words
       for (int j = -3; j < tipH + 3 && tipY-j >= 0; j ++) {
-        final int lat = getCoords(tipX+i, tipY-j).y;
-        if (lat != -1)
-          lats[tipY-j][tipX+i] = lat;
+        final int lon = getCoords(tipX+i, tipY-j).lon;
+        if (lon != -1)
+          lons[tipY-j][tipX+i] = lon;
         else
           drawPx(tipX+i, tipY-j, new Color(lons[tipY-j][tipX+i]>>16, lons[tipY-j][tipX+i]%65536>>8, lons[tipY-j][tipX+i]%256));
       }
@@ -201,8 +201,8 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   public final void initialPaint() {
     for (int x = 0; x < width(); x ++) // draws background colors
       for (int y = 0; y < height(); y ++)
-        if (lats[y][x] == -1)
-          drawPx(x, y, new Color(lons[y][x]>>16, lons[y][x]%65536>>8, lons[y][x]%256)); // draw the color found in the rgb value
+        if (lons[y][x] == -1)	// a lon of -1 means solid color
+          drawPx(x, y, new Color(lats[y][x]>>16, lats[y][x]%65536>>8, lats[y][x]%256)); // draw the color found in the rgb value
     show();
   }
   
@@ -210,7 +210,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
   public void display(ColS theme) { // displays the map
     for (int x = 0; x < width(); x ++)
       for (int y = 0; y < height(); y ++)
-        if (lats[y][x] != -1)
+        if (lons[y][x] != -1)
           drawPx(x, y, getColorBy(theme, x, y));
     show();
   }
@@ -420,7 +420,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
             if (y+i >= 0 && y+i < lats.length) // if in bounds
               for (int j = -3; j <= 3; j ++)
                 if (i*i + j*j <= 9) // if in circle
-                  if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
+                  if (x+j >=0 && x+j < lats[0].length && lons[y+i][x+j] != -1) // if in bounds
                     if (!til.owners.equals(sfc.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) ||
                         sfc.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) // if it is near a tile owned by someone else or near ocean
                       return civ.emblem();
@@ -459,7 +459,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
             if (y+i >= 0 && y+i < lats.length) // if in bounds
               for (int j = -3; j <= 3; j ++)
                 if (i*i + j*j <= 9) // if in circle
-                  if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
+                  if (x+j >=0 && x+j < lats[0].length && lons[y+i][x+j] != -1) // if in bounds
                     if (!til.owners.equals(sfc.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners)) // if it is near a tile owned by someone else
                       return civ.emblem();
           
@@ -503,7 +503,7 @@ public abstract class Map extends JPanel { // a class to manage the graphic elem
             if (y+i >= 0 && y+i < lats.length) // if in bounds
               for (int j = -3; j <= 3; j ++)
                 if (i*i + j*j <= 9) // if in circle
-                  if (x+j >=0 && x+j < lats[0].length && lats[y+i][x+j] != -1) // if in bounds
+                  if (x+j >=0 && x+j < lats[0].length && lons[y+i][x+j] != -1) // if in bounds and there is a tile
                     if (!til.owners.equals(sfc.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).owners) || // if it is near a tile owned by someone else
                         ((sfc.getTileByIndex(lats[y+i][x+j], lons[y+i][x+j]).altitude < 0) && til.altitude >= 0)) // or a coast
                       return civ.emblem();

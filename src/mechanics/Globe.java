@@ -1,5 +1,4 @@
 package mechanics;
-import java.awt.*;
 import java.util.*;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -14,7 +13,7 @@ public class Globe implements Surface{ // a spherical surface
   
   public Globe(int r) {
     radius = r;
-    map = new Tile[(int)(r * Math.PI)][]; // the map is a matrix of tiles with varying width
+    map = new Tile[(int)(radius * Math.PI * Math.sqrt(4/3.0))][]; // the map is a matrix of tiles with varying width
     
     map[0] = new Tile[1]; // the top and bottom are of width 1 (the poles)
     map[map.length-1] = new Tile[1];
@@ -31,6 +30,10 @@ public class Globe implements Surface{ // a spherical surface
         map[lat][lon] = new Tile(lat, lon);
       }
     }
+    
+    for (Tile[] row: map)
+      for (Tile til: row)
+        til.adjacent = adjacentTo(til);	// tells each tile its neighbors
 // FOR TESTING
 //    for (Tile[] row: map) {
 //      for (Tile til: row)
@@ -42,7 +45,7 @@ public class Globe implements Surface{ // a spherical surface
   
   public Globe(Globe source) { // copies a preexisting globe
     radius = source.getRadius();
-    map = new Tile[(int)(radius * Math.PI)][]; // the map is a matrix of tiles with varying width
+    map = new Tile[(int)(radius * Math.PI * Math.sqrt(4/3.0))][]; // the map is a matrix of tiles with varying width
     
     map[0] = new Tile[1]; // the top and bottom are of width 1 (the poles)
     map[map.length-1] = new Tile[1];
@@ -75,8 +78,7 @@ public class Globe implements Surface{ // a spherical surface
   @Override
   public final Tile getTile(double lat, double lon) { // returns a tile at a given coordinate
     if (lat < 0 || lat > Math.PI) {
-      System.err.println("Error accessing "+lat+","+lon);
-      return new Tile(-1, -1);
+      throw new IndexOutOfBoundsException("Error accessing "+lat+","+lon);
     }
     if (lat == Math.PI)
       return map[map.length-1][0];
@@ -105,36 +107,14 @@ public class Globe implements Surface{ // a spherical surface
   
   
   @Override
-  public final Point tilByAngles(double lattitude, double longitude) { // converts a lattitude and longitude to indicies
-    if (lattitude < 0 || lattitude > Math.PI) { // extraneous lattitudes will not do
-      System.err.println("Error accessing "+lattitude+","+longitude);
-      return new Point(-1, -1);
-    }
-    
-    longitude %= 2*Math.PI; // puts longitude into a usable range
-    if (longitude < 0)
-      longitude += 2*Math.PI;
-    
-    int y = (int)(lattitude*map.length/Math.PI);
-    if (y == map.length) // forces pixels looking for pi to look at the southmost tile
-      y --;
-    int x = (int)(longitude*map[y].length/(2*Math.PI));
-    if (x >= map[y].length)
-      x = map[y].length-1; // in the event of unfortunate math screw-ups on java's part, look to the last tile
-    
-    return new Point(x, y);
+  public final double latByTil(Tile til) {	// gets coordinates from tiles
+    return (til.lat + .5)*Math.PI/map.length;
   }
   
   
   @Override
-  public final double latByTil(Tile til) {
-    return (til.lat+.5)/radius;
-  }
-  
-  
-  @Override
-  public final double lonByTil(Tile til) {
-    return (til.lon+.5)/map[til.lat].length*(2*Math.PI);
+  public final double lonByTil(Tile til) {	// gets coordinates from tiles
+    return (til.lon + .5 + (til.lat%2)/2.0)/map[til.lat].length*(2*Math.PI);
   }
   
   
@@ -149,31 +129,26 @@ public class Globe implements Surface{ // a spherical surface
   
   
   @Override
-  public final ArrayList<Tile> adjacentTo(Tile tile) { // returns an arrayList of tiles adjacent to a given tile
+  public final Tile[] adjacentTo(Tile tile) { // returns an array of tiles adjacent to a given tile
+    /*WARNING: It is recommended that the adjacent instance variable of Tile be used rather than this method in loops*/
     if (tile.lat == 0)
-      return new ArrayList<Tile>(Arrays.asList(map[1])); // returns a whole row if it is a pole
+      return map[1]; // returns a whole row if it is a pole
     if (tile.lat == map.length-1)
-      return new ArrayList<Tile>(Arrays.asList(map[map.length-2]));
+      return map[map.length-2];
     
     ArrayList<Tile> output = new ArrayList<Tile>(); // initializes the output
     output.add(map [tile.lat] [(tile.lon+1)%map[tile.lat].length]); // adds the tiles laterally adjacent
     output.add(map [tile.lat] [(tile.lon-1+map[tile.lat].length)%map[tile.lat].length]); // does a bunch of complex addition and moduli to keep it in bounds
-    if (tile.lat < map.length/2) { // behaves differently from here for the northern and southern hemispheres
-      output.add(map [tile.lat-1] [tile.lon*map[tile.lat-1].length/map[tile.lat].length]); // adds the one north of it
-      final int min = tile.lon*map[tile.lat+1].length/map[tile.lat].length;
-      final int max = (tile.lon+1)*map[tile.lat+1].length/map[tile.lat].length;
-      for (int i = min; i < max; i ++) // adds all the ones south of it
-        output.add(map [tile.lat+1] [i]);
-    }
-    else {
-      output.add(map[tile.lat+1][tile.lon*map[tile.lat+1].length/map[tile.lat].length]); // adds the one south of it
-      final int min = tile.lon*map[tile.lat-1].length/map[tile.lat].length;
-      final int max = (tile.lon+1)*map[tile.lat-1].length/map[tile.lat].length;
-      for (int i = min; i < max; i ++) // adds all the ones north of it
-        output.add(map [tile.lat-1] [i]);
-    }
+    final double westBound = (double)(tile.lon /*+ tile.lat%2/2.0*/)/map[tile.lat].length + 1;	// determines the bounds of the tiles
+    final double eastBound = (double)(tile.lon+1 /*+ tile.lat%2/2.0*/)/map[tile.lat].length + 1;
+    for (int i = (int)Math.floor(Math.round(westBound*map[tile.lat-1].length*100000)/100000.0 /*- (tile.lat-1)%2/2.0*/);
+    		i <= (int)(Math.ceil(Math.round(eastBound*map[tile.lat-1].length*100000)/100000.0)-1); i ++)		// very complicated for loop to find adjacent tiles in other rows
+      output.add(map[tile.lat-1][i%map[tile.lat-1].length]);
+    for (int i = (int)Math.floor(Math.round(westBound*map[tile.lat+1].length*100000)/100000.0 /*- (tile.lat+1)%2/2.0*/);
+    		i <= (int)(Math.ceil(Math.round(eastBound*map[tile.lat+1].length*100000)/100000.0)-1); i ++)
+      output.add(map[tile.lat+1][i%map[tile.lat+1].length]);
     
-    return output;
+    return output.toArray(new Tile[output.size()]);
   }
   
   
@@ -216,5 +191,23 @@ public class Globe implements Surface{ // a spherical surface
   @Override
   public void meteor(Tile t) {
 	  meteorTarget = t;
+  }
+  
+  
+  public void verify() {	// checks to make sure adjacency is always a two-way street
+    for (Tile til: this.list()) {
+      for (Tile adj: adjacentTo(til)) {
+        if (!Arrays.asList(adj.adjacent).contains(til)) {
+          System.err.println("BAAAAAH! Why aren't "+til+" (out of "+map[til.lat].length+") and "+adj+" (out of "+map[adj.lat].length+") adjacent?!");
+        }
+      }
+    }
+    System.out.println("Verification Complete!");
+  }
+  
+  
+  public static void main(String[] args) {	// just checks a few things
+    Globe g = new Globe(100);
+    g.verify();
   }
 }

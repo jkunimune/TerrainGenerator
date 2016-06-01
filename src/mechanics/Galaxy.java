@@ -134,7 +134,7 @@ public class Galaxy {
     final double delX = .01;
     
     final Tile til = map.getTile(lat, lon);
-    ArrayList<Tile> list = map.adjacentTo(til);
+    List<Tile> list = Arrays.asList(map.adjacentTo(til));
     list.add(til);
     for (Tile adj: list)
       if (Math.random() < thickness*(1-lat/Math.PI))

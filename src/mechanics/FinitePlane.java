@@ -1,6 +1,5 @@
 package mechanics;
 
-import java.awt.Point;
 import java.util.ArrayList;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -18,6 +17,9 @@ public class FinitePlane implements Surface {
 			for (int x = 0; x < w; x ++)
 				matrix[y][x] = new Tile(y,x);
 		}
+		for (Tile til: list())
+			til.adjacent = adjacentTo(til);
+		
 		width = w;
 		height = h;
 		meteorTarget = null;
@@ -35,17 +37,8 @@ public class FinitePlane implements Surface {
 	}
 	
 	@Override
-	public ArrayList<Tile> adjacentTo(Tile t) {
+	public Tile[] adjacentTo(Tile t) {
 		ArrayList<Tile> output = new ArrayList<Tile>(4);
-		/*for (int dx = -1; dx <= 1; dx ++) {
-			for (int dy = -1; dy <= 1; dy ++) {
-				if (dx != 0 || dy != 0) {
-					try {
-						output.add(matrix[t.lat+dy][t.lon+dx]);
-					} catch (IndexOutOfBoundsException e) {}
-				}
-			}
-		}*/
 		try {
 			output.add(matrix[t.lat+1][t.lon]);
 		} catch (IndexOutOfBoundsException e) {}
@@ -58,7 +51,7 @@ public class FinitePlane implements Surface {
 		try {
 			output.add(matrix[t.lat][t.lon-1]);
 		} catch (IndexOutOfBoundsException e) {}
-		return output;
+		return output.toArray(new Tile[output.size()]);
 	}
 
 	@Override
@@ -84,11 +77,6 @@ public class FinitePlane implements Surface {
 	@Override
 	public Tile getTileByIndex(int lat, int lon) {	// gives indices and gets a tile
 		return matrix[lat][lon];
-	}
-
-	@Override
-	public Point tilByAngles(double lat, double lon) {
-		return new Point((int)(lon*width/(2*Math.PI)),(int)(lat*height/(Math.PI)));
 	}
 
 	@Override

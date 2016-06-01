@@ -1,6 +1,5 @@
 package mechanics;
 import java.util.*;
-import java.awt.*;
 import org.apache.commons.lang3.ArrayUtils;
 
 
@@ -17,8 +16,11 @@ public class Disc implements Surface { // a thin three-dimensional disc
     map = new Tile[radius<<1][radius<<1]; // the map is a plane of tiles one-eight as deep as it is wide
     
     for (int lat = 0; lat < map.length; lat ++)
-      for (int lon = 0; lon < map[lat].length; lon ++)
+      for (int lon = 0; lon < map[lat].length; lon ++)	// initializes all arrays and tiles
         map[lat][lon] = new Tile(lat, lon);
+    for (Tile til: this.list())
+      til.adjacent = adjacentTo(til);	// now that they are initialized, fill in their adjacent arrays
+    
     meteorTarget = null;
   }
   
@@ -63,18 +65,6 @@ public class Disc implements Surface { // a thin three-dimensional disc
   }
   
   
-  @Override
-  public final Point tilByAngles(double lattitude, double longitude) { // converts a lattitude and longitude to indicies
-    if (lattitude < 0) {
-      System.out.println("Error accessing "+lattitude+","+longitude);
-      return new Point(-1, -1);
-    }
-    
-    return new Point((int)(lattitude*radius/Math.PI*Math.sin(longitude)+radius),
-                     (int)(lattitude*radius/Math.PI*Math.cos(longitude)+radius));
-  }
-  
-  
   public final Tile[][] getTileMatrix() {
     return map;
   }
@@ -86,7 +76,7 @@ public class Disc implements Surface { // a thin three-dimensional disc
   
   
   @Override
-  public final ArrayList<Tile> adjacentTo(Tile tile) { // returns an arrayList of tiles adjacent to a given tile
+  public final Tile[] adjacentTo(Tile tile) { // returns an arrayList of tiles adjacent to a given tile
     int x = tile.lon;
     int y = tile.lat;
     ArrayList<Tile> output = new ArrayList<Tile>(6); // initializes the output
@@ -97,7 +87,7 @@ public class Disc implements Surface { // a thin three-dimensional disc
           if (x+dx>=0 && x+dx<map[0].length && y+dy>=0 && y+dy<map.length)
             output.add(map[y+dy][x+dx]);
     
-    return output;
+    return output.toArray(new Tile[output.size()]);
   }
   
   
