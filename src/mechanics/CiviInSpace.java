@@ -18,14 +18,14 @@ public final class CiviInSpace { // the driver for the interstellar version of C
     loadSound();
     
     Galaxy protoEarth = new Galaxy(200);
-    Map topographical = new Polar(protoEarth.getSurface(), 500, 500);
+    Map topographical = new Polar(protoEarth.getSurface(), 600, 600);
     
     intro.play();
     protoEarth.generate(topographical);
     delay(3000);
     
     World earth = new World(protoEarth.getSurface());
-    Map political = new Polar(earth.getSurface(), 500, 500);
+    Map political = new Polar(earth.getSurface(), 600, 600);
     
     music.loop();
     

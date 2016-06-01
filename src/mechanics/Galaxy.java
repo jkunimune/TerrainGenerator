@@ -1,5 +1,4 @@
 package mechanics;
-import java.util.*;
 
 
 
@@ -134,9 +133,9 @@ public class Galaxy {
     final double delX = .01;
     
     final Tile til = map.getTile(lat, lon);
-    List<Tile> list = Arrays.asList(map.adjacentTo(til));
-    list.add(til);
-    for (Tile adj: list)
+    if (Math.random() < thickness*(1-lat/Math.PI))
+      til.altitude += Math.random()*32;
+    for (Tile adj: til.adjacent)
       if (Math.random() < thickness*(1-lat/Math.PI))
         adj.altitude += Math.random()*32;
     
