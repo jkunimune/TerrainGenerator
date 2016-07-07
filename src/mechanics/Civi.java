@@ -424,15 +424,15 @@ public class Civi {
         if (j == 0 || output.charAt(j-1) == ' ' || output.charAt(j-1) == '-' || output.charAt(j-1) == '\'')
           output = output.substring(0,j) + output.substring(j, j+1).toUpperCase() + output.substring(j+1);
       
-      switch ((int)(Math.pow(Math.random(),2.2)*4)) { // puts an ending onto it
+      switch ((int)(Math.pow(Math.random(),4)*4)) { // puts an ending onto it
         case 1:
           output += " City";
           break;
         case 2:
-          output += "town";
+        	output = "The City of " + output + "town";
           break;
         case 3:
-          output += "ville";
+          output = "The City of " + output + "ville";
           break;
         default:
           output = "The City of " + output;
