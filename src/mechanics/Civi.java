@@ -385,7 +385,7 @@ public class Civi {
     for (int i = (int)(Math.pow(Math.random(),3)*3)*4+2; i >= 0; i --) // i decrements from a random number whose %4 is 2
       output += alphabet[i%4][(int)(Math.random()*alphabet[i%4].length)]; // strings together a bunch of random syllables
     
-    switch ((int)(Math.pow(Math.random(),1.8)*5)) { // puts an ending onto it
+    switch ((int)(Math.pow(Math.random(),2.0)*5)) { // puts an ending onto it
       case 1:
         output += alphabet[3][(int)(Math.random()*alphabet[3].length)] + "an";
         break;
@@ -398,7 +398,7 @@ public class Civi {
         output += "land";
         break;
       default:
-        output += alphabet[3][(int)(Math.random()*alphabet[3].length)] + "ia";
+        output += alphabet[2][(int)(Math.random()*alphabet[2].length)] + "ia";
         break;
     }
     
@@ -429,7 +429,7 @@ public class Civi {
           output += " City";
           break;
         case 2:
-        	output = "The City of " + output + "town";
+        	output = "The City of " + output + "ton";
           break;
         case 3:
           output = "The City of " + output + "ville";
