@@ -35,7 +35,7 @@ import model.Tile;
 public class TerrainGenerator {
 	
 	public static final void main(String[] args) {
-		Surface earth = new Globe(3);
+		Surface earth = new Globe(4);
 		System.out.print("A = [");
 		for (Tile t: earth)
 			System.out.println(t.getLon()+" "+t.getLat()+";");

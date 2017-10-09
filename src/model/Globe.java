@@ -25,9 +25,11 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 /**
@@ -70,11 +72,12 @@ public class Globe implements Surface {
 		
 		for (int i = 0; i < order; i ++) { //now, iterate the geodesic process
 			List<Tile[]> faces2 = new LinkedList<Tile[]>();
+			Map<CoordKey, Tile> newVertices = new HashMap<CoordKey, Tile>();
 			
 			for (Tile[] tri: faces) { //for each existing triangle
 				Tile[] mid = new Tile[3];
 				for (int j = 0; j < 3; j ++)
-					mid[j] = tileBetween(tri[j], tri[(j+1)%3]); //generate the midpoints
+					mid[j] = tileBetween(tri[j], tri[(j+1)%3], newVertices); //generate the midpoints
 				for (int j = 0; j < 3; j ++)
 					faces2.add(new Tile[] { mid[j], tri[(j+1)%3], mid[(j+1)%3] }); //and generate new triangles
 				faces2.add(mid);
@@ -86,15 +89,6 @@ public class Globe implements Surface {
 		for (Tile[] face: faces)
 			for (int i = 0; i < 3; i ++)
 				face[i].getAdjacent().add(face[(i+1)%3]);
-	}
-	
-	
-	
-	private Tile tileBetween(Tile t0, Tile t1) {
-		final double x = Math.cos(t0.getLat())*Math.cos(t0.getLon()) + Math.cos(t1.getLat())*Math.cos(t1.getLon());
-		final double y = Math.cos(t0.getLat())*Math.sin(t0.getLon()) + Math.cos(t1.getLat())*Math.sin(t1.getLon());
-		final double z = Math.sin(t0.getLat()) + Math.sin(t1.getLat());
-		return new Tile(Math.atan2(z, Math.hypot(x, y)), Math.atan2(y, x), t0);
 	}
 	
 	
@@ -117,4 +111,42 @@ public class Globe implements Surface {
 		};
 	}
 	
+	
+	private Tile tileBetween(Tile t0, Tile t1, Map<CoordKey, Tile> existing) {
+		final double x = Math.cos(t0.getLat())*Math.cos(t0.getLon()) + Math.cos(t1.getLat())*Math.cos(t1.getLon());
+		final double y = Math.cos(t0.getLat())*Math.sin(t0.getLon()) + Math.cos(t1.getLat())*Math.sin(t1.getLon());
+		final double z = Math.sin(t0.getLat()) + Math.sin(t1.getLat());
+		final CoordKey key = new CoordKey(Math.atan2(z, Math.hypot(x, y)), Math.atan2(y, x));
+		if (existing.containsKey(key)) {
+			return existing.get(key);
+		}
+		else {
+			final Tile midpoint = new Tile(key.d1, key.d2, t0); //TODO:If it becomes an issue, I might use whichever of t0 and t1 has fewer children
+			existing.put(key, midpoint);
+			return midpoint;
+		}
+	}
+}
+
+
+
+class CoordKey { //a simple class for keeping track of my things
+	public double d1, d2;
+	
+	public CoordKey(double d1, double d2) {
+		this.d1 = d1;
+		this.d2 = d2;
+	}
+	
+	@Override
+	public int hashCode() {
+		return (int)((this.d1/Math.PI+1)*32768) | (int)((this.d2/Math.PI+1)*32768)<<16;
+	}
+	
+	@Override
+	public boolean equals(Object that) {
+		if (!(that instanceof CoordKey))
+			return false;
+		return ((CoordKey)that).d1 == this.d1 && ((CoordKey)that).d2 == this.d2;
+	}
 }
