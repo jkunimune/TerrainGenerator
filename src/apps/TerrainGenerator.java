@@ -23,23 +23,34 @@
  */
 package apps;
 
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import model.Globe;
 import model.Surface;
 import model.Tile;
+import view.Cartogram;
 
 /**
  * A script that simply generates some real nice terrain
  * 
  * @author jkunimune
  */
-public class TerrainGenerator {
+public class TerrainGenerator extends Application {
 	
 	public static final void main(String[] args) {
-		Surface earth = new Globe(4);
-		System.out.print("A = [");
-		for (Tile t: earth)
-			System.out.println(t.getLon()+" "+t.getLat()+";");
-		System.out.println("];");
+		launch(args);
 	}
 	
+	
+	public void start(Stage rootStage) throws Exception {
+		Surface earth = new Globe(4);
+		Cartogram map = new Cartogram();
+		
+		rootStage.setTitle("Terrain Generator");
+		rootStage.setScene(new Scene(map));
+		rootStage.show();
+		
+		map.draw(earth);
+	}
 }
